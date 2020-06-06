@@ -1,6 +1,8 @@
 DBAccesser/UserChat/InsertUserChat.class
 Controller/CreateMessage.class
 Entity/UserChat.class
+Controller/GetMessage.class
+Controller/GetChat.class
 Exceptions/ChatAlreadyExistsException.class
 ExceptionHandler/ExceptionHandlerAdvice.class
 DBAccesser/UserChat/QueryUserChat.class
@@ -11,6 +13,7 @@ Controller/CreateUser.class
 Exceptions/UsernameAlreadyExistsException.class
 Controller/ListMessages.class
 Controller/ListChats.class
+Controller/GetUser.class
 Exceptions/UsernameDoesNotExistException.class
 Main/MainClass.class
 Exceptions/MessageIDDoesNotExistException.class
