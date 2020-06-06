@@ -6,11 +6,13 @@ import Entity.Message;
 import DBAccesser.User.QueryUser;
 import DBAccesser.Chat.QueryChat;
 import DBAccesser.Message.QueryMessage;
+import DBAccesser.UserChat.QueryUserChat;
 import DBAccesser.Message.InsertMessage;
 import DBAccesser.Chat.InsertChat;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotExistException;
+import Exceptions.UserChatIDDoesNotExistException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -35,6 +37,9 @@ public class CreateMessage {
     QueryMessage queryMessageHelper;
 
     @Autowired
+    QueryUserChat queryUserChatHelper;
+
+    @Autowired
     InsertMessage insertMessageHelper;
 
     @Autowired
@@ -57,6 +62,11 @@ public class CreateMessage {
         //check if the passed chatID is valid
         if (queryChatHelper.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
             throw new ChatIDDoesNotExistException(path);
+        }
+
+        //check if user is part of chat
+        if (queryUserChatHelper.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+            throw new UserChatIDDoesNotExistException(path);
         }
         
         Message newMessage = new Message(Long.parseLong(chatIDString), Long.parseLong(userIDString), requestBody.get("contentType"), requestBody.get("textContent"));
@@ -105,21 +115,27 @@ public class CreateMessage {
         if (queryChatHelper.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
             throw new ChatIDDoesNotExistException(path);
         }
+
+        //check if user is part of chat
+        if (queryUserChatHelper.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+            throw new UserChatIDDoesNotExistException(path);
+        }
         
+        //check if the passed messageID is valid
         if (queryMessageHelper.checkIfMessageIDExists(Long.parseLong(messageIDString)) == false) {
             throw new MessageIDDoesNotExistException(path);
-        } else {
-            Message message = queryMessageHelper.getMessage(Long.parseLong(messageIDString));
-            responseBody = new LinkedHashMap<String, Object>();
-            responseBody.put("MessageID", message.getMessageID());
-            responseBody.put("ChatID", message.getChatID());
-            responseBody.put("SenderID", message.getSenderID());
-            responseBody.put("ContentType", message.getContentType());
-            responseBody.put("TextContent", message.getTextContent());
-            responseBody.put("SentTS", message.getSentTS());
-            responseBody.put("ReceivedTS", message.getReceivedTS());
-            responseBody.put("CreationTS", message.getCreationTS());
-        }
+        } 
+
+        Message message = queryMessageHelper.getMessage(Long.parseLong(messageIDString));
+        responseBody = new LinkedHashMap<String, Object>();
+        responseBody.put("MessageID", message.getMessageID());
+        responseBody.put("ChatID", message.getChatID());
+        responseBody.put("SenderID", message.getSenderID());
+        responseBody.put("ContentType", message.getContentType());
+        responseBody.put("TextContent", message.getTextContent());
+        responseBody.put("SentTS", message.getSentTS());
+        responseBody.put("ReceivedTS", message.getReceivedTS());
+        responseBody.put("CreationTS", message.getCreationTS());
 
         return responseBody;
         
