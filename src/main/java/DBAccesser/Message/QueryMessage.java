@@ -1,6 +1,6 @@
 package DBAccesser.Message;
 
-import Entity.Class.Message;
+import Entity.Message;
 
 import java.sql.Timestamp;
 import org.springframework.stereotype.Component;

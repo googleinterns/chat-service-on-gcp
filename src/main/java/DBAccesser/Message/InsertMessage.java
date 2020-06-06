@@ -1,6 +1,6 @@
 package DBAccesser.Message;
 
-import Entity.Class.Message;
+import Entity.Message;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package DBAccesser.User;
 
-import Entity.Class.User;
+import Entity.User;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;

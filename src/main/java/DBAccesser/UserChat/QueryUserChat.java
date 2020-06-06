@@ -1,6 +1,6 @@
 package DBAccesser.UserChat;
 
-import Entity.Class.UserChat;
+import Entity.UserChat;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;

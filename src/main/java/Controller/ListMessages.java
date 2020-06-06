@@ -1,6 +1,6 @@
 package Controller;
 
-import Entity.Class.Message;
+import Entity.Message;
 import DBAccesser.User.QueryUser;
 import DBAccesser.Chat.QueryChat;
 import DBAccesser.Message.QueryMessage;

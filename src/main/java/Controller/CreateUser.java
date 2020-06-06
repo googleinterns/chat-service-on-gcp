@@ -1,7 +1,7 @@
 package Controller;
 
 import Helper.Helper;
-import Entity.Class.User;
+import Entity.User;
 import DBAccesser.User.QueryUser;
 import DBAccesser.User.InsertUser;
 import Exceptions.UsernameAlreadyExistsException;
