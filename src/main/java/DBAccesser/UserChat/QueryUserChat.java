@@ -27,4 +27,17 @@ public class QueryUserChat {
             return false;
         }
     }
+
+    public boolean checkIfUserChatIDExists(long userID, long chatID) {
+
+        String SQLStatment = "SELECT * FROM UserChat WHERE UserID=@userID AND ChatID=@chatID";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(userID).bind("chatID").to(chatID).build();
+        List<UserChat> resultSet = spannerTemplate.query(UserChat.class, statement, null);
+    
+        if (resultSet.size()>0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

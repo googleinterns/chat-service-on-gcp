@@ -19,6 +19,7 @@ DBAccesser/Chat/InsertChat.class
 Entity/MessageChat.class
 Controller/CreateChat.class
 Exceptions/ChatIDDoesNotExistException.class
+Exceptions/UserChatIDDoesNotExistException.class
 DBAccesser/Message/QueryMessage.class
 DBAccesser/Chat/QueryChat.class
 Entity/Chat.class

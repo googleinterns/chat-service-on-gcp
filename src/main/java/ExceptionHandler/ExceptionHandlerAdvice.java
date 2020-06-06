@@ -6,6 +6,7 @@ import Exceptions.ChatAlreadyExistsException;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotExistException;
+import Exceptions.UserChatIDDoesNotExistException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -94,5 +95,18 @@ public class ExceptionHandlerAdvice {
         responseBody.put("path", e.getPath());
 
         return new ResponseEntity<Object>(responseBody, MessageIDDoesNotExistException.httpStatus);
+    }  
+    
+    @ExceptionHandler(UserChatIDDoesNotExistException.class)
+    public ResponseEntity<Object> handleUserChatIDDoesNotExistException(UserChatIDDoesNotExistException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", UserChatIDDoesNotExistException.httpStatus.value());
+        responseBody.put("error", UserChatIDDoesNotExistException.httpStatus.toString());
+        responseBody.put("message", UserChatIDDoesNotExistException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, UserChatIDDoesNotExistException.httpStatus);
     }  
 } 

@@ -12,6 +12,7 @@ import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.UsernameDoesNotExistException;
 import Exceptions.ChatAlreadyExistsException;
+import Exceptions.UserChatIDDoesNotExistException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -132,13 +133,17 @@ public class CreateChat {
         //check if the passed chatID is valid
         if (queryChatHelper.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
             throw new ChatIDDoesNotExistException(path);
-        } else { 
-            Chat chat = queryChatHelper.getChat(Long.parseLong(chatIDString));
-            responseBody = new LinkedHashMap<String, Object>();
-            responseBody.put("ChatID", chat.getChatID());
-            responseBody.put("LastSentMessageID", chat.getLastSentMessageID());
-            responseBody.put("CreationTS", chat.getCreationTS());
+        } 
+
+        if (queryUserChatHelper.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+            throw new UserChatIDDoesNotExistException(path);
         }
+        
+        Chat chat = queryChatHelper.getChat(Long.parseLong(chatIDString));
+        responseBody = new LinkedHashMap<String, Object>();
+        responseBody.put("ChatID", chat.getChatID());
+        responseBody.put("LastSentMessageID", chat.getLastSentMessageID());
+        responseBody.put("CreationTS", chat.getCreationTS());
 
         return responseBody;
         
