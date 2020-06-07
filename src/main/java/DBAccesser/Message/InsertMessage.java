@@ -18,4 +18,8 @@ public class InsertMessage {
     public void insertAllForTextMessage(Message message) {
         spannerTemplate.insert(message);
     } 
+
+    public void insertReceivedTS(Message message) {
+        spannerTemplate.update(message, "MessageID", "ReceivedTS");
+    }
 }

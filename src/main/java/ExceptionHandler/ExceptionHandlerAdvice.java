@@ -7,6 +7,7 @@ import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotExistException;
 import Exceptions.UserChatIDDoesNotExistException;
+import Exceptions.MessageIDDoesNotBelongToChatIDException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -109,4 +110,17 @@ public class ExceptionHandlerAdvice {
 
         return new ResponseEntity<Object>(responseBody, UserChatIDDoesNotExistException.httpStatus);
     }  
+
+    @ExceptionHandler(MessageIDDoesNotBelongToChatIDException.class)
+    public ResponseEntity<Object> handleMessageIDDoesNotBelongToChatIDException(MessageIDDoesNotBelongToChatIDException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", MessageIDDoesNotBelongToChatIDException.httpStatus.value());
+        responseBody.put("error", MessageIDDoesNotBelongToChatIDException.httpStatus.toString());
+        responseBody.put("message", MessageIDDoesNotBelongToChatIDException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, MessageIDDoesNotBelongToChatIDException.httpStatus);
+    } 
 } 

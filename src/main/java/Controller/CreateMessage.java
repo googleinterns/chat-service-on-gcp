@@ -49,7 +49,7 @@ public class CreateMessage {
     Helper helper; 
     
     @PostMapping("/users/{userID}/chats/{chatID}/messages")
-    public Map<String, String> createTextMessage(@PathVariable("chatID") String chatIDString, @PathVariable("userID") String userIDString, @RequestBody Map<String, String> requestBody) {
+    public Map<String, String> createMessage(@PathVariable("chatID") String chatIDString, @PathVariable("userID") String userIDString, @RequestBody Map<String, String> requestBody) {
         
         String path = "/users/" + userIDString + "/chats/" + chatIDString + "/messages";
         Map<String, String> responseBody;

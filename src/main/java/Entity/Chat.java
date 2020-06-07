@@ -1,6 +1,6 @@
 package Entity;
 
-import java.sql.Timestamp;
+import com.google.cloud.Timestamp;
 import java.util.Comparator;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;

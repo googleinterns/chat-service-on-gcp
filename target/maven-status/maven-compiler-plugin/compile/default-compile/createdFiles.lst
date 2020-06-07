@@ -16,6 +16,7 @@ Controller/ListChats.class
 Controller/GetUser.class
 Exceptions/UsernameDoesNotExistException.class
 Main/MainClass.class
+Exceptions/MessageIDDoesNotBelongToChatIDException.class
 Exceptions/MessageIDDoesNotExistException.class
 DBAccesser/User/QueryUser.class
 DBAccesser/Chat/InsertChat.class
