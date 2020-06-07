@@ -50,14 +50,13 @@ public class ListChats {
         List<Chat> chatsOfUser = queryChatHelper.getChatsForUser(user);
         
         for (Chat chat : chatsOfUser) {
-            System.out.println(chat.getLastSentMessageID());
             if (chat.getLastSentMessageID() == 0) { //confirm what is stored in the JAVA equivalent of a null containing column
                 chat.setLastSentTime(chat.getCreationTS());
             } else {
                 chat.setLastSentTime(queryMessageHelper.getCreationTSForMessageID(chat.getLastSentMessageID()));
             }
         }
-
+        
         Collections.sort(chatsOfUser, Chat.LastSentTimeDescComparator);
 
         List<String> usernamesOfChatsOfUser = new ArrayList<String>();
