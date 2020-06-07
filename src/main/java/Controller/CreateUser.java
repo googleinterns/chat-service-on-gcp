@@ -7,6 +7,7 @@ import DBAccesser.User.InsertUser;
 import Helper.SuccessResponseGenerator;
 import Exceptions.UsernameAlreadyExistsException;
 import Exceptions.UserIDDoesNotExistException;
+import Exceptions.UsernameMissingFromRequestBodyException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -38,6 +39,11 @@ public class CreateUser {
     public Map<String, String> createUser(@RequestBody Map<String, String> requestBody) {
 
         String path = "/users";
+
+        //check if request body is as required
+        if (requestBody.containsKey("username") == false) {
+            throw new UsernameMissingFromRequestBodyException(path);
+        }
 
         //check if username exists - return error if it does
         if (queryUserHelper.checkIfUsernameExists(requestBody.get("username"))) {

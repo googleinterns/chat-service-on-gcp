@@ -8,6 +8,8 @@ import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.UserChatIDDoesNotExistException;
+import Exceptions.UserIDMissingFromRequestURLPathException;
+import Exceptions.ChatIDMissingFromRequestURLParameterException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -29,11 +31,24 @@ public class GetChat {
     @Autowired
     QueryUserChat queryUserChatHelper;
 
+    @GetMapping("/users/chat")
+    public void getChatWithoutUserIDPathVariable() {
+
+        String path = "/users/chat";
+
+        throw new UserIDMissingFromRequestURLPathException(path);
+    }
+
     @GetMapping("/users/{userID}/chat")
-    public Map<String, Object> getChat(@PathVariable("userID") String userIDString, @RequestParam("chatID") String chatIDString) {
+    public Map<String, Object> getChat(@PathVariable("userID") String userIDString, @RequestParam(value = "chatID", required = false) String chatIDString) {
 
         String path = "/users/" + userIDString + "/chat/?chatID="+chatIDString;
         Map<String, Object> responseBody;
+
+        //check if URL parameter has been provided
+        if (chatIDString == null) {
+            throw new ChatIDMissingFromRequestURLParameterException(path);
+        }
 
         //check if the passed userID is valid
         if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {

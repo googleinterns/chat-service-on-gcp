@@ -1,13 +1,6 @@
 package ExceptionHandler;
 
-import Exceptions.UsernameAlreadyExistsException;
-import Exceptions.UsernameDoesNotExistException;
-import Exceptions.ChatAlreadyExistsException;
-import Exceptions.UserIDDoesNotExistException;
-import Exceptions.ChatIDDoesNotExistException;
-import Exceptions.MessageIDDoesNotExistException;
-import Exceptions.UserChatIDDoesNotExistException;
-import Exceptions.MessageIDDoesNotBelongToChatIDException;
+import Exceptions.*;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -122,5 +115,109 @@ public class ExceptionHandlerAdvice {
         responseBody.put("path", e.getPath());
 
         return new ResponseEntity<Object>(responseBody, MessageIDDoesNotBelongToChatIDException.httpStatus);
-    } 
+    }
+
+    @ExceptionHandler(UsernameMissingFromRequestBodyException.class)
+    public ResponseEntity<Object> handleUsernameMissingFromRequestBodyException(UsernameMissingFromRequestBodyException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", UsernameMissingFromRequestBodyException.httpStatus.value());
+        responseBody.put("error", UsernameMissingFromRequestBodyException.httpStatus.toString());
+        responseBody.put("message", UsernameMissingFromRequestBodyException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, UsernameMissingFromRequestBodyException.httpStatus);
+    }
+
+    @ExceptionHandler(UserIDMissingFromRequestURLPathException.class)
+    public ResponseEntity<Object> handleUserIDMissingFromRequestURLPathException(UserIDMissingFromRequestURLPathException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", UserIDMissingFromRequestURLPathException.httpStatus.value());
+        responseBody.put("error", UserIDMissingFromRequestURLPathException.httpStatus.toString());
+        responseBody.put("message", UserIDMissingFromRequestURLPathException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, UserIDMissingFromRequestURLPathException.httpStatus);
+    }
+
+    @ExceptionHandler(UserIDMissingFromRequestURLParameterException.class)
+    public ResponseEntity<Object> handleUserIDMissingFromRequestURLParameterException(UserIDMissingFromRequestURLParameterException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", UserIDMissingFromRequestURLParameterException.httpStatus.value());
+        responseBody.put("error", UserIDMissingFromRequestURLParameterException.httpStatus.toString());
+        responseBody.put("message", UserIDMissingFromRequestURLParameterException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, UserIDMissingFromRequestURLParameterException.httpStatus);
+    }
+
+    @ExceptionHandler(ChatIDMissingFromRequestURLParameterException.class)
+    public ResponseEntity<Object> handleChatIDMissingFromRequestURLParameterException(ChatIDMissingFromRequestURLParameterException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", ChatIDMissingFromRequestURLParameterException.httpStatus.value());
+        responseBody.put("error", ChatIDMissingFromRequestURLParameterException.httpStatus.toString());
+        responseBody.put("message", ChatIDMissingFromRequestURLParameterException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, ChatIDMissingFromRequestURLParameterException.httpStatus);
+    }
+
+    @ExceptionHandler(TextContentMissingFromRequestBodyException.class)
+    public ResponseEntity<Object> handleTextContentMissingFromRequestBodyException(TextContentMissingFromRequestBodyException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", TextContentMissingFromRequestBodyException.httpStatus.value());
+        responseBody.put("error", TextContentMissingFromRequestBodyException.httpStatus.toString());
+        responseBody.put("message", TextContentMissingFromRequestBodyException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, TextContentMissingFromRequestBodyException.httpStatus);
+    }
+
+    @ExceptionHandler(ContentTypeMissingFromRequestBodyException.class)
+    public ResponseEntity<Object> handleContentTypeMissingFromRequestBodyException(ContentTypeMissingFromRequestBodyException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", ContentTypeMissingFromRequestBodyException.httpStatus.value());
+        responseBody.put("error", ContentTypeMissingFromRequestBodyException.httpStatus.toString());
+        responseBody.put("message", ContentTypeMissingFromRequestBodyException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, ContentTypeMissingFromRequestBodyException.httpStatus);
+    }
+
+    @ExceptionHandler(ChatIDMissingFromRequestURLPathException.class)
+    public ResponseEntity<Object> handleChatIDMissingFromRequestURLPathException(ChatIDMissingFromRequestURLPathException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", ChatIDMissingFromRequestURLPathException.httpStatus.value());
+        responseBody.put("error", ChatIDMissingFromRequestURLPathException.httpStatus.toString());
+        responseBody.put("message", ChatIDMissingFromRequestURLPathException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, ChatIDMissingFromRequestURLPathException.httpStatus);
+    }
+
+    @ExceptionHandler(MessageIDMissingFromRequestURLParameterException.class)
+    public ResponseEntity<Object> handleMessageIDMissingFromRequestURLParameterException(MessageIDMissingFromRequestURLParameterException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", MessageIDMissingFromRequestURLParameterException.httpStatus.value());
+        responseBody.put("error", MessageIDMissingFromRequestURLParameterException.httpStatus.toString());
+        responseBody.put("message", MessageIDMissingFromRequestURLParameterException.message);
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, MessageIDMissingFromRequestURLParameterException.httpStatus);
+    }
 } 

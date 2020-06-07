@@ -14,6 +14,10 @@ import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotExistException;
 import Exceptions.UserChatIDDoesNotExistException;
+import Exceptions.UserIDMissingFromRequestURLPathException;
+import Exceptions.ChatIDMissingFromRequestURLPathException;
+import Exceptions.ContentTypeMissingFromRequestBodyException;
+import Exceptions.TextContentMissingFromRequestBodyException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -48,12 +52,46 @@ public class CreateMessage {
 
     @Autowired
     Helper helper; 
+
+    @PostMapping("/users/chats/messages")
+    public void createMessageWithoutUserIDChatIDPathVariable() {
+
+        String path = "/users/chats/messages";
+
+        throw new UserIDMissingFromRequestURLPathException(path);
+    }
+
+    @PostMapping("/users/chats/{chatID}/messages")
+    public void createMessageWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString) {
+
+        String path = "/users/chats/" + chatIDString + "/messages";
+
+        throw new UserIDMissingFromRequestURLPathException(path);
+    }
+
+    @PostMapping("/users/{userID}/chats/messages")
+    public void createMessageWithoutChatIDPathVariable(@PathVariable("userID") String userIDString) {
+
+        String path = "/users/" + userIDString + "/chats/messages";
+
+        throw new ChatIDMissingFromRequestURLPathException(path);
+    }
     
     @PostMapping("/users/{userID}/chats/{chatID}/messages")
-    public Map<String, String> createMessage(@PathVariable("chatID") String chatIDString, @PathVariable("userID") String userIDString, @RequestBody Map<String, String> requestBody) {
+    public Map<String, String> createMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestBody Map<String, String> requestBody) {
         
         String path = "/users/" + userIDString + "/chats/" + chatIDString + "/messages";
         Map<String, String> responseBody;
+
+        //check if request body is as required
+        if (requestBody.containsKey("contentType") == false) {
+            throw new ContentTypeMissingFromRequestBodyException(path);
+        }
+
+        //check if request body is as required
+        if (requestBody.containsKey("textContent") == false) {
+            throw new TextContentMissingFromRequestBodyException(path);
+        }
         
         //check if the passed userID is valid
         if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {

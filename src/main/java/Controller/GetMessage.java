@@ -10,6 +10,9 @@ import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotExistException;
 import Exceptions.UserChatIDDoesNotExistException;
+import Exceptions.UserIDMissingFromRequestURLPathException;
+import Exceptions.ChatIDMissingFromRequestURLPathException;
+import Exceptions.MessageIDMissingFromRequestURLParameterException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -34,11 +37,40 @@ public class GetMessage {
     @Autowired
     QueryUserChat queryUserChatHelper;
 
-    @GetMapping("/users/{userID}/chats/{chatID}/message")
-    public Map<String, Object> getMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestParam("messageID") String messageIDString) {
+    @GetMapping("/users/chats/message")
+    public void getMessageWithoutUserIDChatIDPathVariable() {
 
-        String path = "/users/" + userIDString + "/chat/" + chatIDString + "/message/?messageID=" + messageIDString;
+        String path = "/users/chats/message";
+
+        throw new UserIDMissingFromRequestURLPathException(path);
+    }
+
+    @GetMapping("/users/chats/{chatID}/message")
+    public void getMessageWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString) {
+
+        String path = "/users/chat/" + chatIDString + "/message";
+
+        throw new UserIDMissingFromRequestURLPathException(path);
+    }
+
+    @GetMapping("/users/{userID}/chats/message")
+    public void getMessageWithoutChatIDPathVariable(@PathVariable("userID") String userIDString) {
+
+        String path = "/users/" + userIDString + "/chat/message";
+
+        throw new ChatIDMissingFromRequestURLPathException(path);
+    }
+
+    @GetMapping("/users/{userID}/chats/{chatID}/message")
+    public Map<String, Object> getMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestParam(value = "messageID", required = false) String messageIDString) {
+
+        String path = "/users/" + userIDString + "/chats/" + chatIDString + "/message/?messageID=" + messageIDString;
         Map<String, Object> responseBody;
+
+        //check if URL parameter has been provided
+        if (messageIDString == null) {
+            throw new MessageIDMissingFromRequestURLParameterException(path);
+        }
         
         //check if the passed userID is valid
         if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {

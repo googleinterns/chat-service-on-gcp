@@ -9,6 +9,7 @@ import DBAccesser.Message.QueryMessage;
 import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
+import Exceptions.UserIDMissingFromRequestURLPathException;
 
 import java.util.Map;
 import java.util.List;
@@ -35,6 +36,14 @@ public class ListChats {
 
     @Autowired
     Helper helper;
+
+    @GetMapping("/users/chats")
+    public void listChatsWithoutUserIDPathVariable() {
+
+        String path = "/users/chats";
+
+        throw new UserIDMissingFromRequestURLPathException(path);
+    }
 
     @GetMapping("/users/{userID}/chats")
     public Map<String, List<String>> listChats(@PathVariable("userID") String userIDString) {

@@ -14,6 +14,8 @@ import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.UsernameDoesNotExistException;
 import Exceptions.ChatAlreadyExistsException;
 import Exceptions.UserChatIDDoesNotExistException;
+import Exceptions.UserIDMissingFromRequestURLPathException;
+import Exceptions.UsernameMissingFromRequestBodyException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -46,13 +48,26 @@ public class CreateChat {
     @Autowired
     Helper helper;
 
+    @PostMapping("/users/chats")
+    public void createChatWithoutUserIDPathVariable() {
+
+        String path = "/users/chats";
+
+        throw new UserIDMissingFromRequestURLPathException(path);
+    }
+
     @PostMapping("/users/{userID}/chats")
     public Map<String, String> createChat(@PathVariable("userID") String userIDString, @RequestBody Map<String, String> requestBody) {
         
         String path = "/users/" + userIDString + "/chats";
         
         Map<String, String> responseBody;
-        
+
+        //check if request body is as required
+        if (requestBody.containsKey("username") == false) {
+            throw new UsernameMissingFromRequestBodyException(path);
+        }
+
         //check if the passed userID is valid
         if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
             throw new UserIDDoesNotExistException(path);

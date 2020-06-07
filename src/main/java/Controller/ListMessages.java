@@ -12,6 +12,8 @@ import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.UserChatIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotBelongToChatIDException;
+import Exceptions.UserIDMissingFromRequestURLPathException;
+import Exceptions.ChatIDMissingFromRequestURLPathException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -41,9 +43,33 @@ public class ListMessages {
 
     @Autowired 
     InsertMessage insertMessageHelper;
+
+    @GetMapping("/users/chats/messages")
+    public void listMessagesWithoutUserIDChatIDPathVariable() {
+
+        String path = "/users/chats/messages";
+
+        throw new UserIDMissingFromRequestURLPathException(path);
+    }
+
+    @GetMapping("/users/chats/{chatID}/messages")
+    public void listMessagesWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString) {
+
+        String path = "/users/chat/" + chatIDString + "/message";
+
+        throw new UserIDMissingFromRequestURLPathException(path);
+    }
+
+    @GetMapping("/users/{userID}/chats/messages")
+    public void listMessagesWithoutChatIDPathVariable(@PathVariable("userID") String userIDString) {
+
+        String path = "/users/" + userIDString + "/chat/message";
+
+        throw new ChatIDMissingFromRequestURLPathException(path);
+    }
     
     @GetMapping("/users/{userID}/chats/{chatID}/messages")
-    public Map<String, List<Map<String, Object>>> listMessages(@PathVariable("chatID") String chatIDString, @PathVariable("userID") String userIDString, @RequestParam (value = "startMessageID", required = false) String startMessageIDString, @RequestParam (value = "endMessageID", required = false) String endMessageIDString, @RequestParam (value = "count", required = false) String countString) {
+    public Map<String, List<Map<String, Object>>> listMessages(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestParam(value = "startMessageID", required = false) String startMessageIDString, @RequestParam(value = "endMessageID", required = false) String endMessageIDString, @RequestParam(value = "count", required = false) String countString) {
 
         Timestamp receivedTS = Timestamp.now();
         String path = "/users/" + userIDString + "/chats/" + chatIDString + "/messages";
