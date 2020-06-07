@@ -6,6 +6,7 @@ import DBAccesser.Chat.QueryChat;
 import DBAccesser.UserChat.QueryUserChat;
 import DBAccesser.Message.QueryMessage;
 import DBAccesser.Message.InsertMessage;
+import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.UserChatIDDoesNotExistException;
@@ -142,29 +143,7 @@ public class ListMessages {
                 insertMessageHelper.insertReceivedTS(message);
             }
         }
-
-        //return messages in ascending order of CreationTS
-        List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
-
-        for (int i = messages.size()-1; i >= 0; --i) {
-            Message message = messages.get(i);
-            Map<String, Object> nextMessage = new LinkedHashMap<String, Object>();
-
-            nextMessage.put("MessageID", message.getMessageID());
-            nextMessage.put("CreationTS", message.getCreationTS());
-            nextMessage.put("ChatID", message.getChatID());
-            nextMessage.put("SenderID", message.getSenderID());
-            nextMessage.put("ContentType", message.getContentType());
-            nextMessage.put("TextContent", message.getTextContent());
-            nextMessage.put("SentTS", message.getSentTS());
-            nextMessage.put("ReceivedTS", message.getReceivedTS());
-
-            listOfMessages.add(nextMessage);
-        }
-
-        responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
-        responseBody.put("payload", listOfMessages);
         
-        return responseBody;
+        return SuccessResponseGenerator.getSuccessResponseForListMessages(messages);
     }
 }

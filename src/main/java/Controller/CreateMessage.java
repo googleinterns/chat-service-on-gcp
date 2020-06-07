@@ -9,6 +9,7 @@ import DBAccesser.Message.QueryMessage;
 import DBAccesser.UserChat.QueryUserChat;
 import DBAccesser.Message.InsertMessage;
 import DBAccesser.Chat.InsertChat;
+import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotExistException;
@@ -77,26 +78,6 @@ public class CreateMessage {
 
         insertChatHelper.insertLastSentMessageID(new Chat(Long.parseLong(chatIDString), newMessage.getMessageID()));
         
-        responseBody = new LinkedHashMap<String, String>();
-        responseBody.put("message", "Created");
-
-        return responseBody;
-        
-        /*
-        //test without Spanner - change the return type of the method to Map<String, Object>
-        Message newMessage = new Message(Long.parseLong(chatIDString), Long.parseLong(userIDString), requestBody.get("contentType"), requestBody.get("textContent"));
-
-        newMessage.setMessageID(1);
-
-        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("message", "Created");
-        responseBody.put("messageID", newMessage.getMessageID());
-        responseBody.put("getChatID", newMessage.getChatID());
-        responseBody.put("getSenderID", newMessage.getSenderID());
-        responseBody.put("getContentType", newMessage.getContentType());
-        responseBody.put("getTextContent", newMessage.getTextContent());
-
-        return responseBody;
-        */
+        return SuccessResponseGenerator.getSuccessResponseForCreateEntity();
     }
 }

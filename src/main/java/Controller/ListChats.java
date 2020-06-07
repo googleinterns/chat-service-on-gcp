@@ -2,10 +2,11 @@ package Controller;
 
 import Entity.User;
 import Entity.Chat;
+import Helper.Helper;
 import DBAccesser.User.QueryUser;
 import DBAccesser.Chat.QueryChat;
 import DBAccesser.Message.QueryMessage;
-import Helper.Helper;
+import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 
@@ -50,7 +51,7 @@ public class ListChats {
         List<Chat> chatsOfUser = queryChatHelper.getChatsForUser(user);
         
         for (Chat chat : chatsOfUser) {
-            if (chat.getLastSentMessageID() == 0) { //confirm what is stored in the JAVA equivalent of a null containing column
+            if (chat.getLastSentMessageID() == 0) { 
                 chat.setLastSentTime(chat.getCreationTS());
             } else {
                 chat.setLastSentTime(queryMessageHelper.getCreationTSForMessageID(chat.getLastSentMessageID()));
@@ -66,17 +67,6 @@ public class ListChats {
             usernamesOfChatsOfUser.add(queryUserHelper.getSecondUserForChat(user, chat).get(0).getUsername());
         }
 
-        responseBody = new LinkedHashMap<String,List<String>>();
-        responseBody.put("payload", usernamesOfChatsOfUser);
-
-        return responseBody;
-        
-        /*
-        //test without Spanner 
-        responseBody = new LinkedHashMap<String,List<String>>();
-        responseBody.put("payload", new ArrayList<String>(){{add(userIDString);}});
-
-        return responseBody;
-        */
+        return SuccessResponseGenerator.getSuccessResponseForListChats(usernamesOfChatsOfUser);
     }
 }

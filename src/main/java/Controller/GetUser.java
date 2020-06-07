@@ -3,6 +3,7 @@ package Controller;
 import Entity.User;
 import DBAccesser.User.QueryUser;
 import Exceptions.UserIDDoesNotExistException;
+import Helper.SuccessResponseGenerator;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -30,25 +31,7 @@ public class GetUser {
         } 
 
         User user = queryUserHelper.getUser(Long.parseLong(userIDString));
-        responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("UserID", user.getUserID());
-        responseBody.put("Username", user.getUsername());
-        responseBody.put("CreationTS", user.getCreationTS());
 
-        return responseBody;
-        
-        /*
-        //test without Spanner
-        if (Long.parseLong(userIDString) == 5) {
-            throw new UserIDDoesNotExistException(path);
-        } else {
-            User user = new User(Long.parseLong(userIDString), "simran");
-            responseBody = new LinkedHashMap<String, Object>();
-            responseBody.put("UserID", user.getUserID());
-            responseBody.put("Username", user.getUsername());
-        }
-        
-        return responseBody;
-        */
+        return SuccessResponseGenerator.getSuccessResponseForGetUser(user);
     }
 }

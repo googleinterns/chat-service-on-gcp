@@ -5,6 +5,7 @@ import DBAccesser.User.QueryUser;
 import DBAccesser.Chat.QueryChat;
 import DBAccesser.Message.QueryMessage;
 import DBAccesser.UserChat.QueryUserChat;
+import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotExistException;
@@ -60,30 +61,7 @@ public class GetMessage {
         } 
 
         Message message = queryMessageHelper.getMessage(Long.parseLong(messageIDString));
-        responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("MessageID", message.getMessageID());
-        responseBody.put("ChatID", message.getChatID());
-        responseBody.put("SenderID", message.getSenderID());
-        responseBody.put("ContentType", message.getContentType());
-        responseBody.put("TextContent", message.getTextContent());
-        responseBody.put("SentTS", message.getSentTS());
-        responseBody.put("ReceivedTS", message.getReceivedTS());
-        responseBody.put("CreationTS", message.getCreationTS());
-
-        return responseBody;
-        
-        /*
-        //test without Spanner
-        if (Long.parseLong(chatIDString) == 5) {
-            throw new ChatIDDoesNotExistException(path);
-        } else {
-            Chat chat = queryChatHelper.getChat(Long.parseLong(chatIDString), 2);
-            responseBody = new LinkedHashMap<String, Object>();
-            responseBody.put("ChatID", user.getChatID());
-            responseBody.put("LastSentMessageID", user.getLastSentMessageID());
-        }
-        
-        return responseBody;
-        */
+    
+        return SuccessResponseGenerator.getSuccessResponseForGetMessage(message);
     }
 }

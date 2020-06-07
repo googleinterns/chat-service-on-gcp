@@ -4,6 +4,7 @@ import Helper.Helper;
 import Entity.User;
 import DBAccesser.User.QueryUser;
 import DBAccesser.User.InsertUser;
+import Helper.SuccessResponseGenerator;
 import Exceptions.UsernameAlreadyExistsException;
 import Exceptions.UserIDDoesNotExistException;
 
@@ -37,37 +38,18 @@ public class CreateUser {
     public Map<String, String> createUser(@RequestBody Map<String, String> requestBody) {
 
         String path = "/users";
-        
-        Map<String, String> responseBody;
-        
+
         //check if username exists - return error if it does
         if (queryUserHelper.checkIfUsernameExists(requestBody.get("username"))) {
             throw new UsernameAlreadyExistsException(path);
-        } else {
-            User newUser = new User(requestBody.get("username"));
-            //generate unique userID
-            newUser.setUserID(helper.generateUniqueID("User", false, false));
-            //insert new entry into User
-            insertUserHelper.insertAll(newUser);
+        } 
 
-            responseBody = new LinkedHashMap<String, String>();
-            responseBody.put("message", "Created");
-
-            return responseBody;
-        }
-        
-        /*
-        //test without Spanner
-        if (requestBody.get("username").equals("simran")) {
-            throw new UsernameAlreadyExistsException(path);
-        }
         User newUser = new User(requestBody.get("username"));
+        //generate unique userID
+        newUser.setUserID(helper.generateUniqueID("User", false, false));
+        //insert new entry into User
+        insertUserHelper.insertAll(newUser);
 
-        Map<String, String> responseBody = new LinkedHashMap<String, String>();
-        responseBody.put("message", "Created");
-        responseBody.put("responseUsername", newUser.getUsername());
-
-        return responseBody;
-        */
+        return SuccessResponseGenerator.getSuccessResponseForCreateEntity();
     }
 }
