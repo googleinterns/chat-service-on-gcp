@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity"
+    android:focusableInTouchMode="true"
+    android:focusable="true">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="16dp"
+
+            android:padding="16dp"
+            >
+
+
+            <ImageView
+                android:id="@+id/top_logo"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:padding="20dp"
+                android:src="@drawable/chat_logo_new"
+
+                />
+
+
+            <ImageView
+
+                android:id="@+id/username_icon"
+                android:layout_width="30dp"
+
+                android:layout_height="30dp"
+                android:layout_below="@id/top_logo"
+
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="16dp"
+
+                android:layout_marginTop="16dp"
+                android:layout_marginRight="4dp"
+                android:src="@drawable/baseline_email_black"
+
+                />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/input_email_id_layout"
+                android:layout_below="@id/top_logo"
+
+                android:layout_alignBaseline="@id/username_icon"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="8dp"
+
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="16dp"
+                android:layout_toEndOf="@id/username_icon"
+                >
+            <EditText
+
+                android:id="@+id/input_email_id"
+
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+
+
+
+                android:hint="@string/email"
+
+                android:inputType="textEmailAddress" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageView
+
+                android:id="@+id/password_icon"
+                android:layout_width="30dp"
+
+                android:layout_height="30dp"
+                android:layout_below="@id/username_icon"
+
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="16dp"
+
+                android:layout_marginTop="28dp"
+                android:layout_marginRight="4dp"
+                android:src="@drawable/baseline_lock_black"
+
+                />
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/input_password_layout"
+                android:layout_below="@id/input_email_id_layout"
+
+                android:layout_alignBaseline="@id/password_icon"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="8dp"
+                app:passwordToggleEnabled="true"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="16dp"
+                android:layout_toEndOf="@id/password_icon"
+                android:layout_toRightOf="@id/password_icon">
+            <EditText
+
+                android:id="@+id/input_password"
+
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+
+
+
+                android:hint="Password"
+
+                android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/login_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/indigo"
+                android:textColor="@android:color/white"
+                android:layout_below="@id/input_password_layout"
+                android:layout_centerHorizontal="true"
+
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+
+                android:layout_margin="20dp"
+
+                android:text="SIGN IN"
+                android:textSize="20sp"
+
+                />
+
+            <TextView
+                android:id="@+id/new_user_register"
+
+
+                android:text="New User? Sign Up"
+
+                android:textColor="#000000"
+                android:textSize="16sp"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:padding="8dp"
+
+                android:layout_centerHorizontal="true"
+
+                android:layout_below="@id/login_button"
+
+                />
+            <TextView
+                android:id="@+id/forgot_password"
+                android:text="Forgot Password?"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:padding="8dp"
+
+                android:layout_centerHorizontal="true"
+
+                android:layout_below="@id/new_user_register"
+
+                />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
