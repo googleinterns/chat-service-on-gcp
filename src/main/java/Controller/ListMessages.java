@@ -45,6 +45,10 @@ public final class ListMessages {
     @Autowired 
     private InsertMessage insertMessage;
 
+    private static final int UPPER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN = 1000;
+    
+    private static final int LOWER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN = 50;
+
     @GetMapping("/users/chats/messages")
     public void listMessagesWithoutUserIDChatIDPathVariable(HttpServletRequest request) {
 
@@ -81,8 +85,6 @@ public final class ListMessages {
         long startMessageID;
         long endMessageID;
 
-        int uppLimitOfMessageCountToReturn = 1000;
-        int lowLimitOfMessageCountToReturn = 50;
         int count;
 
         Timestamp startCreationTS;
@@ -107,11 +109,11 @@ public final class ListMessages {
 
         //configure the value of count
         if (countString == null) {
-            count = lowLimitOfMessageCountToReturn;
+            count = LOWER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN;
         } else {
             count = Math.abs(Integer.parseInt(countString));
-            count = Math.min(count, uppLimitOfMessageCountToReturn);
-            count = Math.max(count, lowLimitOfMessageCountToReturn);
+            count = Math.min(count, UPPER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN);
+            count = Math.max(count, LOWER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN);
         }
 
         if (startMessageIDString != null) {
