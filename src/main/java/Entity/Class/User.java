@@ -5,7 +5,6 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 
-// import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
 @Table(name = "User")
@@ -51,13 +50,11 @@ public class User {
     this.Password = password;
     this.EmailID = emailID;
     this.MobileNo = mobileNo;
-
-    this.Picture = base64Image.getBytes();
-    // Base64.Decoder dec = Base64.getDecoder();
-    // this.Picture = dec.decode(base64Image);
-    // for(int i = 0; i < this.Picture.length; i++){
-    //   System.out.println(this.Picture[i] + " ");
-    // }
+    if(base64Image.length() == 0){
+      this.Picture = base64Image.getBytes();
+    } else {
+      this.Picture = null;
+    }
   }
 
   public User(
@@ -71,6 +68,7 @@ public class User {
     this.Password = password;
     this.EmailID = emailID;
     this.MobileNo = mobileNo;
+    this.Picture = null;
   }
 
   public long getUserID(){

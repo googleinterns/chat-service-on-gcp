@@ -6,6 +6,8 @@ import DBAccesser.User.InsertUser;
 import Helper.Helper;
 import Exceptions.RequiredFieldMissingException;
 import Exceptions.UserAlreadyExistsException;
+import Exceptions.InvalidLoginException;
+import Exceptions.UserNotFoundException;
 import Exceptions.APIException;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,6 +47,16 @@ public class UserAPI {
         return new ResponseEntity<Object>(helper.getResponseBody(e), e.getHttpStatus());
     }
 
+    @ExceptionHandler(InvalidLoginException.class)
+    public ResponseEntity<Object> handleInvalidLoginException(InvalidLoginException e) {
+        return new ResponseEntity<Object>(helper.getResponseBody(e), e.getHttpStatus());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleInvalidLoginException(UserNotFoundException e) {
+        return new ResponseEntity<Object>(helper.getResponseBody(e), e.getHttpStatus());
+    }
+
     @PostMapping(value = "/signup", consumes={"application/json"})
     public String signup(@RequestBody HashMap<String, Object> data) {
 
@@ -78,5 +90,33 @@ public class UserAPI {
             insertUserHelper.insertAll(newUser);
             return Long.toString(newUser.getUserID());
         }
+    }
+
+    @PostMapping(value = "/login", consumes={"application/json"})
+    public String login(@RequestBody HashMap<String, Object> data) {
+        String path = "/login";
+        String[] required = {"Username", "Password"};
+        List<String> missing_fields = helper.missingFields(data, required);
+        if(missing_fields.size() > 0) {
+            throw new RequiredFieldMissingException(path, missing_fields);
+        }
+
+        String username = data.get("Username").toString();
+        String password = data.get("Password").toString();
+        long id = queryUserHelper.login(username, password);
+        if(id == -1) {
+            throw new InvalidLoginException(path);
+        }
+        return Long.toString(id);
+    }
+
+    @GetMapping("/viewUser")
+    public Map<String, Object> viewUser(@RequestParam(value = "username", required = true) String username) {
+        String path = "/viewUser?username=" + username;
+        Map<String, Object> user = queryUserHelper.getUser(username);
+        if(user.get("userID").toString().equals("-1")) {
+            throw new UserNotFoundException(path);
+        }
+        return user;
     }
 }

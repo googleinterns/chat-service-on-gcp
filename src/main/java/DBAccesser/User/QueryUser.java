@@ -10,6 +10,8 @@ import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Component
 public class QueryUser {
@@ -45,7 +47,7 @@ public class QueryUser {
 
     public long getUserIDFromUsername(String username) {
 
-        String SQLStatment = "SELECT userID FROM User WHERE Username=@Username";
+        String SQLStatment = "SELECT UserID FROM User WHERE Username=@Username";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
                                 .to(username)
@@ -53,5 +55,43 @@ public class QueryUser {
         List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return resultSet.get(0).getUserID();
+    }
+
+    public long login(String username, String password) {
+        String SQLStatment = "SELECT UserID from User WHERE Username=@username and Password=@password";
+        Statement statement = Statement.newBuilder(SQLStatment)
+                                .bind("username")
+                                .to(username)
+                                .bind("password")
+                                .to(password)
+                                .build();
+        List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+        if(resultSet.size() == 0) {
+            return -1;
+        }
+        return resultSet.get(0).getUserID();
+    }
+
+    public Map<String, Object> getUser(String username) {
+        String SQLStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User WHERE Username=@Username";
+        Statement statement = Statement.newBuilder(SQLStatment)
+                                .bind("Username")
+                                .to(username)
+                                .build();
+        List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+        Map<String, Object> response = new HashMap<String, Object>();
+        if(resultSet.size() == 0) {
+            response.put("userID", -1);
+            return response;
+        }
+        User user = resultSet.get(0);
+        response.put("userID", user.getUserID());
+        response.put("username", username);
+        response.put("EmailID", user.getEmailID());
+        response.put("MobileNo", user.getMobileNumber());
+        if(user.getPicture() != null) {
+            response.put("Picture", user.getPicture());
+        }
+        return response;
     }
 }
