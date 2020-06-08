@@ -21,6 +21,7 @@ import Exceptions.TextContentMissingFromRequestBodyException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
+import javax.servlet.http.HttpServletRequest;  
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,33 +52,32 @@ public final class CreateMessage {
     private Helper helper; 
 
     @PostMapping("/users/chats/messages")
-    public void createMessageWithoutUserIDChatIDPathVariable() {
+    public void createMessageWithoutUserIDChatIDPathVariable(HttpServletRequest request) {
 
-        String path = "/users/chats/messages";
+        String path = request.getRequestUri();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
 
     @PostMapping("/users/chats/{chatID}/messages")
-    public void createMessageWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString) {
+    public void createMessageWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString, HttpServletRequest request) {
 
-        String path = "/users/chats/" + chatIDString + "/messages";
+        String path = request.getRequestUri();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
 
     @PostMapping("/users/{userID}/chats/messages")
-    public void createMessageWithoutChatIDPathVariable(@PathVariable("userID") String userIDString) {
+    public void createMessageWithoutChatIDPathVariable(@PathVariable("userID") String userIDString, HttpServletRequest request) {
 
-        String path = "/users/" + userIDString + "/chats/messages";
-
+        String path = request.getRequestUri();
         throw new ChatIDMissingFromRequestURLPathException(path);
     }
     
     @PostMapping("/users/{userID}/chats/{chatID}/messages")
-    public Map<String, String> createMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestBody Map<String, String> requestBody) {
+    public Map<String, String> createMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         
-        String path = "/users/" + userIDString + "/chats/" + chatIDString + "/messages";
+        String path = request.getRequestUri();
         Map<String, String> responseBody;
 
         //check if request body is as required

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import javax.servlet.http.HttpServletRequest;  
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,17 +39,17 @@ public final class ListChats {
     private Helper helper;
 
     @GetMapping("/users/chats")
-    public void listChatsWithoutUserIDPathVariable() {
+    public void listChatsWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = "/users/chats";
+        String path = request.getRequestUri();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
 
     @GetMapping("/users/{userID}/chats")
-    public Map<String, List<String>> listChats(@PathVariable("userID") String userIDString) {
+    public Map<String, List<String>> listChats(@PathVariable("userID") String userIDString, HttpServletRequest request) {
         
-        String path = "/users/" + userIDString + "/chats";
+        String path = request.getRequestUri();
         Map<String, List<String>> responseBody;
         
         //check if the passed userID is valid

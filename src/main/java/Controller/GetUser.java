@@ -8,6 +8,7 @@ import Helper.SuccessResponseGenerator;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
+import javax.servlet.http.HttpServletRequest;  
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +23,17 @@ public final class GetUser {
     private QueryUser queryUser;
 
     @GetMapping("/users")
-    public void getUserWithoutUserIDPathVariable() {
+    public void getUserWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = "/users";
+        String path = request.getRequestUri();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
 
     @GetMapping("/users/{userID}")
-    public Map<String, Object> getUser(@PathVariable("userID") String userIDString) {
+    public Map<String, Object> getUser(@PathVariable("userID") String userIDString, HttpServletRequest request) {
 
-        String path = "/users/"+userIDString;
+        String path = request.getRequestUri();
         Map<String, Object> responseBody;
 
         //check if UserID is valid

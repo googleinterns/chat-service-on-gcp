@@ -19,6 +19,7 @@ import Exceptions.UsernameMissingFromRequestBodyException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
+import javax.servlet.http.HttpServletRequest;  
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,17 +47,18 @@ public final class CreateChat {
     private Helper helper;
 
     @PostMapping("/users/chats")
-    public void createChatWithoutUserIDPathVariable() {
+    public void createChatWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = "/users/chats";
+        String path = request.getRequestUri();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
 
     @PostMapping("/users/{userID}/chats")
-    public Map<String, String> createChat(@PathVariable("userID") String userIDString, @RequestBody Map<String, String> requestBody) {
+    public Map<String, String> createChat(@PathVariable("userID") String userIDString, 
+    @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         
-        String path = "/users/" + userIDString + "/chats";
+        String path = request.getRequestUri();
         
         Map<String, String> responseBody;
 

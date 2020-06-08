@@ -12,6 +12,7 @@ import Exceptions.UserIDMissingFromRequestURLPathException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
+import javax.servlet.http.HttpServletRequest;  
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +32,17 @@ public final class GetChat {
     private QueryUserChat queryUserChat;
 
     @GetMapping("/users/chats/{chatID}")
-    public void getChatWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString) {
+    public void getChatWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString, HttpServletRequest request) {
 
-        String path = "/users/chat/"+chatIDString;
+        String path = request.getRequestUri();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
 
     @GetMapping("/users/{userID}/chats/{chatID}")
-    public Map<String, Object> getChat(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString) {
+    public Map<String, Object> getChat(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, HttpServletRequest request) {
 
-        String path = "/users/" + userIDString + "/chat/"+chatIDString;
+        String path = request.getRequestUri();
         Map<String, Object> responseBody;
 
         //check if the passed userID is valid

@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import com.google.cloud.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;  
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,17 +46,17 @@ public final class ListMessages {
     private InsertMessage insertMessage;
 
     @GetMapping("/users/chats/messages")
-    public void listMessagesWithoutUserIDChatIDPathVariable() {
+    public void listMessagesWithoutUserIDChatIDPathVariable(HttpServletRequest request) {
 
-        String path = "/users/chats/messages";
+        String path = request.getRequestUri();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
 
     @GetMapping("/users/chats/{chatID}/messages")
-    public void listMessagesWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString) {
+    public void listMessagesWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString, HttpServletRequest request) {
 
-        String path = "/users/chat/" + chatIDString + "/message";
+        String path = request.getRequestUri();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
@@ -63,7 +64,7 @@ public final class ListMessages {
     @GetMapping("/users/{userID}/chats/messages")
     public void listMessagesWithoutChatIDPathVariable(@PathVariable("userID") String userIDString) {
 
-        String path = "/users/" + userIDString + "/chat/message";
+        String path = request.getRequestUri();
 
         throw new ChatIDMissingFromRequestURLPathException(path);
     }
@@ -72,7 +73,7 @@ public final class ListMessages {
     public Map<String, List<Map<String, Object>>> listMessages(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestParam(value = "startMessageID", required = false) String startMessageIDString, @RequestParam(value = "endMessageID", required = false) String endMessageIDString, @RequestParam(value = "count", required = false) String countString) {
 
         Timestamp receivedTS = Timestamp.now();
-        String path = "/users/" + userIDString + "/chats/" + chatIDString + "/messages";
+        String path = request.getRequestUri();
         Map<String, List<Map<String, Object>>> responseBody;
 
         int uppLimitOfMessageCountToReturn = 1000;

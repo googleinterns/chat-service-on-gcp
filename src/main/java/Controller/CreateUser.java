@@ -12,6 +12,7 @@ import Exceptions.UsernameMissingFromRequestBodyException;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;  
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,9 +37,9 @@ public final class CreateUser {
     
     @PostMapping("/users")
     //if we use @Request Body String username, the body of the POST request needs to contain the string username i.e. say "simran" as Text 
-    public Map<String, String> createUser(@RequestBody Map<String, String> requestBody) {
+    public Map<String, String> createUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
 
-        String path = "/users";
+        String path = request.getRequestUri();
 
         //check if request body is as required
         if (requestBody.containsKey("username") == false) {
