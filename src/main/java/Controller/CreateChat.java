@@ -49,18 +49,16 @@ public final class CreateChat {
     @PostMapping("/users/chats")
     public void createChatWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
 
     @PostMapping("/users/{userID}/chats")
-    public Map<String, String> createChat(@PathVariable("userID") String userIDString, 
+    public Map<String, Object> createChat(@PathVariable("userID") String userIDString, 
     @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         
-        String path = request.getRequestUri();
-        
-        Map<String, String> responseBody;
+        String path = request.getRequestURI();
 
         long userID = Long.parseLong(userIDString);
 
@@ -101,6 +99,6 @@ public final class CreateChat {
         insertUserChatHelper.insertAll(newUserChat1);
         insertUserChatHelper.insertAll(newUserChat2);
 
-        return SuccessResponseGenerator.getSuccessResponseForCreateEntity();
+        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", newChat.getChatID());
     }
 }

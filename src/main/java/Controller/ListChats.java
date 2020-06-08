@@ -41,7 +41,7 @@ public final class ListChats {
     @GetMapping("/users/chats")
     public void listChatsWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
@@ -49,7 +49,7 @@ public final class ListChats {
     @GetMapping("/users/{userID}/chats")
     public Map<String, List<String>> listChats(@PathVariable("userID") String userIDString, HttpServletRequest request) {
         
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
         Map<String, List<String>> responseBody;
 
         long userID = Long.parseLong(userIDString);

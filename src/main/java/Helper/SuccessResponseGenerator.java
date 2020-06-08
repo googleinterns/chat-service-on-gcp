@@ -11,11 +11,12 @@ import java.util.ArrayList;
 
 public class SuccessResponseGenerator {
 
-    public static Map<String, String> getSuccessResponseForCreateEntity() {
+    public static Map<String, Object> getSuccessResponseForCreateEntity(String className, long ID) {
 
-        Map<String, String> responseBody = new LinkedHashMap<String, String>();
+        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
 
         responseBody.put("message", "Created");
+        responseBody.put(className+"ID", ID);
 
         return responseBody;
     }

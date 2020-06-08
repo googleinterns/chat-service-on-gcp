@@ -25,7 +25,7 @@ public final class GetUser {
     @GetMapping("/users")
     public void getUserWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
@@ -33,7 +33,7 @@ public final class GetUser {
     @GetMapping("/users/{userID}")
     public Map<String, Object> getUser(@PathVariable("userID") String userIDString, HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
         Map<String, Object> responseBody;
 
         long userID = Long.parseLong(userIDString);

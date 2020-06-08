@@ -34,7 +34,7 @@ public final class GetChat {
     @GetMapping("/users/chats/{chatID}")
     public void getChatWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
@@ -42,14 +42,14 @@ public final class GetChat {
     @GetMapping("/users/{userID}/chats/{chatID}")
     public Map<String, Object> getChat(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
         Map<String, Object> responseBody;
 
         long userID = Long.parseLong(userIDString);
         long chatID = Long.parseLong(chatIDString);
 
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists() == false) {
+        if (queryUser.checkIfUserIDExists(userID) == false) {
             throw new UserIDDoesNotExistException(path);
         }
         

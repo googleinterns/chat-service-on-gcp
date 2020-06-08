@@ -41,7 +41,7 @@ public final class GetMessage {
     @GetMapping("/users/{userID}/chats/messages/{messageID}")
     public void getMessageWithoutChatIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new ChatIDMissingFromRequestURLPathException(path);
     }
@@ -49,7 +49,7 @@ public final class GetMessage {
     @GetMapping("/users/chats/{chatID}/messages/{messageID}")
     public void getMessageWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
@@ -57,7 +57,7 @@ public final class GetMessage {
     @GetMapping("/users/{userID}/chats/{chatID}/messages/{messageID}")
     public Map<String, Object> getMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @PathVariable("messageID") String messageIDString, HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
         Map<String, Object> responseBody;
 
         long userID = Long.parseLong(userIDString);

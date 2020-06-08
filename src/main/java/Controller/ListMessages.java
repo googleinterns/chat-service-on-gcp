@@ -48,7 +48,7 @@ public final class ListMessages {
     @GetMapping("/users/chats/messages")
     public void listMessagesWithoutUserIDChatIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
@@ -56,7 +56,7 @@ public final class ListMessages {
     @GetMapping("/users/chats/{chatID}/messages")
     public void listMessagesWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
@@ -64,22 +64,22 @@ public final class ListMessages {
     @GetMapping("/users/{userID}/chats/messages")
     public void listMessagesWithoutChatIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new ChatIDMissingFromRequestURLPathException(path);
     }
     
     @GetMapping("/users/{userID}/chats/{chatID}/messages")
-    public Map<String, List<Map<String, Object>>> listMessages(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestParam(value = "startMessageID", required = false) String startMessageIDString, @RequestParam(value = "endMessageID", required = false) String endMessageIDString, @RequestParam(value = "count", required = false) String countString) {
+    public Map<String, List<Map<String, Object>>> listMessages(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestParam(value = "startMessageID", required = false) String startMessageIDString, @RequestParam(value = "endMessageID", required = false) String endMessageIDString, @RequestParam(value = "count", required = false) String countString, HttpServletRequest request) {
 
         Timestamp receivedTS = Timestamp.now();
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
         Map<String, List<Map<String, Object>>> responseBody;
 
         long userID = Long.parseLong(userIDString);
         long chatID = Long.parseLong(chatIDString);
-        long startMessageID = Long.parseLong(startMessageIDString);
-        long endMessageID = Long.parseLong(endMessageIDString);
+        long startMessageID;
+        long endMessageID;
 
         int uppLimitOfMessageCountToReturn = 1000;
         int lowLimitOfMessageCountToReturn = 50;
@@ -115,6 +115,7 @@ public final class ListMessages {
         }
 
         if (startMessageIDString != null) {
+            startMessageID = Long.parseLong(startMessageIDString);
             //check if startMessageID is valid
             if (queryMessage.checkIfMessageIDExists(startMessageID) == false) {
                 throw new MessageIDDoesNotExistException(path);
@@ -132,6 +133,7 @@ public final class ListMessages {
         }
 
         if (endMessageIDString != null) {
+            endMessageID = Long.parseLong(endMessageIDString);
             //check if endMessageID is valid
             if (queryMessage.checkIfMessageIDExists(endMessageID) == false) {
                 throw new MessageIDDoesNotExistException(path);

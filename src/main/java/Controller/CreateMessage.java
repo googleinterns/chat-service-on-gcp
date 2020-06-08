@@ -54,7 +54,7 @@ public final class CreateMessage {
     @PostMapping("/users/chats/messages")
     public void createMessageWithoutUserIDChatIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
@@ -62,7 +62,7 @@ public final class CreateMessage {
     @PostMapping("/users/chats/{chatID}/messages")
     public void createMessageWithoutUserIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
@@ -70,15 +70,14 @@ public final class CreateMessage {
     @PostMapping("/users/{userID}/chats/messages")
     public void createMessageWithoutChatIDPathVariable(HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
         throw new ChatIDMissingFromRequestURLPathException(path);
     }
     
     @PostMapping("/users/{userID}/chats/{chatID}/messages")
-    public Map<String, String> createMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
+    public Map<String, Object> createMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         
-        String path = request.getRequestUri();
-        Map<String, String> responseBody;
+        String path = request.getRequestURI();
 
         long userID = Long.parseLong(userIDString);
         long chatID = Long.parseLong(chatIDString);
@@ -116,6 +115,6 @@ public final class CreateMessage {
 
         insertChat.insertLastSentMessageID(new Chat(chatID, newMessage.getMessageID()));
         
-        return SuccessResponseGenerator.getSuccessResponseForCreateEntity();
+        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Message", newMessage.getMessageID());
     }
 }

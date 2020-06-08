@@ -36,10 +36,9 @@ public final class CreateUser {
     //this annotation tells that when a URL POST request of the given form comes to the server, the following method should be called
     
     @PostMapping("/users")
-    //if we use @Request Body String username, the body of the POST request needs to contain the string username i.e. say "simran" as Text 
-    public Map<String, String> createUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
+    public Map<String, Object> createUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
 
-        String path = request.getRequestUri();
+        String path = request.getRequestURI();
 
         //check if request body is as required
         if (requestBody.containsKey("username") == false) {
@@ -57,6 +56,6 @@ public final class CreateUser {
         //insert new entry into User
         insertUserHelper.insertAll(newUser);
 
-        return SuccessResponseGenerator.getSuccessResponseForCreateEntity();
+        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", newUser.getUserID());
     }
 }
