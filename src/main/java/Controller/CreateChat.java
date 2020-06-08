@@ -31,22 +31,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 public final class CreateChat {
     
     @Autowired
-    QueryUser queryUserHelper;
+    private QueryUser queryUser;
 
     @Autowired
-    QueryChat queryChatHelper;
+    private InsertChat insertChat;
 
     @Autowired
-    InsertChat insertChatHelper;
+    private QueryUserChat queryUserChat;
 
     @Autowired
-    QueryUserChat queryUserChatHelper;
+    private InsertUserChat insertUserChatHelper;
 
     @Autowired
-    InsertUserChat insertUserChatHelper;
-
-    @Autowired
-    Helper helper;
+    private Helper helper;
 
     @PostMapping("/users/chats")
     public void createChatWithoutUserIDPathVariable() {
@@ -69,21 +66,21 @@ public final class CreateChat {
         }
 
         //check if the passed userID is valid
-        if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
             throw new UserIDDoesNotExistException(path);
         }
 
         //check if username of second user exists - error if does not
-        if (queryUserHelper.checkIfUsernameExists(requestBody.get("username")) == false) {
+        if (queryUser.checkIfUsernameExists(requestBody.get("username")) == false) {
             throw new UsernameDoesNotExistException(path);
         } 
 
         Chat newChat = new Chat();
         UserChat newUserChat1 = new UserChat(Long.parseLong(userIDString), "UserID");
-        UserChat newUserChat2 = new UserChat(queryUserHelper.getUserIDFromUsername(requestBody.get("username")), "UserID");
+        UserChat newUserChat2 = new UserChat(queryUser.getUserIDFromUsername(requestBody.get("username")), "UserID");
 
         //check if chat between the users already exists - return error if it does
-        if (queryUserChatHelper.checkIfChatExistsBetweenUserIDs(newUserChat1.userID, newUserChat2.userID)) {
+        if (queryUserChat.checkIfChatExistsBetweenUserIDs(newUserChat1.userID, newUserChat2.userID)) {
             throw new ChatAlreadyExistsException(path);
         } 
         
@@ -94,7 +91,7 @@ public final class CreateChat {
         newUserChat2.setChatID(newChat.getChatID());
 
         //insert new chat entry into Chat
-        insertChatHelper.insertAllExceptLastSentMessageID(newChat);
+        insertChat.insertAllExceptLastSentMessageID(newChat);
 
         //insert two new user-chat entries into UserChat
         insertUserChatHelper.insertAll(newUserChat1);

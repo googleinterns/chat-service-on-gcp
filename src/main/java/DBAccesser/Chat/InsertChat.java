@@ -13,7 +13,7 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 public class InsertChat {
     
     @Autowired
-    SpannerTemplate spannerTemplate;
+    private SpannerTemplate spannerTemplate;
 
     public void insertAllExceptLastSentMessageID(Chat chat) {
         //must mention to add CreationTS even if it is set to be automatically committed

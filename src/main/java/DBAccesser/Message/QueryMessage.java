@@ -14,7 +14,7 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 public class QueryMessage {
     
     @Autowired
-    SpannerTemplate spannerTemplate;
+    private SpannerTemplate spannerTemplate;
 
     public boolean checkIfMessageIDExists(long messageID) {
 

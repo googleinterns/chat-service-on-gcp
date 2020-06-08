@@ -30,19 +30,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 public final class ListMessages {
 
     @Autowired 
-    QueryUser queryUserHelper;
+    private QueryUser queryUser;
 
     @Autowired 
-    QueryChat queryChatHelper;
+    private QueryChat queryChat;
 
     @Autowired 
-    QueryMessage queryMessageHelper;
+    private QueryMessage queryMessage;
 
     @Autowired 
-    QueryUserChat queryUserChatHelper;
+    private QueryUserChat queryUserChat;
 
     @Autowired 
-    InsertMessage insertMessageHelper;
+    private InsertMessage insertMessage;
 
     @GetMapping("/users/chats/messages")
     public void listMessagesWithoutUserIDChatIDPathVariable() {
@@ -85,17 +85,17 @@ public final class ListMessages {
         List<Message> messages;
         
         //check if the passed userID is valid
-        if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
             throw new UserIDDoesNotExistException(path);
         }
         
         //check if the passed chatID is valid
-        if (queryChatHelper.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
+        if (queryChat.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
             throw new ChatIDDoesNotExistException(path);
         }
 
         //check if user is part of chat
-        if (queryUserChatHelper.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+        if (queryUserChat.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
             throw new UserChatIDDoesNotExistException(path);
         }
 
@@ -110,34 +110,34 @@ public final class ListMessages {
 
         if (startMessageIDString != null) {
             //check if startMessageID is valid
-            if (queryMessageHelper.checkIfMessageIDExists(Long.parseLong(startMessageIDString)) == false) {
+            if (queryMessage.checkIfMessageIDExists(Long.parseLong(startMessageIDString)) == false) {
                 throw new MessageIDDoesNotExistException(path);
             } 
 
             //check if startMessageID is part of this chat
-            if (queryMessageHelper.checkIfMessageIDBelongsToChatID(Long.parseLong(startMessageIDString), Long.parseLong(chatIDString)) == false) {
+            if (queryMessage.checkIfMessageIDBelongsToChatID(Long.parseLong(startMessageIDString), Long.parseLong(chatIDString)) == false) {
                 throw new MessageIDDoesNotBelongToChatIDException(path);
             } 
 
             //get CreationTS of startMessageID 
-            startCreationTS = queryMessageHelper.getCreationTSForMessageID(Long.parseLong(startMessageIDString));
+            startCreationTS = queryMessage.getCreationTSForMessageID(Long.parseLong(startMessageIDString));
         } else {
             startCreationTS = null;
         }
 
         if (endMessageIDString != null) {
             //check if endMessageID is valid
-            if (queryMessageHelper.checkIfMessageIDExists(Long.parseLong(endMessageIDString)) == false) {
+            if (queryMessage.checkIfMessageIDExists(Long.parseLong(endMessageIDString)) == false) {
                 throw new MessageIDDoesNotExistException(path);
             } 
 
             //check if endMessageID is part of this chat
-            if (queryMessageHelper.checkIfMessageIDBelongsToChatID(Long.parseLong(endMessageIDString), Long.parseLong(chatIDString)) == false) {
+            if (queryMessage.checkIfMessageIDBelongsToChatID(Long.parseLong(endMessageIDString), Long.parseLong(chatIDString)) == false) {
                 throw new MessageIDDoesNotBelongToChatIDException(path);
             }
 
             //get CreationTS of endCreationTS 
-            endCreationTS = queryMessageHelper.getCreationTSForMessageID(Long.parseLong(endMessageIDString));
+            endCreationTS = queryMessage.getCreationTSForMessageID(Long.parseLong(endMessageIDString));
         } else {
             endCreationTS = null;
         }
@@ -150,23 +150,23 @@ public final class ListMessages {
                 endCreationTS = temp;
             }
             //get messages within the required time frame
-            messages = queryMessageHelper.listCountMessagesOfChatIDWithinGivenTime(startCreationTS, endCreationTS, count, Long.parseLong(chatIDString));
+            messages = queryMessage.listCountMessagesOfChatIDWithinGivenTime(startCreationTS, endCreationTS, count, Long.parseLong(chatIDString));
         } else if (startCreationTS != null) {
             //get messages beginning at the start time
-            messages = queryMessageHelper.listCountMessagesOfChatIDFromStartTime(startCreationTS, count, Long.parseLong(chatIDString));
+            messages = queryMessage.listCountMessagesOfChatIDFromStartTime(startCreationTS, count, Long.parseLong(chatIDString));
         } else if (endCreationTS != null) {
             //get messages before the end time
-            messages = queryMessageHelper.listCountMessagesOfChatIDBeforeEndTime(endCreationTS, count, Long.parseLong(chatIDString));
+            messages = queryMessage.listCountMessagesOfChatIDBeforeEndTime(endCreationTS, count, Long.parseLong(chatIDString));
         } else {
             //get latest messages 
-            messages = queryMessageHelper.listLatestCountMessagesOfChatID(count, Long.parseLong(chatIDString));
+            messages = queryMessage.listLatestCountMessagesOfChatID(count, Long.parseLong(chatIDString));
         }
 
         //check ReceivedTS of each message not sent by current user- if it is null set it to the time when listMessages was called
         for (Message message : messages) {
             if (message.getReceivedTS() == null && message.getSenderID() != Long.parseLong(userIDString)) {
                 message.setReceivedTS(receivedTS);
-                insertMessageHelper.insertReceivedTS(message);
+                insertMessage.insertReceivedTS(message);
             }
         }
         

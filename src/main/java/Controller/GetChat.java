@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 public final class GetChat {
     
     @Autowired
-    QueryUser queryUserHelper;
+    private QueryUser queryUser;
 
     @Autowired
-    QueryChat queryChatHelper;
+    private QueryChat queryChat;
 
     @Autowired
-    QueryUserChat queryUserChatHelper;
+    private QueryUserChat queryUserChat;
 
     @GetMapping("/users/chats/{chatID}")
     public void getChatWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString) {
@@ -45,20 +45,20 @@ public final class GetChat {
         Map<String, Object> responseBody;
 
         //check if the passed userID is valid
-        if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
             throw new UserIDDoesNotExistException(path);
         }
         
         //check if the passed chatID is valid
-        if (queryChatHelper.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
+        if (queryChat.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
             throw new ChatIDDoesNotExistException(path);
         } 
 
-        if (queryUserChatHelper.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+        if (queryUserChat.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
             throw new UserChatIDDoesNotExistException(path);
         }
         
-        Chat chat = queryChatHelper.getChat(Long.parseLong(chatIDString));
+        Chat chat = queryChat.getChat(Long.parseLong(chatIDString));
 
         return SuccessResponseGenerator.getSuccessResponseForGetChat(chat);
     }

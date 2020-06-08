@@ -13,7 +13,7 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 public class InsertMessage {
     
     @Autowired
-    SpannerTemplate spannerTemplate;
+    private SpannerTemplate spannerTemplate;
 
     public void insertAllForTextMessage(Message message) {
         spannerTemplate.insert(message);

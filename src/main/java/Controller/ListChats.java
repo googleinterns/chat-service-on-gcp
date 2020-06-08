@@ -26,16 +26,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 public final class ListChats {
     
     @Autowired 
-    QueryUser queryUserHelper;
+    private QueryUser queryUser;
 
     @Autowired 
-    QueryChat queryChatHelper;
+    private QueryChat queryChat;
 
     @Autowired
-    QueryMessage queryMessageHelper;
+    private QueryMessage queryMessage;
 
     @Autowired
-    Helper helper;
+    private Helper helper;
 
     @GetMapping("/users/chats")
     public void listChatsWithoutUserIDPathVariable() {
@@ -52,18 +52,18 @@ public final class ListChats {
         Map<String, List<String>> responseBody;
         
         //check if the passed userID is valid
-        if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
             throw new UserIDDoesNotExistException(path);
         }
         
         User user = new User(Long.parseLong(userIDString));
-        List<Chat> chatsOfUser = queryChatHelper.getChatsForUser(user);
+        List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
         
         for (Chat chat : chatsOfUser) {
             if (chat.getLastSentMessageID() == 0) { 
                 chat.setLastSentTime(chat.getCreationTS());
             } else {
-                chat.setLastSentTime(queryMessageHelper.getCreationTSForMessageID(chat.getLastSentMessageID()));
+                chat.setLastSentTime(queryMessage.getCreationTSForMessageID(chat.getLastSentMessageID()));
             }
         }
         
@@ -73,7 +73,7 @@ public final class ListChats {
         
         for (Chat chat : chatsOfUser) {
 
-            usernamesOfChatsOfUser.add(queryUserHelper.getSecondUserForChat(user, chat).get(0).getUsername());
+            usernamesOfChatsOfUser.add(queryUser.getSecondUserForChat(user, chat).get(0).getUsername());
         }
 
         return SuccessResponseGenerator.getSuccessResponseForListChats(usernamesOfChatsOfUser);

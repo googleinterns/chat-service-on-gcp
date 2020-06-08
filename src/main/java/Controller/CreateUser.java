@@ -24,13 +24,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 public final class CreateUser {
 
     @Autowired 
-    QueryUser queryUserHelper;
+    private QueryUser queryUser;
 
     @Autowired
-    InsertUser insertUserHelper;
+    private InsertUser insertUserHelper;
 
     @Autowired
-    Helper helper;
+    private Helper helper;
 
     //this annotation tells that when a URL POST request of the given form comes to the server, the following method should be called
     
@@ -46,7 +46,7 @@ public final class CreateUser {
         }
 
         //check if username exists - return error if it does
-        if (queryUserHelper.checkIfUsernameExists(requestBody.get("username"))) {
+        if (queryUser.checkIfUsernameExists(requestBody.get("username"))) {
             throw new UsernameAlreadyExistsException(path);
         } 
 

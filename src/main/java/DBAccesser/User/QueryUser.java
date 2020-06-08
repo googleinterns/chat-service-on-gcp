@@ -14,7 +14,7 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 public class QueryUser {
     
     @Autowired
-    SpannerTemplate spannerTemplate;
+    private SpannerTemplate spannerTemplate;
 
     public boolean checkIfUsernameExists(String username) {
 

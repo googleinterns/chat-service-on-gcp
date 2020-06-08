@@ -13,7 +13,7 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 public class QueryUserChat {
 
     @Autowired
-    SpannerTemplate spannerTemplate;
+    private SpannerTemplate spannerTemplate;
     
     public boolean checkIfChatExistsBetweenUserIDs(long userID1, long userID2) {
 

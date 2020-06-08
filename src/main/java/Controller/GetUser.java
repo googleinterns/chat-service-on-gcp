@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public final class GetUser {
 
     @Autowired 
-    QueryUser queryUserHelper;
+    private QueryUser queryUser;
 
     @GetMapping("/users")
     public void getUserWithoutUserIDPathVariable() {
@@ -36,11 +36,11 @@ public final class GetUser {
         Map<String, Object> responseBody;
 
         //check if UserID is valid
-        if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
             throw new UserIDDoesNotExistException(path);
         } 
 
-        User user = queryUserHelper.getUser(Long.parseLong(userIDString));
+        User user = queryUser.getUser(Long.parseLong(userIDString));
 
         return SuccessResponseGenerator.getSuccessResponseForGetUser(user);
     }

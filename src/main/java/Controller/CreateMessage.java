@@ -33,25 +33,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 public final class CreateMessage {
 
     @Autowired
-    QueryUser queryUserHelper;
+    private QueryUser queryUser;
 
     @Autowired
-    QueryChat queryChatHelper;
+    private QueryChat queryChat;
 
     @Autowired
-    QueryMessage queryMessageHelper;
+    private QueryUserChat queryUserChat;
 
     @Autowired
-    QueryUserChat queryUserChatHelper;
+    private InsertMessage insertMessage;
 
     @Autowired
-    InsertMessage insertMessageHelper;
+    private InsertChat insertChat;
 
     @Autowired
-    InsertChat insertChatHelper;
-
-    @Autowired
-    Helper helper; 
+    private Helper helper; 
 
     @PostMapping("/users/chats/messages")
     public void createMessageWithoutUserIDChatIDPathVariable() {
@@ -94,17 +91,17 @@ public final class CreateMessage {
         }
         
         //check if the passed userID is valid
-        if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
             throw new UserIDDoesNotExistException(path);
         }
         
         //check if the passed chatID is valid
-        if (queryChatHelper.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
+        if (queryChat.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
             throw new ChatIDDoesNotExistException(path);
         }
 
         //check if user is part of chat
-        if (queryUserChatHelper.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+        if (queryUserChat.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
             throw new UserChatIDDoesNotExistException(path);
         }
         
@@ -112,9 +109,9 @@ public final class CreateMessage {
 
         newMessage.setMessageID(helper.generateUniqueID("Message", false, false));
 
-        insertMessageHelper.insertAllForTextMessage(newMessage);
+        insertMessage.insertAllForTextMessage(newMessage);
 
-        insertChatHelper.insertLastSentMessageID(new Chat(Long.parseLong(chatIDString), newMessage.getMessageID()));
+        insertChat.insertLastSentMessageID(new Chat(Long.parseLong(chatIDString), newMessage.getMessageID()));
         
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity();
     }

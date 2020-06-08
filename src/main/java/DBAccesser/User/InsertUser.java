@@ -13,7 +13,7 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 public class InsertUser {
     
     @Autowired
-    SpannerTemplate spannerTemplate;
+    private SpannerTemplate spannerTemplate;
 
     public void insertAll(User user) {
         spannerTemplate.insert(user);

@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 public class Helper {
 
     @Autowired
-    QueryUser queryUserHelper;
+    private QueryUser queryUser;
 
     @Autowired
-    QueryChat queryChatHelper;
+    private QueryChat queryChat;
 
     @Autowired
-    QueryMessage queryMessageHelper; 
+    private QueryMessage queryMessage; 
     
     //generates long type unique ID value for the given table and its corres ID attribute
     public long generateUniqueID(String tableName, boolean zeroAllowed, boolean negativeAllowed) {
@@ -38,9 +38,9 @@ public class Helper {
             }
 
             switch (tableName) {
-                case "User": if (queryUserHelper.checkIfUserIDExists(ID)) {continue;} else {return ID;}
-                case "Chat": if (queryChatHelper.checkIfChatIDExists(ID)) {continue;} else {return ID;}
-                case "Message": if (queryMessageHelper.checkIfMessageIDExists(ID)) {continue;} else {return ID;}
+                case "User": if (queryUser.checkIfUserIDExists(ID)) {continue;} else {return ID;}
+                case "Chat": if (queryChat.checkIfChatIDExists(ID)) {continue;} else {return ID;}
+                case "Message": if (queryMessage.checkIfMessageIDExists(ID)) {continue;} else {return ID;}
             }
         }
     }
