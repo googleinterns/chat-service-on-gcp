@@ -9,7 +9,6 @@ import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
 import Exceptions.UserChatIDDoesNotExistException;
 import Exceptions.UserIDMissingFromRequestURLPathException;
-import Exceptions.ChatIDMissingFromRequestURLParameterException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -31,24 +30,19 @@ public class GetChat {
     @Autowired
     QueryUserChat queryUserChatHelper;
 
-    @GetMapping("/users/chat")
-    public void getChatWithoutUserIDPathVariable() {
+    @GetMapping("/users/chats/{chatID}")
+    public void getChatWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString) {
 
-        String path = "/users/chat";
+        String path = "/users/chat/"+chatIDString;
 
         throw new UserIDMissingFromRequestURLPathException(path);
     }
 
-    @GetMapping("/users/{userID}/chat")
-    public Map<String, Object> getChat(@PathVariable("userID") String userIDString, @RequestParam(value = "chatID", required = false) String chatIDString) {
+    @GetMapping("/users/{userID}/chats/{chatID}")
+    public Map<String, Object> getChat(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString) {
 
-        String path = "/users/" + userIDString + "/chat/?chatID="+chatIDString;
+        String path = "/users/" + userIDString + "/chat/"+chatIDString;
         Map<String, Object> responseBody;
-
-        //check if URL parameter has been provided
-        if (chatIDString == null) {
-            throw new ChatIDMissingFromRequestURLParameterException(path);
-        }
 
         //check if the passed userID is valid
         if (queryUserHelper.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
