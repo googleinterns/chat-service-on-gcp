@@ -2,7 +2,7 @@ package Controller;
 
 import Entity.User;
 import Entity.Chat;
-import Helper.Helper;
+import Helper.UniqueIDGenerator;
 import DBAccesser.User.UserAccessor;
 import DBAccesser.Chat.ChatAccessor;
 import DBAccesser.Message.MessageAccessor;
@@ -36,7 +36,7 @@ public final class ListChats {
     private MessageAccessor queryMessage;
 
     @Autowired
-    private Helper helper;
+    private UniqueIDGenerator uniqueIDGenerator;
 
     @GetMapping("/users/chats")
     public void listChatsWithoutUserIDPathVariable(HttpServletRequest request) {

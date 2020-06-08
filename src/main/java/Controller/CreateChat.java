@@ -1,6 +1,6 @@
 package Controller;
 
-import Helper.Helper;
+import Helper.UniqueIDGenerator;
 import Entity.Chat;
 import Entity.UserChat;
 import DBAccesser.User.UserAccessor;
@@ -40,10 +40,10 @@ public final class CreateChat {
     private UserChatAccessor queryUserChat;
 
     @Autowired
-    private UserChatAccessor insertUserChatHelper;
+    private UserChatAccessor insertUserChat;
 
     @Autowired
-    private Helper helper;
+    private UniqueIDGenerator uniqueIDGenerator;
 
     @PostMapping("/users/chats")
     public void createChatWithoutUserIDPathVariable(HttpServletRequest request) {
@@ -89,7 +89,7 @@ public final class CreateChat {
         } 
         
         //generate unique chatID
-        newChat.setChatID(helper.generateUniqueID("Chat", false, false));
+        newChat.setChatID(uniqueIDGenerator.generateUniqueID("Chat", false, false));
 
         newUserChat1.setChatID(newChat.getChatID());
         newUserChat2.setChatID(newChat.getChatID());
@@ -98,8 +98,8 @@ public final class CreateChat {
         insertChat.insertAllExceptLastSentMessageID(newChat);
 
         //insert two new user-chat entries into UserChat
-        insertUserChatHelper.insertAll(newUserChat1);
-        insertUserChatHelper.insertAll(newUserChat2);
+        insertUserChat.insertAll(newUserChat1);
+        insertUserChat.insertAll(newUserChat2);
 
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", newChat.getChatID());
     }

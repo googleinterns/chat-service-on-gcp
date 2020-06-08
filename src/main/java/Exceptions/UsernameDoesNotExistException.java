@@ -5,13 +5,17 @@ import org.springframework.http.HttpStatus;
 
 public class UsernameDoesNotExistException extends RuntimeException {
 
-    public static HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-    public static String message = "Username Does Not Exist";
-    public String path;
+    public static HttpStatus HTTP_STATUS = HttpStatus.NOT_FOUND;
+    private static final String message = "Username Does Not Exist";
+    private final String path;
 
     public UsernameDoesNotExistException(String path) {
         super();
         this.path = path;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public String getPath() {

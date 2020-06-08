@@ -1,4 +1,5 @@
 Exceptions/TextContentMissingFromRequestBodyException.class
+Helper/UniqueIDGenerator.class
 Controller/CreateMessage.class
 Entity/UserChat.class
 Controller/GetMessage.class
@@ -8,7 +9,6 @@ Exceptions/ContentTypeMissingFromRequestBodyException.class
 Exceptions/ChatAlreadyExistsException.class
 ExceptionHandler/ExceptionHandlerAdvice.class
 Entity/User.class
-Helper/Helper.class
 Entity/Chat$1.class
 Controller/CreateUser.class
 Exceptions/UsernameAlreadyExistsException.class

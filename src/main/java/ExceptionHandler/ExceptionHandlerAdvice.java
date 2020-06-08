@@ -18,12 +18,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", UsernameAlreadyExistsException.httpStatus.value());
-        responseBody.put("error", UsernameAlreadyExistsException.httpStatus.toString());
-        responseBody.put("message", UsernameAlreadyExistsException.message);
+        responseBody.put("status", UsernameAlreadyExistsException.HTTP_STATUS.value());
+        responseBody.put("error", UsernameAlreadyExistsException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, UsernameAlreadyExistsException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, UsernameAlreadyExistsException.HTTP_STATUS);
     }  
      
     @ExceptionHandler(UsernameDoesNotExistException.class)
@@ -31,12 +31,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", UsernameDoesNotExistException.httpStatus.value());
-        responseBody.put("error", UsernameDoesNotExistException.httpStatus.toString());
-        responseBody.put("message", UsernameDoesNotExistException.message);
+        responseBody.put("status", UsernameDoesNotExistException.HTTP_STATUS.value());
+        responseBody.put("error", UsernameDoesNotExistException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, UsernameDoesNotExistException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, UsernameDoesNotExistException.HTTP_STATUS);
     } 
     
     @ExceptionHandler(ChatAlreadyExistsException.class)
@@ -44,12 +44,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", ChatAlreadyExistsException.httpStatus.value());
-        responseBody.put("error", ChatAlreadyExistsException.httpStatus.toString());
-        responseBody.put("message", ChatAlreadyExistsException.message);
+        responseBody.put("status", ChatAlreadyExistsException.HTTP_STATUS.value());
+        responseBody.put("error", ChatAlreadyExistsException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, ChatAlreadyExistsException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, ChatAlreadyExistsException.HTTP_STATUS);
     }
 
     @ExceptionHandler(UserIDDoesNotExistException.class)
@@ -57,12 +57,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", UserIDDoesNotExistException.httpStatus.value());
-        responseBody.put("error", UserIDDoesNotExistException.httpStatus.toString());
-        responseBody.put("message", UserIDDoesNotExistException.message);
+        responseBody.put("status", UserIDDoesNotExistException.HTTP_STATUS.value());
+        responseBody.put("error", UserIDDoesNotExistException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, UserIDDoesNotExistException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, UserIDDoesNotExistException.HTTP_STATUS);
     }
 
     @ExceptionHandler(ChatIDDoesNotExistException.class)
@@ -70,12 +70,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", ChatIDDoesNotExistException.httpStatus.value());
-        responseBody.put("error", ChatIDDoesNotExistException.httpStatus.toString());
-        responseBody.put("message", ChatIDDoesNotExistException.message);
+        responseBody.put("status", ChatIDDoesNotExistException.HTTP_STATUS.value());
+        responseBody.put("error", ChatIDDoesNotExistException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, ChatIDDoesNotExistException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, ChatIDDoesNotExistException.HTTP_STATUS);
     }  
 
     @ExceptionHandler(MessageIDDoesNotExistException.class)
@@ -83,12 +83,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", MessageIDDoesNotExistException.httpStatus.value());
-        responseBody.put("error", MessageIDDoesNotExistException.httpStatus.toString());
-        responseBody.put("message", MessageIDDoesNotExistException.message);
+        responseBody.put("status", MessageIDDoesNotExistException.HTTP_STATUS.value());
+        responseBody.put("error", MessageIDDoesNotExistException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, MessageIDDoesNotExistException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, MessageIDDoesNotExistException.HTTP_STATUS);
     }  
     
     @ExceptionHandler(UserChatIDDoesNotExistException.class)
@@ -96,12 +96,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", UserChatIDDoesNotExistException.httpStatus.value());
-        responseBody.put("error", UserChatIDDoesNotExistException.httpStatus.toString());
-        responseBody.put("message", UserChatIDDoesNotExistException.message);
+        responseBody.put("status", UserChatIDDoesNotExistException.HTTP_STATUS.value());
+        responseBody.put("error", UserChatIDDoesNotExistException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, UserChatIDDoesNotExistException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, UserChatIDDoesNotExistException.HTTP_STATUS);
     }  
 
     @ExceptionHandler(MessageIDDoesNotBelongToChatIDException.class)
@@ -109,12 +109,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", MessageIDDoesNotBelongToChatIDException.httpStatus.value());
-        responseBody.put("error", MessageIDDoesNotBelongToChatIDException.httpStatus.toString());
-        responseBody.put("message", MessageIDDoesNotBelongToChatIDException.message);
+        responseBody.put("status", MessageIDDoesNotBelongToChatIDException.HTTP_STATUS.value());
+        responseBody.put("error", MessageIDDoesNotBelongToChatIDException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, MessageIDDoesNotBelongToChatIDException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, MessageIDDoesNotBelongToChatIDException.HTTP_STATUS);
     }
 
     @ExceptionHandler(UsernameMissingFromRequestBodyException.class)
@@ -122,12 +122,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", UsernameMissingFromRequestBodyException.httpStatus.value());
-        responseBody.put("error", UsernameMissingFromRequestBodyException.httpStatus.toString());
-        responseBody.put("message", UsernameMissingFromRequestBodyException.message);
+        responseBody.put("status", UsernameMissingFromRequestBodyException.HTTP_STATUS.value());
+        responseBody.put("error", UsernameMissingFromRequestBodyException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, UsernameMissingFromRequestBodyException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, UsernameMissingFromRequestBodyException.HTTP_STATUS);
     }
 
     @ExceptionHandler(UserIDMissingFromRequestURLPathException.class)
@@ -135,12 +135,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", UserIDMissingFromRequestURLPathException.httpStatus.value());
-        responseBody.put("error", UserIDMissingFromRequestURLPathException.httpStatus.toString());
-        responseBody.put("message", UserIDMissingFromRequestURLPathException.message);
+        responseBody.put("status", UserIDMissingFromRequestURLPathException.HTTP_STATUS.value());
+        responseBody.put("error", UserIDMissingFromRequestURLPathException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, UserIDMissingFromRequestURLPathException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, UserIDMissingFromRequestURLPathException.HTTP_STATUS);
     }
 
     @ExceptionHandler(UserIDMissingFromRequestURLParameterException.class)
@@ -148,12 +148,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", UserIDMissingFromRequestURLParameterException.httpStatus.value());
-        responseBody.put("error", UserIDMissingFromRequestURLParameterException.httpStatus.toString());
-        responseBody.put("message", UserIDMissingFromRequestURLParameterException.message);
+        responseBody.put("status", UserIDMissingFromRequestURLParameterException.HTTP_STATUS.value());
+        responseBody.put("error", UserIDMissingFromRequestURLParameterException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, UserIDMissingFromRequestURLParameterException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, UserIDMissingFromRequestURLParameterException.HTTP_STATUS);
     }
 
     @ExceptionHandler(ChatIDMissingFromRequestURLParameterException.class)
@@ -161,12 +161,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", ChatIDMissingFromRequestURLParameterException.httpStatus.value());
-        responseBody.put("error", ChatIDMissingFromRequestURLParameterException.httpStatus.toString());
-        responseBody.put("message", ChatIDMissingFromRequestURLParameterException.message);
+        responseBody.put("status", ChatIDMissingFromRequestURLParameterException.HTTP_STATUS.value());
+        responseBody.put("error", ChatIDMissingFromRequestURLParameterException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, ChatIDMissingFromRequestURLParameterException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, ChatIDMissingFromRequestURLParameterException.HTTP_STATUS);
     }
 
     @ExceptionHandler(TextContentMissingFromRequestBodyException.class)
@@ -174,12 +174,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", TextContentMissingFromRequestBodyException.httpStatus.value());
-        responseBody.put("error", TextContentMissingFromRequestBodyException.httpStatus.toString());
-        responseBody.put("message", TextContentMissingFromRequestBodyException.message);
+        responseBody.put("status", TextContentMissingFromRequestBodyException.HTTP_STATUS.value());
+        responseBody.put("error", TextContentMissingFromRequestBodyException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, TextContentMissingFromRequestBodyException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, TextContentMissingFromRequestBodyException.HTTP_STATUS);
     }
 
     @ExceptionHandler(ContentTypeMissingFromRequestBodyException.class)
@@ -187,12 +187,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", ContentTypeMissingFromRequestBodyException.httpStatus.value());
-        responseBody.put("error", ContentTypeMissingFromRequestBodyException.httpStatus.toString());
-        responseBody.put("message", ContentTypeMissingFromRequestBodyException.message);
+        responseBody.put("status", ContentTypeMissingFromRequestBodyException.HTTP_STATUS.value());
+        responseBody.put("error", ContentTypeMissingFromRequestBodyException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, ContentTypeMissingFromRequestBodyException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, ContentTypeMissingFromRequestBodyException.HTTP_STATUS);
     }
 
     @ExceptionHandler(ChatIDMissingFromRequestURLPathException.class)
@@ -200,12 +200,12 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", ChatIDMissingFromRequestURLPathException.httpStatus.value());
-        responseBody.put("error", ChatIDMissingFromRequestURLPathException.httpStatus.toString());
-        responseBody.put("message", ChatIDMissingFromRequestURLPathException.message);
+        responseBody.put("status", ChatIDMissingFromRequestURLPathException.HTTP_STATUS.value());
+        responseBody.put("error", ChatIDMissingFromRequestURLPathException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, ChatIDMissingFromRequestURLPathException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, ChatIDMissingFromRequestURLPathException.HTTP_STATUS);
     }
 
     @ExceptionHandler(MessageIDMissingFromRequestURLParameterException.class)
@@ -213,11 +213,11 @@ public class ExceptionHandlerAdvice {
 
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", MessageIDMissingFromRequestURLParameterException.httpStatus.value());
-        responseBody.put("error", MessageIDMissingFromRequestURLParameterException.httpStatus.toString());
-        responseBody.put("message", MessageIDMissingFromRequestURLParameterException.message);
+        responseBody.put("status", MessageIDMissingFromRequestURLParameterException.HTTP_STATUS.value());
+        responseBody.put("error", MessageIDMissingFromRequestURLParameterException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
         responseBody.put("path", e.getPath());
 
-        return new ResponseEntity<Object>(responseBody, MessageIDMissingFromRequestURLParameterException.httpStatus);
+        return new ResponseEntity<Object>(responseBody, MessageIDMissingFromRequestURLParameterException.HTTP_STATUS);
     }
 } 

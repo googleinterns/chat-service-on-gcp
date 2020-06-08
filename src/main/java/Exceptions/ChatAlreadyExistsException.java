@@ -5,13 +5,17 @@ import org.springframework.http.HttpStatus;
 
 public class ChatAlreadyExistsException extends RuntimeException {
 
-    public static HttpStatus httpStatus = HttpStatus.CONFLICT;
-    public static String message = "Chat Already Exists";
-    public String path;
+    public static HttpStatus HTTP_STATUS = HttpStatus.CONFLICT;
+    private static final String message = "Chat Already Exists";
+    private final String path;
 
     public ChatAlreadyExistsException(String path) {
         super();
         this.path = path;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public String getPath() {

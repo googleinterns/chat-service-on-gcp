@@ -1,6 +1,6 @@
 package Controller;
 
-import Helper.Helper;
+import Helper.UniqueIDGenerator;
 import Entity.User;
 import DBAccesser.User.UserAccessor;
 import Helper.SuccessResponseGenerator;
@@ -27,10 +27,10 @@ public final class CreateUser {
     private UserAccessor queryUser;
 
     @Autowired
-    private UserAccessor insertUserHelper;
+    private UserAccessor insertUser;
 
     @Autowired
-    private Helper helper;
+    private UniqueIDGenerator uniqueIDGenerator;
 
     //this annotation tells that when a URL POST request of the given form comes to the server, the following method should be called
     
@@ -53,9 +53,9 @@ public final class CreateUser {
 
         User newUser = new User(username);
         //generate unique userID
-        newUser.setUserID(helper.generateUniqueID("User", false, false));
+        newUser.setUserID(uniqueIDGenerator.generateUniqueID("User", false, false));
         //insert new entry into User
-        insertUserHelper.insertAll(newUser);
+        insertUser.insertAll(newUser);
 
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", newUser.getUserID());
     }

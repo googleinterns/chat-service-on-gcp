@@ -5,13 +5,17 @@ import org.springframework.http.HttpStatus;
 
 public class ContentTypeMissingFromRequestBodyException extends RuntimeException {
 
-    public static HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-    public static String message = "Key: 'contentType' Missing From Request Body";
-    public String path;
+    public static HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;
+    private static final String message = "Key: 'contentType' Missing From Request Body";
+    private final String path;
 
     public ContentTypeMissingFromRequestBodyException(String path) {
         super();
         this.path = path;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public String getPath() {

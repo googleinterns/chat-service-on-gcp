@@ -5,13 +5,17 @@ import org.springframework.http.HttpStatus;
 
 public class UsernameAlreadyExistsException extends RuntimeException {
 
-    public static HttpStatus httpStatus = HttpStatus.CONFLICT;
-    public static String message = "Username Already Exists";
-    public String path;
+    public static HttpStatus HTTP_STATUS = HttpStatus.CONFLICT;
+    private static final String message = "Username Already Exists";
+    private final String path;
 
     public UsernameAlreadyExistsException(String path) {
         super();
         this.path = path;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public String getPath() {

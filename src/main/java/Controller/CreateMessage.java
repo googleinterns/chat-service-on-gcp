@@ -1,6 +1,6 @@
 package Controller;
 
-import Helper.Helper;
+import Helper.UniqueIDGenerator;
 import Entity.Chat;
 import Entity.Message;
 import DBAccesser.User.UserAccessor;
@@ -47,7 +47,7 @@ public final class CreateMessage {
     private ChatAccessor insertChat;
 
     @Autowired
-    private Helper helper; 
+    private UniqueIDGenerator uniqueIDGenerator; 
 
     @PostMapping("/users/chats/messages")
     public void createMessageWithoutUserIDChatIDPathVariable(HttpServletRequest request) {
@@ -111,7 +111,7 @@ public final class CreateMessage {
         
         Message newMessage = new Message(chatID, userID, contentType, textContent);
 
-        newMessage.setMessageID(helper.generateUniqueID("Message", false, false));
+        newMessage.setMessageID(uniqueIDGenerator.generateUniqueID("Message", false, false));
 
         insertMessage.insertAllForTextMessage(newMessage);
 
