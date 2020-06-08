@@ -8,24 +8,22 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.NotMapped;
 
 @Table(name = "Chat")
-public class Chat {
+public final class Chat {
     
     @Column(name = "CreationTS", spannerCommitTimestamp = true) 
-    public Timestamp creationTS;
+    private Timestamp creationTS;
     
     @PrimaryKey
     @Column(name = "ChatID")
-    public long chatID;
+    private long chatID;
 
     @Column(name = "LastSentMessageID")
-    public long lastSentMessageID;
+    private long lastSentMessageID;
 
     @NotMapped
-    public Timestamp lastSentTime;
+    private Timestamp lastSentTime;
 
-    public Chat() {
-
-    }
+    public Chat() {}
   
     public Chat(long chatID, long lastSentMessageID) {
       
@@ -33,15 +31,12 @@ public class Chat {
         this.lastSentMessageID = lastSentMessageID;
     }
 
-    public Chat(long ID, String chatIDOrlastSentMessageID) {
-      
-        switch(chatIDOrlastSentMessageID) {
-            case "ChatID":  this.chatID = ID;
-                            this.lastSentMessageID = -1;
-                            break;
-            case "LastSentMessageID":   this.chatID = -1;
-                                        this.lastSentMessageID = ID;
-        }
+    public static Chat newChatWithChatID(long chatID) {
+        return new Chat(chatID, 0);
+    }
+
+    public static Chat newChatWithLastSentMessageID(long lastSentMessageID) {
+        return new Chat(0, lastSentMessageID);
     }
   
     public void setChatID(long chatID) {
@@ -79,7 +74,7 @@ public class Chat {
         return this.lastSentTime;
     }
 
-    public static Comparator<Chat> LastSentTimeDescComparator = new Comparator<Chat>() {
+    public static final Comparator<Chat> LastSentTimeDescComparator = new Comparator<Chat>() {
 
         public int compare(Chat chat1, Chat chat2) {
             

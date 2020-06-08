@@ -79,8 +79,8 @@ public final class CreateChat {
         } 
 
         Chat newChat = new Chat();
-        UserChat newUserChat1 = new UserChat(userID, "UserID");
-        UserChat newUserChat2 = new UserChat(queryUser.getUserIDFromUsername(username), "UserID");
+        UserChat newUserChat1 = UserChat.newUserChatWithUserID(userID);
+        UserChat newUserChat2 = UserChat.newUserChatWithUserID(queryUser.getUserIDFromUsername(username));
 
         //check if chat between the users already exists
         List<UserChat> resultSet = queryUserChat.getChatIDIfChatExistsBetweenUserIDs(newUserChat1.getUserID(), newUserChat2.getUserID());

@@ -6,42 +6,40 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 
 @Table(name = "Message")
-public class Message {
+public final class Message {
     
     @Column(name = "CreationTS", spannerCommitTimestamp = true) 
-    Timestamp creationTS;
+    private Timestamp creationTS;
 
     @PrimaryKey
     @Column(name = "MessageID")
-    long messageID;
+    private long messageID;
 
     @Column(name = "ChatID")
-    long chatID;
+    private long chatID;
 
     @Column(name = "SenderID")
-    long senderID;
+    private long senderID;
 
     @Column(name = "ContentType")
-    String contentType;
+    private String contentType;
 
     @Column(name = "TextContent")
-    String textContent;
+    private String textContent;
     
     @Column(name = "ContentID")
-    long contentID;
+    private long contentID;
 
     @Column(name = "LinkToBlob")
-    String linkToBlob;
+    private String linkToBlob;
 
     @Column(name = "SentTS", spannerCommitTimestamp = true) 
-    Timestamp sentTS;
+    private Timestamp sentTS;
 
     @Column(name = "ReceivedTS") 
-    Timestamp receivedTS;
+    private Timestamp receivedTS;
 
-    public Message() {
-
-    }
+    public Message() {}
 
     public Message(long messageID, long chatID, long senderID, String contentType) {
         this.messageID = messageID;

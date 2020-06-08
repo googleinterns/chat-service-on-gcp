@@ -24,7 +24,6 @@ Exceptions/MessageIDDoesNotBelongToChatIDException.class
 Exceptions/MessageIDDoesNotExistException.class
 DBAccesser/Message/MessageAccessor.class
 DBAccesser/UserChat/UserChatAccessor.class
-Entity/MessageChat.class
 Controller/CreateChat.class
 Exceptions/ChatIDDoesNotExistException.class
 Helper/SuccessResponseGenerator.class

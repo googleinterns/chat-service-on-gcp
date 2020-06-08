@@ -6,21 +6,19 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 
 @Table(name = "User")
-public class User {
+public final class User {
 
   @Column(name = "CreationTS", spannerCommitTimestamp = true) 
   public Timestamp creationTS;
   
   @PrimaryKey
   @Column(name = "UserID")
-  public long userID;
+  private long userID;
 
   @Column(name = "Username")
-  public String username;
+  private String username;
 
-  public User() {
-
-  }
+  public User() {}
 
   public User(long userID, String username) {
     
@@ -36,7 +34,7 @@ public class User {
 
   public User(String username) {
 
-    this.userID = -1;
+    this.userID = 0;
     this.username = username;
   }
 
