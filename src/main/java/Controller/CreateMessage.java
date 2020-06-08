@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-public class CreateMessage {
+public final class CreateMessage {
 
     @Autowired
     QueryUser queryUserHelper;

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-public class ListChats {
+public final class ListChats {
     
     @Autowired 
     QueryUser queryUserHelper;

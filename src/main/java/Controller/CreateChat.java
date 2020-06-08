@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-public class CreateChat {
+public final class CreateChat {
     
     @Autowired
     QueryUser queryUserHelper;

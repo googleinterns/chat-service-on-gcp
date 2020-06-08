@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 //this annotation tells that this class can contain methods which map to URL requests
 @RestController
-public class GetUser {
+public final class GetUser {
 
     @Autowired 
     QueryUser queryUserHelper;

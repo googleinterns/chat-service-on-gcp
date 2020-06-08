@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 //this annotation tells that this class can contain methods which map to URL requests
 @RestController
-public class CreateUser {
+public final class CreateUser {
 
     @Autowired 
     QueryUser queryUserHelper;
