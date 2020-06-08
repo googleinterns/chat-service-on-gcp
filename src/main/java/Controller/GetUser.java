@@ -36,12 +36,14 @@ public final class GetUser {
         String path = request.getRequestUri();
         Map<String, Object> responseBody;
 
+        long userID = Long.parseLong(userIDString);
+
         //check if UserID is valid
-        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(userID) == false) {
             throw new UserIDDoesNotExistException(path);
         } 
 
-        User user = queryUser.getUser(Long.parseLong(userIDString));
+        User user = queryUser.getUser(userID);
 
         return SuccessResponseGenerator.getSuccessResponseForGetUser(user);
     }

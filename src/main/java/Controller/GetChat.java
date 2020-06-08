@@ -32,7 +32,7 @@ public final class GetChat {
     private QueryUserChat queryUserChat;
 
     @GetMapping("/users/chats/{chatID}")
-    public void getChatWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString, HttpServletRequest request) {
+    public void getChatWithoutUserIDPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestUri();
 
@@ -45,21 +45,24 @@ public final class GetChat {
         String path = request.getRequestUri();
         Map<String, Object> responseBody;
 
+        long userID = Long.parseLong(userIDString);
+        long chatID = Long.parseLong(chatIDString);
+
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists() == false) {
             throw new UserIDDoesNotExistException(path);
         }
         
         //check if the passed chatID is valid
-        if (queryChat.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
+        if (queryChat.checkIfChatIDExists(chatID) == false) {
             throw new ChatIDDoesNotExistException(path);
         } 
 
-        if (queryUserChat.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+        if (queryUserChat.checkIfUserChatIDExists(userID, chatID) == false) {
             throw new UserChatIDDoesNotExistException(path);
         }
         
-        Chat chat = queryChat.getChat(Long.parseLong(chatIDString));
+        Chat chat = queryChat.getChat(chatID);
 
         return SuccessResponseGenerator.getSuccessResponseForGetChat(chat);
     }

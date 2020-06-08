@@ -60,7 +60,7 @@ public final class CreateMessage {
     }
 
     @PostMapping("/users/chats/{chatID}/messages")
-    public void createMessageWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString, HttpServletRequest request) {
+    public void createMessageWithoutUserIDPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestUri();
 
@@ -68,7 +68,7 @@ public final class CreateMessage {
     }
 
     @PostMapping("/users/{userID}/chats/messages")
-    public void createMessageWithoutChatIDPathVariable(@PathVariable("userID") String userIDString, HttpServletRequest request) {
+    public void createMessageWithoutChatIDPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestUri();
         throw new ChatIDMissingFromRequestURLPathException(path);
@@ -79,6 +79,9 @@ public final class CreateMessage {
         
         String path = request.getRequestUri();
         Map<String, String> responseBody;
+
+        long userID = Long.parseLong(userIDString);
+        long chatID = Long.parseLong(chatIDString);
 
         //check if request body is as required
         if (requestBody.containsKey("contentType") == false) {
@@ -91,27 +94,27 @@ public final class CreateMessage {
         }
         
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(userID) == false) {
             throw new UserIDDoesNotExistException(path);
         }
         
         //check if the passed chatID is valid
-        if (queryChat.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
+        if (queryChat.checkIfChatIDExists(chatID) == false) {
             throw new ChatIDDoesNotExistException(path);
         }
 
         //check if user is part of chat
-        if (queryUserChat.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+        if (queryUserChat.checkIfUserChatIDExists(userID, chatID) == false) {
             throw new UserChatIDDoesNotExistException(path);
         }
         
-        Message newMessage = new Message(Long.parseLong(chatIDString), Long.parseLong(userIDString), requestBody.get("contentType"), requestBody.get("textContent"));
+        Message newMessage = new Message(chatID, userID, requestBody.get("contentType"), requestBody.get("textContent"));
 
         newMessage.setMessageID(helper.generateUniqueID("Message", false, false));
 
         insertMessage.insertAllForTextMessage(newMessage);
 
-        insertChat.insertLastSentMessageID(new Chat(Long.parseLong(chatIDString), newMessage.getMessageID()));
+        insertChat.insertLastSentMessageID(new Chat(chatID, newMessage.getMessageID()));
         
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity();
     }

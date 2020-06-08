@@ -54,7 +54,7 @@ public final class ListMessages {
     }
 
     @GetMapping("/users/chats/{chatID}/messages")
-    public void listMessagesWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString, HttpServletRequest request) {
+    public void listMessagesWithoutUserIDPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestUri();
 
@@ -62,7 +62,7 @@ public final class ListMessages {
     }
 
     @GetMapping("/users/{userID}/chats/messages")
-    public void listMessagesWithoutChatIDPathVariable(@PathVariable("userID") String userIDString) {
+    public void listMessagesWithoutChatIDPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestUri();
 
@@ -76,6 +76,11 @@ public final class ListMessages {
         String path = request.getRequestUri();
         Map<String, List<Map<String, Object>>> responseBody;
 
+        long userID = Long.parseLong(userIDString);
+        long chatID = Long.parseLong(chatIDString);
+        long startMessageID = Long.parseLong(startMessageIDString);
+        long endMessageID = Long.parseLong(endMessageIDString);
+
         int uppLimitOfMessageCountToReturn = 1000;
         int lowLimitOfMessageCountToReturn = 50;
         int count;
@@ -86,17 +91,17 @@ public final class ListMessages {
         List<Message> messages;
         
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(userID) == false) {
             throw new UserIDDoesNotExistException(path);
         }
         
         //check if the passed chatID is valid
-        if (queryChat.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
+        if (queryChat.checkIfChatIDExists(chatID) == false) {
             throw new ChatIDDoesNotExistException(path);
         }
 
         //check if user is part of chat
-        if (queryUserChat.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+        if (queryUserChat.checkIfUserChatIDExists(userID, chatID) == false) {
             throw new UserChatIDDoesNotExistException(path);
         }
 
@@ -111,34 +116,34 @@ public final class ListMessages {
 
         if (startMessageIDString != null) {
             //check if startMessageID is valid
-            if (queryMessage.checkIfMessageIDExists(Long.parseLong(startMessageIDString)) == false) {
+            if (queryMessage.checkIfMessageIDExists(startMessageID) == false) {
                 throw new MessageIDDoesNotExistException(path);
             } 
 
             //check if startMessageID is part of this chat
-            if (queryMessage.checkIfMessageIDBelongsToChatID(Long.parseLong(startMessageIDString), Long.parseLong(chatIDString)) == false) {
+            if (queryMessage.checkIfMessageIDBelongsToChatID(startMessageID, chatID) == false) {
                 throw new MessageIDDoesNotBelongToChatIDException(path);
             } 
 
             //get CreationTS of startMessageID 
-            startCreationTS = queryMessage.getCreationTSForMessageID(Long.parseLong(startMessageIDString));
+            startCreationTS = queryMessage.getCreationTSForMessageID(startMessageID);
         } else {
             startCreationTS = null;
         }
 
         if (endMessageIDString != null) {
             //check if endMessageID is valid
-            if (queryMessage.checkIfMessageIDExists(Long.parseLong(endMessageIDString)) == false) {
+            if (queryMessage.checkIfMessageIDExists(endMessageID) == false) {
                 throw new MessageIDDoesNotExistException(path);
             } 
 
             //check if endMessageID is part of this chat
-            if (queryMessage.checkIfMessageIDBelongsToChatID(Long.parseLong(endMessageIDString), Long.parseLong(chatIDString)) == false) {
+            if (queryMessage.checkIfMessageIDBelongsToChatID(endMessageID, chatID) == false) {
                 throw new MessageIDDoesNotBelongToChatIDException(path);
             }
 
             //get CreationTS of endCreationTS 
-            endCreationTS = queryMessage.getCreationTSForMessageID(Long.parseLong(endMessageIDString));
+            endCreationTS = queryMessage.getCreationTSForMessageID(endMessageID);
         } else {
             endCreationTS = null;
         }
@@ -151,21 +156,21 @@ public final class ListMessages {
                 endCreationTS = temp;
             }
             //get messages within the required time frame
-            messages = queryMessage.listCountMessagesOfChatIDWithinGivenTime(startCreationTS, endCreationTS, count, Long.parseLong(chatIDString));
+            messages = queryMessage.listCountMessagesOfChatIDWithinGivenTime(startCreationTS, endCreationTS, count, chatID);
         } else if (startCreationTS != null) {
             //get messages beginning at the start time
-            messages = queryMessage.listCountMessagesOfChatIDFromStartTime(startCreationTS, count, Long.parseLong(chatIDString));
+            messages = queryMessage.listCountMessagesOfChatIDFromStartTime(startCreationTS, count, chatID);
         } else if (endCreationTS != null) {
             //get messages before the end time
-            messages = queryMessage.listCountMessagesOfChatIDBeforeEndTime(endCreationTS, count, Long.parseLong(chatIDString));
+            messages = queryMessage.listCountMessagesOfChatIDBeforeEndTime(endCreationTS, count, chatID);
         } else {
             //get latest messages 
-            messages = queryMessage.listLatestCountMessagesOfChatID(count, Long.parseLong(chatIDString));
+            messages = queryMessage.listLatestCountMessagesOfChatID(count, chatID);
         }
 
         //check ReceivedTS of each message not sent by current user- if it is null set it to the time when listMessages was called
         for (Message message : messages) {
-            if (message.getReceivedTS() == null && message.getSenderID() != Long.parseLong(userIDString)) {
+            if (message.getReceivedTS() == null && message.getSenderID() != userID) {
                 message.setReceivedTS(receivedTS);
                 insertMessage.insertReceivedTS(message);
             }

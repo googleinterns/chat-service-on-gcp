@@ -39,7 +39,7 @@ public final class GetMessage {
     private QueryUserChat queryUserChat;
 
     @GetMapping("/users/{userID}/chats/messages/{messageID}")
-    public void getMessageWithoutChatIDPathVariable(@PathVariable("userID") String userIDString, @PathVariable("messageID") String messageIDString, HttpServletRequest request) {
+    public void getMessageWithoutChatIDPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestUri();
 
@@ -47,7 +47,7 @@ public final class GetMessage {
     }
 
     @GetMapping("/users/chats/{chatID}/messages/{messageID}")
-    public void getMessageWithoutUserIDPathVariable(@PathVariable("chatID") String chatIDString, @PathVariable("messageID") String messageIDString, HttpServletRequest request) {
+    public void getMessageWithoutUserIDPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestUri();
 
@@ -60,27 +60,31 @@ public final class GetMessage {
         String path = request.getRequestUri();
         Map<String, Object> responseBody;
 
+        long userID = Long.parseLong(userIDString);
+        long chatID = Long.parseLong(chatIDString);
+        long messageID = Long.parseLong(messageIDString);
+
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(userID) == false) {
             throw new UserIDDoesNotExistException(path);
         }
         
         //check if the passed chatID is valid
-        if (queryChat.checkIfChatIDExists(Long.parseLong(chatIDString)) == false) {
+        if (queryChat.checkIfChatIDExists(chatID) == false) {
             throw new ChatIDDoesNotExistException(path);
         }
 
         //check if user is part of chat
-        if (queryUserChat.checkIfUserChatIDExists(Long.parseLong(userIDString), Long.parseLong(chatIDString)) == false) {
+        if (queryUserChat.checkIfUserChatIDExists(userID, chatID) == false) {
             throw new UserChatIDDoesNotExistException(path);
         }
         
         //check if the passed messageID is valid
-        if (queryMessage.checkIfMessageIDExists(Long.parseLong(messageIDString)) == false) {
+        if (queryMessage.checkIfMessageIDExists(messageID) == false) {
             throw new MessageIDDoesNotExistException(path);
         } 
 
-        Message message = queryMessage.getMessage(Long.parseLong(messageIDString));
+        Message message = queryMessage.getMessage(messageID);
     
         return SuccessResponseGenerator.getSuccessResponseForGetMessage(message);
     }

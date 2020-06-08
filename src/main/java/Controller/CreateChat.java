@@ -62,13 +62,15 @@ public final class CreateChat {
         
         Map<String, String> responseBody;
 
+        long userID = Long.parseLong(userIDString);
+
         //check if request body is as required
         if (requestBody.containsKey("username") == false) {
             throw new UsernameMissingFromRequestBodyException(path);
         }
 
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(userID) == false) {
             throw new UserIDDoesNotExistException(path);
         }
 
@@ -78,7 +80,7 @@ public final class CreateChat {
         } 
 
         Chat newChat = new Chat();
-        UserChat newUserChat1 = new UserChat(Long.parseLong(userIDString), "UserID");
+        UserChat newUserChat1 = new UserChat(userID, "UserID");
         UserChat newUserChat2 = new UserChat(queryUser.getUserIDFromUsername(requestBody.get("username")), "UserID");
 
         //check if chat between the users already exists - return error if it does

@@ -51,13 +51,15 @@ public final class ListChats {
         
         String path = request.getRequestUri();
         Map<String, List<String>> responseBody;
+
+        long userID = Long.parseLong(userIDString);
         
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(Long.parseLong(userIDString)) == false) {
+        if (queryUser.checkIfUserIDExists(userID) == false) {
             throw new UserIDDoesNotExistException(path);
         }
         
-        User user = new User(Long.parseLong(userIDString));
+        User user = new User(userID);
         List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
         
         for (Chat chat : chatsOfUser) {
