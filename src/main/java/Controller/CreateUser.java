@@ -2,8 +2,7 @@ package Controller;
 
 import Helper.Helper;
 import Entity.User;
-import DBAccesser.User.QueryUser;
-import DBAccesser.User.InsertUser;
+import DBAccesser.User.UserAccessor;
 import Helper.SuccessResponseGenerator;
 import Exceptions.UsernameAlreadyExistsException;
 import Exceptions.UserIDDoesNotExistException;
@@ -25,10 +24,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 public final class CreateUser {
 
     @Autowired 
-    private QueryUser queryUser;
+    private UserAccessor queryUser;
 
     @Autowired
-    private InsertUser insertUserHelper;
+    private UserAccessor insertUserHelper;
 
     @Autowired
     private Helper helper;

@@ -1,8 +1,8 @@
 package Helper;
 
-import DBAccesser.User.QueryUser;
-import DBAccesser.Chat.QueryChat;
-import DBAccesser.Message.QueryMessage;
+import DBAccesser.User.UserAccessor;
+import DBAccesser.Chat.ChatAccessor;
+import DBAccesser.Message.MessageAccessor;
 
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 public class Helper {
 
     @Autowired
-    private QueryUser queryUser;
+    private UserAccessor queryUser;
 
     @Autowired
-    private QueryChat queryChat;
+    private ChatAccessor queryChat;
 
     @Autowired
-    private QueryMessage queryMessage; 
+    private MessageAccessor queryMessage; 
     
     //generates long type unique ID value for the given table and its corres ID attribute
     public long generateUniqueID(String tableName, boolean zeroAllowed, boolean negativeAllowed) {

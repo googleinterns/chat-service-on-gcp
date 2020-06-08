@@ -3,9 +3,9 @@ package Controller;
 import Entity.User;
 import Entity.Chat;
 import Helper.Helper;
-import DBAccesser.User.QueryUser;
-import DBAccesser.Chat.QueryChat;
-import DBAccesser.Message.QueryMessage;
+import DBAccesser.User.UserAccessor;
+import DBAccesser.Chat.ChatAccessor;
+import DBAccesser.Message.MessageAccessor;
 import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
@@ -27,13 +27,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 public final class ListChats {
     
     @Autowired 
-    private QueryUser queryUser;
+    private UserAccessor queryUser;
 
     @Autowired 
-    private QueryChat queryChat;
+    private ChatAccessor queryChat;
 
     @Autowired
-    private QueryMessage queryMessage;
+    private MessageAccessor queryMessage;
 
     @Autowired
     private Helper helper;

@@ -1,11 +1,10 @@
 package Controller;
 
 import Entity.Message;
-import DBAccesser.User.QueryUser;
-import DBAccesser.Chat.QueryChat;
-import DBAccesser.UserChat.QueryUserChat;
-import DBAccesser.Message.QueryMessage;
-import DBAccesser.Message.InsertMessage;
+import DBAccesser.User.UserAccessor;
+import DBAccesser.Chat.ChatAccessor;
+import DBAccesser.Message.MessageAccessor;
+import DBAccesser.UserChat.UserChatAccessor;
 import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
@@ -31,19 +30,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 public final class ListMessages {
 
     @Autowired 
-    private QueryUser queryUser;
+    private UserAccessor queryUser;
 
     @Autowired 
-    private QueryChat queryChat;
+    private ChatAccessor queryChat;
 
     @Autowired 
-    private QueryMessage queryMessage;
+    private MessageAccessor queryMessage;
 
     @Autowired 
-    private QueryUserChat queryUserChat;
+    private UserChatAccessor queryUserChat;
 
     @Autowired 
-    private InsertMessage insertMessage;
+    private MessageAccessor insertMessage;
 
     private static final int UPPER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN = 1000;
     

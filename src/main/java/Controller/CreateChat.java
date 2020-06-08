@@ -3,11 +3,9 @@ package Controller;
 import Helper.Helper;
 import Entity.Chat;
 import Entity.UserChat;
-import DBAccesser.User.QueryUser;
-import DBAccesser.Chat.QueryChat;
-import DBAccesser.UserChat.QueryUserChat;
-import DBAccesser.Chat.InsertChat;
-import DBAccesser.UserChat.InsertUserChat;
+import DBAccesser.User.UserAccessor;
+import DBAccesser.Chat.ChatAccessor;
+import DBAccesser.UserChat.UserChatAccessor;
 import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
@@ -33,16 +31,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 public final class CreateChat {
     
     @Autowired
-    private QueryUser queryUser;
+    private UserAccessor queryUser;
 
     @Autowired
-    private InsertChat insertChat;
+    private ChatAccessor insertChat;
 
     @Autowired
-    private QueryUserChat queryUserChat;
+    private UserChatAccessor queryUserChat;
 
     @Autowired
-    private InsertUserChat insertUserChatHelper;
+    private UserChatAccessor insertUserChatHelper;
 
     @Autowired
     private Helper helper;

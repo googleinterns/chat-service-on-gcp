@@ -1,10 +1,10 @@
 package Controller;
 
 import Entity.Message;
-import DBAccesser.User.QueryUser;
-import DBAccesser.Chat.QueryChat;
-import DBAccesser.Message.QueryMessage;
-import DBAccesser.UserChat.QueryUserChat;
+import DBAccesser.User.UserAccessor;
+import DBAccesser.Chat.ChatAccessor;
+import DBAccesser.Message.MessageAccessor;
+import DBAccesser.UserChat.UserChatAccessor;
 import Helper.SuccessResponseGenerator;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.ChatIDDoesNotExistException;
@@ -28,16 +28,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 public final class GetMessage {
 
     @Autowired
-    private QueryUser queryUser;
+    private UserAccessor queryUser;
 
     @Autowired
-    private QueryChat queryChat;
+    private ChatAccessor queryChat;
 
     @Autowired
-    private QueryMessage queryMessage;
+    private MessageAccessor queryMessage;
 
     @Autowired
-    private QueryUserChat queryUserChat;
+    private UserChatAccessor queryUserChat;
 
     @GetMapping("/users/{userID}/chats/messages/{messageID}")
     public void getMessageWithoutChatIDPathVariable(HttpServletRequest request) {

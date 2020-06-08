@@ -1,7 +1,7 @@
 package Controller;
 
 import Entity.User;
-import DBAccesser.User.QueryUser;
+import DBAccesser.User.UserAccessor;
 import Exceptions.UserIDDoesNotExistException;
 import Exceptions.UserIDMissingFromRequestURLPathException;
 import Helper.SuccessResponseGenerator;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public final class GetUser {
 
     @Autowired 
-    private QueryUser queryUser;
+    private UserAccessor queryUser;
 
     @GetMapping("/users")
     public void getUserWithoutUserIDPathVariable(HttpServletRequest request) {
