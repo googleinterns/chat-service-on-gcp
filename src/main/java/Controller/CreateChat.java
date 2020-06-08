@@ -19,6 +19,7 @@ import Exceptions.UsernameMissingFromRequestBodyException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;  
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -81,9 +82,10 @@ public final class CreateChat {
         UserChat newUserChat1 = new UserChat(userID, "UserID");
         UserChat newUserChat2 = new UserChat(queryUser.getUserIDFromUsername(requestBody.get("username")), "UserID");
 
-        //check if chat between the users already exists - return error if it does
-        if (queryUserChat.checkIfChatExistsBetweenUserIDs(newUserChat1.userID, newUserChat2.userID)) {
-            throw new ChatAlreadyExistsException(path);
+        //check if chat between the users already exists
+        List<UserChat> resultSet = queryUserChat.getChatIDIfChatExistsBetweenUserIDs(newUserChat1.getUserID(), newUserChat2.getUserID());
+        if (!resultSet.isEmpty()) {
+            return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", resultSet.get(0).getChatID());
         } 
         
         //generate unique chatID

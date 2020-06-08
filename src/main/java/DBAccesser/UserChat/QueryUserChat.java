@@ -15,17 +15,13 @@ public class QueryUserChat {
     @Autowired
     private SpannerTemplate spannerTemplate;
     
-    public boolean checkIfChatExistsBetweenUserIDs(long userID1, long userID2) {
+    public List<UserChat> getChatIDIfChatExistsBetweenUserIDs(long userID1, long userID2) {
 
-        String SQLStatment = "SELECT UserID FROM UserChat WHERE UserID=@userID2 AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userID1)";
+        String SQLStatment = "SELECT ChatID FROM UserChat WHERE UserID=@userID2 AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userID1)";
         Statement statement = Statement.newBuilder(SQLStatment).bind("userID2").to(userID2).bind("userID1").to(userID1).build();
         List<UserChat> resultSet = spannerTemplate.query(UserChat.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
     
-        if (resultSet.size()>0) {
-            return true;
-        } else {
-            return false;
-        }
+        return resultSet;
     }
 
     public boolean checkIfUserChatIDExists(long userID, long chatID) {

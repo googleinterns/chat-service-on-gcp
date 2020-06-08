@@ -15,7 +15,7 @@ public class SuccessResponseGenerator {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
 
-        responseBody.put("message", "Created");
+        responseBody.put("message", "Success");
         responseBody.put(className+"ID", ID);
 
         return responseBody;
