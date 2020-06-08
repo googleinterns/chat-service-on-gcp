@@ -13,6 +13,7 @@ import Exceptions.UserChatIDDoesNotExistException;
 import Exceptions.UserIDMissingFromRequestURLPathException;
 import Exceptions.ChatIDMissingFromRequestURLPathException;
 import Exceptions.MessageIDMissingFromRequestURLParameterException;
+import Exceptions.MessageIDDoesNotBelongToChatIDException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -82,7 +83,12 @@ public final class GetMessage {
         //check if the passed messageID is valid
         if (queryMessage.checkIfMessageIDExists(messageID) == false) {
             throw new MessageIDDoesNotExistException(path);
-        } 
+        }
+
+        //check if passed message belongs to chat 
+        if (queryMessage.checkIfMessageIDBelongsToChatID(messageID, chatID) == false) {
+            throw new MessageIDDoesNotBelongToChatIDException(path);
+        }
 
         Message message = queryMessage.getMessage(messageID);
     
