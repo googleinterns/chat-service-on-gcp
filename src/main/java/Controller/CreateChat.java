@@ -64,23 +64,25 @@ public final class CreateChat {
         long userID = Long.parseLong(userIDString);
 
         //check if request body is as required
-        if (requestBody.containsKey("username") == false) {
+        if (!requestBody.containsKey("username")) {
             throw new UsernameMissingFromRequestBodyException(path);
         }
 
+        String username = requestBody.get("username");
+
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(userID) == false) {
+        if (!queryUser.checkIfUserIDExists(userID)) {
             throw new UserIDDoesNotExistException(path);
         }
 
         //check if username of second user exists - error if does not
-        if (queryUser.checkIfUsernameExists(requestBody.get("username")) == false) {
+        if (!queryUser.checkIfUsernameExists(username)) {
             throw new UsernameDoesNotExistException(path);
         } 
 
         Chat newChat = new Chat();
         UserChat newUserChat1 = new UserChat(userID, "UserID");
-        UserChat newUserChat2 = new UserChat(queryUser.getUserIDFromUsername(requestBody.get("username")), "UserID");
+        UserChat newUserChat2 = new UserChat(queryUser.getUserIDFromUsername(username), "UserID");
 
         //check if chat between the users already exists
         List<UserChat> resultSet = queryUserChat.getChatIDIfChatExistsBetweenUserIDs(newUserChat1.getUserID(), newUserChat2.getUserID());

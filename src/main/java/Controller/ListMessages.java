@@ -91,17 +91,17 @@ public final class ListMessages {
         List<Message> messages;
         
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(userID) == false) {
+        if (!queryUser.checkIfUserIDExists(userID)) {
             throw new UserIDDoesNotExistException(path);
         }
         
         //check if the passed chatID is valid
-        if (queryChat.checkIfChatIDExists(chatID) == false) {
+        if (!queryChat.checkIfChatIDExists(chatID)) {
             throw new ChatIDDoesNotExistException(path);
         }
 
         //check if user is part of chat
-        if (queryUserChat.checkIfUserChatIDExists(userID, chatID) == false) {
+        if (!queryUserChat.checkIfUserChatIDExists(userID, chatID)) {
             throw new UserChatIDDoesNotExistException(path);
         }
 
@@ -117,12 +117,12 @@ public final class ListMessages {
         if (startMessageIDString != null) {
             startMessageID = Long.parseLong(startMessageIDString);
             //check if startMessageID is valid
-            if (queryMessage.checkIfMessageIDExists(startMessageID) == false) {
+            if (!queryMessage.checkIfMessageIDExists(startMessageID)) {
                 throw new MessageIDDoesNotExistException(path);
             } 
 
             //check if startMessageID is part of this chat
-            if (queryMessage.checkIfMessageIDBelongsToChatID(startMessageID, chatID) == false) {
+            if (!queryMessage.checkIfMessageIDBelongsToChatID(startMessageID, chatID)) {
                 throw new MessageIDDoesNotBelongToChatIDException(path);
             } 
 
@@ -135,12 +135,12 @@ public final class ListMessages {
         if (endMessageIDString != null) {
             endMessageID = Long.parseLong(endMessageIDString);
             //check if endMessageID is valid
-            if (queryMessage.checkIfMessageIDExists(endMessageID) == false) {
+            if (!queryMessage.checkIfMessageIDExists(endMessageID)) {
                 throw new MessageIDDoesNotExistException(path);
             } 
 
             //check if endMessageID is part of this chat
-            if (queryMessage.checkIfMessageIDBelongsToChatID(endMessageID, chatID) == false) {
+            if (!queryMessage.checkIfMessageIDBelongsToChatID(endMessageID, chatID)) {
                 throw new MessageIDDoesNotBelongToChatIDException(path);
             }
 

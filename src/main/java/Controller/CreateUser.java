@@ -41,16 +41,18 @@ public final class CreateUser {
         String path = request.getRequestURI();
 
         //check if request body is as required
-        if (requestBody.containsKey("username") == false) {
+        if (!requestBody.containsKey("username")) {
             throw new UsernameMissingFromRequestBodyException(path);
         }
 
+        String username  = requestBody.get("username");
+
         //check if username exists - return error if it does
-        if (queryUser.checkIfUsernameExists(requestBody.get("username"))) {
+        if (queryUser.checkIfUsernameExists(username)) {
             throw new UsernameAlreadyExistsException(path);
         } 
 
-        User newUser = new User(requestBody.get("username"));
+        User newUser = new User(username);
         //generate unique userID
         newUser.setUserID(helper.generateUniqueID("User", false, false));
         //insert new entry into User

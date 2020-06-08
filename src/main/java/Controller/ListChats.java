@@ -55,7 +55,7 @@ public final class ListChats {
         long userID = Long.parseLong(userIDString);
         
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(userID) == false) {
+        if (!queryUser.checkIfUserIDExists(userID)) {
             throw new UserIDDoesNotExistException(path);
         }
         
@@ -75,7 +75,6 @@ public final class ListChats {
         List<String> usernamesOfChatsOfUser = new ArrayList<String>();
         
         for (Chat chat : chatsOfUser) {
-
             usernamesOfChatsOfUser.add(queryUser.getSecondUserForChat(user, chat).get(0).getUsername());
         }
 

@@ -83,31 +83,35 @@ public final class CreateMessage {
         long chatID = Long.parseLong(chatIDString);
 
         //check if request body is as required
-        if (requestBody.containsKey("contentType") == false) {
+        if (!requestBody.containsKey("contentType")) {
             throw new ContentTypeMissingFromRequestBodyException(path);
         }
 
+        String contentType = requestBody.get("contentType");
+
         //check if request body is as required
-        if (requestBody.containsKey("textContent") == false) {
+        if (!requestBody.containsKey("textContent")) {
             throw new TextContentMissingFromRequestBodyException(path);
         }
+
+        String textContent = requestBody.get("textContent");
         
         //check if the passed userID is valid
-        if (queryUser.checkIfUserIDExists(userID) == false) {
+        if (!queryUser.checkIfUserIDExists(userID)) {
             throw new UserIDDoesNotExistException(path);
         }
         
         //check if the passed chatID is valid
-        if (queryChat.checkIfChatIDExists(chatID) == false) {
+        if (!queryChat.checkIfChatIDExists(chatID)) {
             throw new ChatIDDoesNotExistException(path);
         }
 
         //check if user is part of chat
-        if (queryUserChat.checkIfUserChatIDExists(userID, chatID) == false) {
+        if (!queryUserChat.checkIfUserChatIDExists(userID, chatID)) {
             throw new UserChatIDDoesNotExistException(path);
         }
         
-        Message newMessage = new Message(chatID, userID, requestBody.get("contentType"), requestBody.get("textContent"));
+        Message newMessage = new Message(chatID, userID, contentType, textContent);
 
         newMessage.setMessageID(helper.generateUniqueID("Message", false, false));
 
