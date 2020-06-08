@@ -34,10 +34,6 @@ public class UserChatAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(userID).bind("chatID").to(chatID).build();
         List<UserChat> resultSet = spannerTemplate.query(UserChat.class, statement, null);
     
-        if (resultSet.size()>0) {
-            return true;
-        } else {
-            return false;
-        }
+        return (!resultSet.isEmpty());
     }
 }

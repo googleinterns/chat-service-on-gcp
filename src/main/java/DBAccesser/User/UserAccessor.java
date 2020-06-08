@@ -26,11 +26,7 @@ public class UserAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("username").to(username).build();
         List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
  
-        if (resultSet.size()>0) {
-            return true;
-        } else {
-            return false;
-        }
+        return (!resultSet.isEmpty());
     }
 
     public User getUser(long userID) {
@@ -48,11 +44,7 @@ public class UserAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(userID).build();
         List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        if (resultSet.size()>0) {
-            return true;
-        } else {
-            return false;
-        }
+        return (!resultSet.isEmpty());
     }
 
     public long getUserIDFromUsername(String username) {

@@ -32,11 +32,7 @@ public class ChatAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("chatID").to(chatID).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        if (resultSet.size()>0) {
-            return true;
-        } else {
-            return false;
-        }        
+        return (!resultSet.isEmpty());        
     }
 
     public Chat getChat(long chatID) {
@@ -52,7 +48,7 @@ public class ChatAccessor {
 
         String SQLStatment = "SELECT * FROM Chat WHERE ChatID in (SELECT ChatID FROM UserChat WHERE UserID=@userID)";
         Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(user.getUserID()).build();
-        List<Chat> resultSet = spannerTemplate.query(Chat.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+        List<Chat> resultSet = spannerTemplate.query(Chat.class, statement, null);
  
         return resultSet;
     }
