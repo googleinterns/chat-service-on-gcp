@@ -66,25 +66,30 @@ public class SuccessResponseGenerator {
         return responseBody;
     }
 
+    private static Map<String, Object> getMessageForResponseBody(Message message) {
+    
+        Map<String, Object> messageForResponseBody = new LinkedHashMap<String, Object>();
+
+        messageForResponseBody.put("MessageID", message.getMessageID());
+        messageForResponseBody.put("CreationTS", message.getCreationTS());
+        messageForResponseBody.put("ChatID", message.getChatID());
+        messageForResponseBody.put("SenderID", message.getSenderID());
+        messageForResponseBody.put("ContentType", message.getContentType());
+        messageForResponseBody.put("TextContent", message.getTextContent());
+        messageForResponseBody.put("SentTS", message.getSentTS());
+        messageForResponseBody.put("ReceivedTS", message.getReceivedTS());
+
+        return messageForResponseBody;
+    }
+
     public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(List<Message> messages) {
 
-        //return messages in ascending order of CreationTS
+        //messages passed would be in descending order of CreationTS
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
 
+        //traversed in the reverse order since we want to return messages in ascending order of CreationTS
         for (int i = messages.size()-1; i >= 0; --i) {
-            Message message = messages.get(i);
-            Map<String, Object> nextMessage = new LinkedHashMap<String, Object>();
-
-            nextMessage.put("MessageID", message.getMessageID());
-            nextMessage.put("CreationTS", message.getCreationTS());
-            nextMessage.put("ChatID", message.getChatID());
-            nextMessage.put("SenderID", message.getSenderID());
-            nextMessage.put("ContentType", message.getContentType());
-            nextMessage.put("TextContent", message.getTextContent());
-            nextMessage.put("SentTS", message.getSentTS());
-            nextMessage.put("ReceivedTS", message.getReceivedTS());
-
-            listOfMessages.add(nextMessage);
+            listOfMessages.add(getMessageForResponseBody(messages.get(i)));
         }
 
         Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
