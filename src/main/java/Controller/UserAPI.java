@@ -59,7 +59,7 @@ public class UserAPI {
     }
 
     @PostMapping(value = "/signup", consumes={"application/json"})
-    public String signup(@RequestBody Map<String, Object> data, HttpServletRequest request) {
+    public Map<String, Object> signup(@RequestBody Map<String, Object> data, HttpServletRequest request) {
 
         String path = request.getRequestURI();
         String[] required = {"Username", "EmailID", "Password", "MobileNo"};
@@ -89,11 +89,11 @@ public class UserAPI {
         User newUser = new User(id, username, password, emailID, mobileNo, base64Image);
         //insert new entry into User
         userAccessor.insertAll(newUser);
-        return Long.toString(newUser.getUserID());
+        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", id);
     }
 
     @PostMapping(value = "/login", consumes={"application/json"})
-    public String login(@RequestBody Map<String, Object> data, HttpServletRequest request) {
+    public Map<String, Object> login(@RequestBody Map<String, Object> data, HttpServletRequest request) {
         String path = request.getRequestURI();
         String[] required = {"Username", "Password"};
         List<String> missing_fields = missingFields.getMissingFields(data, required);
@@ -106,7 +106,7 @@ public class UserAPI {
         if(id == -1) {
             throw new InvalidLoginException(path);
         }
-        return Long.toString(id);
+        return SuccessResponseGenerator.getSuccessResponseForLogin(id);
     }
 
     @GetMapping("/viewUser")
