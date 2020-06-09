@@ -13,7 +13,7 @@ public final class DatabaseContract
         public static final String COLUMN_EMAIL_ID = "email_id";
         public static final String COLUMN_PASSWORD = "password";
         public static final String COLUMN_LAST_MESSAGE = "last_message";
-
+        public static final String COLUMN_SERVER_USER_ID = "server_user_id";
 
         public static final String SQL_CREATE_TABLE =
                 "CREATE TABLE " + TABLE_NAME + " ( "+
@@ -21,7 +21,8 @@ public final class DatabaseContract
                         COLUMN_NAME+" TEXT NOT NULL , "+
                         COLUMN_EMAIL_ID+" TEXT UNIQUE NOT NULL , "+
                         COLUMN_PASSWORD+" TEXT , "+
-                        COLUMN_LAST_MESSAGE+" TEXT  ) ";
+                        COLUMN_LAST_MESSAGE+" TEXT , " +
+                        COLUMN_SERVER_USER_ID+" TEXT ) ";
 
 
 
@@ -84,7 +85,8 @@ public final class DatabaseContract
                         _ID + " INTEGER PRIMARY KEY , " +
                         COLUMN_USER1+" INTEGER NOT NULL , "+
                         COLUMN_USER2+" INTEGER NOT NULL , "+
-                        COLUMN_LAST_MESSAGE+" TEXT  ) ";
+                        COLUMN_LAST_MESSAGE+" TEXT  , " +
+                        " UNIQUE ( user1 , user2 )  ) ";
 
 
 

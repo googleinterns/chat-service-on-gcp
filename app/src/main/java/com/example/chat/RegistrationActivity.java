@@ -16,8 +16,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.chat.DatabaseContract.chatEntry;
 import com.example.chat.DatabaseContract.userEntry;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -36,9 +44,6 @@ public class RegistrationActivity extends AppCompatActivity
     private EditText passwordEditText;
 
     private EditText confirmPasswordEditText;
-
-    private volatile boolean addedToDb;
-    private volatile boolean rowInserted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -64,14 +69,21 @@ public class RegistrationActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                if(!createAccount(emailEditText.getText().toString(), passwordEditText.getText().toString()))
-                    return;
-
-                Toast.makeText(getApplicationContext(), "Successfully registered", Toast.LENGTH_LONG).show();
-                finish();
+                if(!validateForm())
+                {
+                    return ;
+                }
+                try
+                {
+                    addUserServer(emailEditText.getText().toString());
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
             }
         });
-        enableStrictMode();
+//        enableStrictMode();
     }
     private void enableStrictMode()
     {
@@ -89,36 +101,83 @@ public class RegistrationActivity extends AppCompatActivity
         super.onPause();
     }
 
-    public boolean createAccount(String email, String password)
+
+    private void addUserServer(String userName) throws JSONException
     {
-        if (!validateForm())
-        {
-            return false;
-        }
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users";
 
 
-        String name=nameEditText.getText().toString();
+        JSONObject jsonBody = new JSONObject();
+
+//        Log.d("here","email sent to server "+ userName);
+
+        jsonBody.put("username", userName);
 
 
-        ContentValues values = new ContentValues();
-        values.put(userEntry.COLUMN_NAME,name);
-        values.put(userEntry.COLUMN_EMAIL_ID,email);
-        values.put(userEntry.COLUMN_LAST_MESSAGE,"");
-        values.put(userEntry.COLUMN_PASSWORD,hashPassword(password));
-        addedToDb=false;
-        new AddUserDb().execute(values);
-        while(!addedToDb);
-        if(!rowInserted)
-        {
-            Toast.makeText(getApplicationContext(), "This email ID is already registered", Toast.LENGTH_SHORT).show();
-            emailEditText.setText("");
-            passwordEditText.setText("");
-            confirmPasswordEditText.setText("");
-            emailEditText.requestFocus();
-        }
-        else
-            new UpdateChats().execute(email);
-        return rowInserted;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>() {
+
+
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        Log.d("hereResponseMessage: " , response.toString());
+                        try
+                        {
+                            String message = response.getString("message");
+                            if(message.equals("Success"))
+                            {
+                                String userID = response.getString("UserID");
+//                                Log.d("here", "userID: " + userID);
+
+
+
+                                String name = nameEditText.getText().toString();
+                                ContentValues values = new ContentValues();
+                                values.put(userEntry.COLUMN_NAME, name);
+                                values.put(userEntry.COLUMN_EMAIL_ID, emailEditText.getText().toString());
+                                values.put(userEntry.COLUMN_LAST_MESSAGE, "");
+                                values.put(userEntry.COLUMN_PASSWORD, hashPassword(passwordEditText.getText().toString()));
+                                values.put(userEntry.COLUMN_SERVER_USER_ID, userID);
+
+
+                                new addUserDb().execute(values);
+
+                                Toast.makeText(getApplicationContext(), "Successfully registered", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                            else if(message.equals("Username Already Exists"))
+                            {
+                                Toast.makeText(getApplicationContext(), "This email ID is already registered", Toast.LENGTH_SHORT).show();
+                                emailEditText.setText("");
+                                passwordEditText.setText("");
+                                confirmPasswordEditText.setText("");
+                                emailEditText.requestFocus();
+                            }
+                            else
+                            {
+                                Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                        catch (JSONException e)
+                        {
+                            Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
+                            Log.d("JsonError: ",e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener()
+                {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        RequestSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
     public boolean validateForm()
@@ -194,14 +253,12 @@ public class RegistrationActivity extends AppCompatActivity
 
 
 
-    private class AddUserDb extends AsyncTask<ContentValues,Void,Void>
+    private class addUserDb extends AsyncTask<ContentValues,Void,Void>
     {
         @Override
         protected Void doInBackground(ContentValues... contentValues)
         {
             Uri uri = getContentResolver().insert(ChatProviderContract.Users.CONTENT_URI,contentValues[0]);
-            rowInserted= (uri != null);
-            addedToDb=true;
             return null;
         }
         @Override
@@ -211,65 +268,65 @@ public class RegistrationActivity extends AppCompatActivity
         }
     }
 
-    private class UpdateChats extends AsyncTask<String,Void,Void>
-    {
-        @Override
-        protected Void doInBackground(String... email)
-        {
-            Uri uri = ChatProviderContract.Users.CONTENT_URI;
-            String emailId=email[0];
-
-            while(!addedToDb);
-            if(!rowInserted)
-                return null;
-
-            Cursor cursor1 = getContentResolver().query(uri,new String[]{"_id"}," email_id = ? ",new String[]{emailId},null);
-            if(cursor1==null)
-                return null;
-            cursor1.moveToFirst();
-            int userId1=cursor1.getInt(cursor1.getColumnIndex("_id"));
-            Log.d("userID1",""+userId1);
-            cursor1.close();
-
-            String[] user_columns =
-                    {
-                            BaseColumns._ID,
-                            userEntry.COLUMN_NAME,
-                            userEntry.COLUMN_EMAIL_ID,
-                            userEntry.COLUMN_LAST_MESSAGE
-                    };
-            String selection = userEntry._ID + " != ? ";
-            String selectionArgs[]=
-                    {
-                            Integer.toString(userId1)
-                    };
-            Cursor cursor = getContentResolver().query(uri,user_columns,selection,selectionArgs,null);
-
-            if(cursor==null)
-                return null;
-
-
-            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
-            {
-                int userId2=cursor.getInt(cursor.getColumnIndex("_id"));
-                ContentValues values = new ContentValues();
-                values.put(chatEntry.COLUMN_USER1,userId2);
-                values.put(chatEntry.COLUMN_USER2,userId1);
-                values.put(chatEntry.COLUMN_LAST_MESSAGE,"");
-
-                getContentResolver().insert(ChatProviderContract.Chat.CONTENT_URI,values);
-            }
-
-            cursor.close();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid)
-        {
-            super.onPostExecute(aVoid);
-        }
-    }
+//    private class UpdateChats extends AsyncTask<String,Void,Void>
+//    {
+//        @Override
+//        protected Void doInBackground(String... email)
+//        {
+//            Uri uri = ChatProviderContract.Users.CONTENT_URI;
+//            String emailId=email[0];
+//
+//            while(!addedToDb);
+//            if(!rowInserted)
+//                return null;
+//
+//            Cursor cursor1 = getContentResolver().query(uri,new String[]{"_id"}," email_id = ? ",new String[]{emailId},null);
+//            if(cursor1==null)
+//                return null;
+//            cursor1.moveToFirst();
+//            int userId1=cursor1.getInt(cursor1.getColumnIndex("_id"));
+//            Log.d("userID1",""+userId1);
+//            cursor1.close();
+//
+//            String[] user_columns =
+//                    {
+//                            BaseColumns._ID,
+//                            userEntry.COLUMN_NAME,
+//                            userEntry.COLUMN_EMAIL_ID,
+//                            userEntry.COLUMN_LAST_MESSAGE
+//                    };
+//            String selection = userEntry._ID + " != ? ";
+//            String selectionArgs[]=
+//                    {
+//                            Integer.toString(userId1)
+//                    };
+//            Cursor cursor = getContentResolver().query(uri,user_columns,selection,selectionArgs,null);
+//
+//            if(cursor==null)
+//                return null;
+//
+//
+//            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+//            {
+//                int userId2=cursor.getInt(cursor.getColumnIndex("_id"));
+//                ContentValues values = new ContentValues();
+//                values.put(chatEntry.COLUMN_USER1,userId2);
+//                values.put(chatEntry.COLUMN_USER2,userId1);
+//                values.put(chatEntry.COLUMN_LAST_MESSAGE,"");
+//
+//                getContentResolver().insert(ChatProviderContract.Chat.CONTENT_URI,values);
+//            }
+//
+//            cursor.close();
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void aVoid)
+//        {
+//            super.onPostExecute(aVoid);
+//        }
+//    }
 
 
 }

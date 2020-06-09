@@ -93,7 +93,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         googleLogin();
         facebookLogin();
 
-        enableStrictMode();
+//        enableStrictMode();
     }
 
     private void googleLogin()
@@ -399,13 +399,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onStart()
     {
         super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if(account!=null)
-        {
+//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+//        if(account!=null)
+//        {
 
             //TODO login using the email provided
             //String Email = account.getDisplayName();
-        }
+//        }
     }
 
     @Override

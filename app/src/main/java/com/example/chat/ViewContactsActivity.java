@@ -22,6 +22,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.example.chat.ChatProviderContract.Chat;
 import com.example.chat.ChatProviderContract.Messages;
 import com.example.chat.ChatProviderContract.Users;
@@ -33,6 +39,8 @@ import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.json.JSONObject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -90,7 +98,34 @@ public class ViewContactsActivity extends AppCompatActivity
         enableStrictMode();
 
 
+
+//        LoadChatsFromServer();
     }
+
+//    private void LoadChatsFromServer()
+//    {
+//        String url = "https://gcp-chat-service.an.r.appspot.com/users/3441453482889885209/chats";
+//        RequestQueue queue = RequestSingleton.getInstance(this.getApplicationContext()).
+//                getRequestQueue();
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+//                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+//
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        textView.setText("Response: " + response.toString());
+//                    }
+//                }, new Response.ErrorListener() {
+//
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        // TODO: Handle error
+//
+//                    }
+//                });
+//        RequestSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+//    }
+
+
     private void HideSoftKeyboard() {
         View view = this.getCurrentFocus();
         if (view != null) {
@@ -432,6 +467,33 @@ public class ViewContactsActivity extends AppCompatActivity
             return; // already logged out
         }
         LoginManager.getInstance().logOut();
+    }
+
+
+    public void ConnectURL(String url)
+    {
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response)
+                    {
+                        // Display the first 500 characters of the response string.
+                        Log.d("Response is: ", response.substring(0,500));
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        Log.d("That didn't work!" , error.toString());
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        RequestSingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 
 }
