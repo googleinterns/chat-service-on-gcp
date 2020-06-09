@@ -50,7 +50,7 @@ public class User {
     this.Password = password;
     this.EmailID = emailID;
     this.MobileNo = mobileNo;
-    if(base64Image.length() == 0){
+    if(base64Image.length() != 0){
       this.Picture = base64Image.getBytes();
     } else {
       this.Picture = null;
