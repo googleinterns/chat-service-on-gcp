@@ -1,27 +1,53 @@
 package com.example.chat;
 
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.BaseColumns;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.chat.ChatProviderContract.Users;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import static util.BCrypt.checkPassword;
+import static util.BCrypt.hashPassword;
 
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
@@ -32,7 +58,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private volatile boolean received;
     private volatile int current_user;
     private volatile boolean currentUserUpdated;
-
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final int RC_SIGN_IN = 9001;
+    private static final String TAG = "SignInActivity";
+    private static final String EMAIL = "email";
+    private CallbackManager callbackManager;
+    private volatile boolean addedToDb;
+    private volatile boolean rowInserted;
+    private LoginButton fbLoginButton;
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -52,11 +85,99 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mPasswordField=findViewById(R.id.input_password);
         //Buttons
         findViewById(R.id.login_button).setOnClickListener(this);
+        findViewById(R.id.google_sign_in_button).setOnClickListener(this);
         findViewById(R.id.new_user_register).setOnClickListener(this);
         findViewById(R.id.forgot_password).setOnClickListener(this);
+        findViewById(R.id.facebook_login_linear_layout).setOnClickListener(this);
+
+        googleLogin();
+        facebookLogin();
 
         enableStrictMode();
     }
+
+    private void googleLogin()
+    {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        SignInButton signInButton = findViewById(R.id.google_sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
+        signInButton.setColorScheme(SignInButton.COLOR_LIGHT);
+    }
+
+    private void facebookLogin()
+    {
+        callbackManager = CallbackManager.Factory.create();
+        fbLoginButton = (LoginButton) findViewById(R.id.fb_login_button);
+        fbLoginButton.setPermissions(Arrays.asList(EMAIL));
+
+        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // App code
+
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+
+                                try
+                                {
+                                    String email = object.getString("email");
+                                    String name = object.getString("name");
+                                    Log.d("here1",email);
+                                    Log.d("here1",name);
+                                    //check if the email already exists else create a new account
+                                    addedToDb=false;
+                                    ContentValues values = new ContentValues();
+                                    values.put(DatabaseContract.userEntry.COLUMN_NAME,name);
+                                    values.put(DatabaseContract.userEntry.COLUMN_EMAIL_ID,email);
+                                    values.put(DatabaseContract.userEntry.COLUMN_LAST_MESSAGE,"");
+                                    values.put(DatabaseContract.userEntry.COLUMN_PASSWORD,"");
+                                    new AddUserDb().execute(values);
+                                    while(!addedToDb);
+                                    if(rowInserted)
+                                    {
+                                        new UpdateChats().execute(email);
+                                    }
+                                    setCurrentUser();
+                                    Log.d("here current_user:",Integer.toString(current_user));
+                                    if(current_user>=0)
+                                    {
+                                        startActivity(new Intent(LoginActivity.this,ViewContactsActivity.class));
+                                    }
+                                }
+                                catch (JSONException e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email");
+                request.setParameters(parameters);
+                request.executeAsync();
+
+            }
+
+            @Override
+            public void onCancel()
+            {
+                // App code
+            }
+
+            @Override
+            public void onError(FacebookException exception)
+            {
+                // App code
+            }
+        });
+    }
+
     private void enableStrictMode()
     {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
@@ -153,15 +274,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v)
     {
-        int i = v.getId();
-        if(i==R.id.new_user_register)
+        switch (v.getId())
         {
-            startActivity(new Intent(LoginActivity.this,RegistrationActivity.class));
+            case R.id.new_user_register:
+                startActivity(new Intent(LoginActivity.this,RegistrationActivity.class));
+                break;
+            case R.id.login_button:
+                signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
+                break;
+            case R.id.google_sign_in_button:
+                signInWithGoogle();
+                break;
+            case R.id.facebook_login_linear_layout:
+                fbLoginButton.performClick();
+                break;
         }
-        if (i == R.id.login_button)
-        {
-            signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
-        }
+    }
+
+    private void signInWithGoogle()
+    {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     private void shakeLoginButton()
@@ -266,5 +399,134 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onStart()
     {
         super.onStart();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if(account!=null)
+        {
+
+            //TODO login using the email provided
+            //String Email = account.getDisplayName();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        callbackManager.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN)
+        {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask)
+    {
+        try
+        {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            Log.d("here","Signed In");
+        }
+        catch (ApiException e)
+        {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+        }
+    }
+
+    private class AddUserDb extends AsyncTask<ContentValues,Void,Void>
+    {
+        @Override
+        protected Void doInBackground(ContentValues... contentValues)
+        {
+            Uri uri = getContentResolver().insert(ChatProviderContract.Users.CONTENT_URI,contentValues[0]);
+            rowInserted= (uri != null);
+            if(uri!=null)
+            {
+                current_user = (Long.valueOf(Objects.requireNonNull(uri.getLastPathSegment()))).intValue();
+            }
+            else
+            {
+                Uri uri1 = ChatProviderContract.Users.CONTENT_URI;
+                String emailId = contentValues[0].getAsString("email_id");
+                Log.d("here2",emailId);
+
+                Cursor cursor1 = getContentResolver().query(uri1,new String[]{"_id"}," email_id = ? ",new String[]{emailId},null);
+                cursor1.moveToFirst();
+                current_user=cursor1.getInt(cursor1.getColumnIndex("_id"));
+            }
+            addedToDb=true;
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            super.onPostExecute(aVoid);
+        }
+    }
+    private class UpdateChats extends AsyncTask<String,Void,Void>
+    {
+        @Override
+        protected Void doInBackground(String... email)
+        {
+            Uri uri = ChatProviderContract.Users.CONTENT_URI;
+            String emailId=email[0];
+
+            while(!addedToDb);
+            if(!rowInserted)
+                return null;
+
+            Cursor cursor1 = getContentResolver().query(uri,new String[]{"_id"}," email_id = ? ",new String[]{emailId},null);
+            if(cursor1==null)
+                return null;
+            cursor1.moveToFirst();
+            int userId1=cursor1.getInt(cursor1.getColumnIndex("_id"));
+            Log.d("userID1",""+userId1);
+            cursor1.close();
+
+            String[] user_columns =
+                    {
+                            BaseColumns._ID,
+                            DatabaseContract.userEntry.COLUMN_NAME,
+                            DatabaseContract.userEntry.COLUMN_EMAIL_ID,
+                            DatabaseContract.userEntry.COLUMN_LAST_MESSAGE
+                    };
+            String selection = DatabaseContract.userEntry._ID + " != ? ";
+            String selectionArgs[]=
+                    {
+                            Integer.toString(userId1)
+                    };
+            Cursor cursor = getContentResolver().query(uri,user_columns,selection,selectionArgs,null);
+
+            if(cursor==null)
+                return null;
+
+
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+            {
+                int userId2=cursor.getInt(cursor.getColumnIndex("_id"));
+                ContentValues values = new ContentValues();
+                values.put(DatabaseContract.chatEntry.COLUMN_USER1,userId2);
+                values.put(DatabaseContract.chatEntry.COLUMN_USER2,userId1);
+                values.put(DatabaseContract.chatEntry.COLUMN_LAST_MESSAGE,"");
+
+                getContentResolver().insert(ChatProviderContract.Chat.CONTENT_URI,values);
+            }
+
+            cursor.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            super.onPostExecute(aVoid);
+        }
     }
 }

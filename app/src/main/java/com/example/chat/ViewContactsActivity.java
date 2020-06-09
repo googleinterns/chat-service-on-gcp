@@ -26,6 +26,12 @@ import com.example.chat.ChatProviderContract.Chat;
 import com.example.chat.ChatProviderContract.Messages;
 import com.example.chat.ChatProviderContract.Users;
 import com.example.chat.DatabaseContract.userEntry;
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
@@ -64,7 +70,6 @@ public class ViewContactsActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-
 
         setContentView(R.layout.activity_view_contacts);
         Toolbar toolbar = findViewById(R.id.view_contacts_toolbar);
@@ -387,6 +392,7 @@ public class ViewContactsActivity extends AppCompatActivity
         SharedPreferences mPrefs = getSharedPreferences(CHAT_LOGGED_IN_USER, 0);
         SharedPreferences.Editor mEditor = mPrefs.edit();
         mEditor.putInt(CURRENT_USER,-1).apply();
+        disconnectFromFacebook();
         startActivity(new Intent(this,LoginActivity.class));
     }
 
@@ -416,6 +422,16 @@ public class ViewContactsActivity extends AppCompatActivity
         });
         dialog.show();
 
+    }
+
+    public void disconnectFromFacebook()
+    {
+
+        if (AccessToken.getCurrentAccessToken() == null)
+        {
+            return; // already logged out
+        }
+        LoginManager.getInstance().logOut();
     }
 
 }

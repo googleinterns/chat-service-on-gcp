@@ -41,12 +41,8 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
 //    implementation 'com.android.support:design:28.0.0'
     implementation 'com.google.android.gms:play-services-auth:18.0.0'
-
-
-    //firebase
-    // Add the Firebase SDK for Google Analytics
+    implementation 'com.facebook.android:facebook-android-sdk:5.15.3'
 //    implementation 'com.google.firebase:firebase-analytics:17.3.0'
-//     To also use Firebase Authentication
 //    implementation 'com.google.firebase:firebase-auth:19.3.0'
 
 

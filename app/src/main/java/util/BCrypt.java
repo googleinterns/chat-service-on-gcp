@@ -96,7 +96,7 @@ public class BCrypt {
 		boolean password_verified = false;
 
 		if(null == stored_hash || !stored_hash.startsWith("$2a$"))
-			throw new java.lang.IllegalArgumentException("Invalid hash provided for comparison");
+			return false;
 
 		password_verified = checkpw(password_plaintext, stored_hash);
 

@@ -106,8 +106,7 @@ public class RegistrationActivity extends AppCompatActivity
         values.put(userEntry.COLUMN_LAST_MESSAGE,"");
         values.put(userEntry.COLUMN_PASSWORD,hashPassword(password));
         addedToDb=false;
-        new SendMessageDb().execute(values);
-        new UpdateChats().execute(email);
+        new AddUserDb().execute(values);
         while(!addedToDb);
         if(!rowInserted)
         {
@@ -117,6 +116,8 @@ public class RegistrationActivity extends AppCompatActivity
             confirmPasswordEditText.setText("");
             emailEditText.requestFocus();
         }
+        else
+            new UpdateChats().execute(email);
         return rowInserted;
     }
 
@@ -193,7 +194,7 @@ public class RegistrationActivity extends AppCompatActivity
 
 
 
-    private class SendMessageDb extends AsyncTask<ContentValues,Void,Void>
+    private class AddUserDb extends AsyncTask<ContentValues,Void,Void>
     {
         @Override
         protected Void doInBackground(ContentValues... contentValues)
