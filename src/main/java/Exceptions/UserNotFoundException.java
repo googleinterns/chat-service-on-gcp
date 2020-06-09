@@ -6,9 +6,9 @@ import Exceptions.APIException;
 
 public class UserNotFoundException extends RuntimeException implements APIException {
 
-    private static final HttpStatus HTTP_STATUS = HttpStatus.CONFLICT;
-    private String message = "Invalid Username";
-    private String path;
+    private static final HttpStatus HTTP_STATUS = HttpStatus.NOT_FOUND;
+    private static final String message = "Invalid Username";
+    private final String path;
 
     public UserNotFoundException(String path) {
         super();

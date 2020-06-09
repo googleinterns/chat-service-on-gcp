@@ -1,10 +1,9 @@
 package Controller;
 
 import Entity.Class.User;
-import DBAccesser.User.QueryUser;
-import DBAccesser.User.InsertUser;
-import Helper.Helper;
-import Exceptions.RequiredFieldMissingException;
+import DBAccesser.User.UserAccessor;
+import Helper.*;
+import Exceptions.UserRequiredFieldMissingException;
 import Exceptions.UserAlreadyExistsException;
 import Exceptions.InvalidLoginException;
 import Exceptions.UserNotFoundException;
@@ -18,53 +17,55 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
+import javax.servlet.http.HttpServletRequest; 
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
 
 //this annotation tells that this class can contain methods which map to URL requests
 @RestController
 public class UserAPI {
 
     @Autowired 
-    QueryUser queryUserHelper;
+    private UserAccessor userAccessor;
 
     @Autowired
-    InsertUser insertUserHelper;
+    private UniqueIDGenerator uniqueIDGenerator;
 
     @Autowired
-    Helper helper;
+    private MissingFields missingFields;
+
+    @Autowired
+    private ErrorResponseBody errorResponseBody;
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Object> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
-        return new ResponseEntity<Object>(helper.getResponseBody(e), e.getHttpStatus());
+        return new ResponseEntity<Object>(errorResponseBody.getResponseBody(e), e.getHttpStatus());
     }  
      
-    @ExceptionHandler(RequiredFieldMissingException.class)
-    public ResponseEntity<Object> handleRequiredFieldMissingException(RequiredFieldMissingException e) {
-        return new ResponseEntity<Object>(helper.getResponseBody(e), e.getHttpStatus());
+    @ExceptionHandler(UserRequiredFieldMissingException.class)
+    public ResponseEntity<Object> handleRequiredFieldMissingException(UserRequiredFieldMissingException e) {
+        return new ResponseEntity<Object>(errorResponseBody.getResponseBody(e), e.getHttpStatus());
     }
 
     @ExceptionHandler(InvalidLoginException.class)
     public ResponseEntity<Object> handleInvalidLoginException(InvalidLoginException e) {
-        return new ResponseEntity<Object>(helper.getResponseBody(e), e.getHttpStatus());
+        return new ResponseEntity<Object>(errorResponseBody.getResponseBody(e), e.getHttpStatus());
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Object> handleInvalidLoginException(UserNotFoundException e) {
-        return new ResponseEntity<Object>(helper.getResponseBody(e), e.getHttpStatus());
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException e) {
+        return new ResponseEntity<Object>(errorResponseBody.getResponseBody(e), e.getHttpStatus());
     }
 
     @PostMapping(value = "/signup", consumes={"application/json"})
-    public String signup(@RequestBody HashMap<String, Object> data) {
+    public String signup(@RequestBody Map<String, Object> data, HttpServletRequest request) {
 
-        String path = "/signup";
+        String path = request.getRequestURI();
         String[] required = {"Username", "EmailID", "Password", "MobileNo"};
-        List<String> missing_fields = helper.missingFields(data, required);
+        List<String> missing_fields = missingFields.getMissingFields(data, required);
         if( missing_fields.size() > 0 ) {
-            throw new RequiredFieldMissingException(path, missing_fields);
+            throw new UserRequiredFieldMissingException(path, missing_fields);
         }
 
         // necessary fields
@@ -80,30 +81,28 @@ public class UserAPI {
         }
 
         // check if Username or email exists - return error if it does
-        if (queryUserHelper.checkIfUserExists(username, emailID)) {
+        if (userAccessor.checkIfUserExists(username, emailID)) {
             throw new UserAlreadyExistsException(path);
-        } else {
-            //generate unique userID
-            long id = helper.generateUniqueID("User", false, false);
-            User newUser = new User(id, username, password, emailID, mobileNo, base64Image);
-            //insert new entry into User
-            insertUserHelper.insertAll(newUser);
-            return Long.toString(newUser.getUserID());
         }
+        //generate unique userID
+        long id = uniqueIDGenerator.generateUniqueID("User", false, false);
+        User newUser = new User(id, username, password, emailID, mobileNo, base64Image);
+        //insert new entry into User
+        userAccessor.insertAll(newUser);
+        return Long.toString(newUser.getUserID());
     }
 
     @PostMapping(value = "/login", consumes={"application/json"})
-    public String login(@RequestBody HashMap<String, Object> data) {
-        String path = "/login";
+    public String login(@RequestBody Map<String, Object> data, HttpServletRequest request) {
+        String path = request.getRequestURI();
         String[] required = {"Username", "Password"};
-        List<String> missing_fields = helper.missingFields(data, required);
+        List<String> missing_fields = missingFields.getMissingFields(data, required);
         if(missing_fields.size() > 0) {
-            throw new RequiredFieldMissingException(path, missing_fields);
+            throw new UserRequiredFieldMissingException(path, missing_fields);
         }
-
         String username = data.get("Username").toString();
         String password = data.get("Password").toString();
-        long id = queryUserHelper.login(username, password);
+        long id = userAccessor.login(username, password);
         if(id == -1) {
             throw new InvalidLoginException(path);
         }
@@ -111,10 +110,10 @@ public class UserAPI {
     }
 
     @GetMapping("/viewUser")
-    public Map<String, Object> viewUser(@RequestParam(value = "username", required = true) String username) {
-        String path = "/viewUser?username=" + username;
-        Map<String, Object> user = queryUserHelper.getUser(username);
-        if(user.get("userID").toString().equals("-1")) {
+    public Map<String, Object> viewUser(@RequestParam(value = "username", required = true) String username, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        Map<String, Object> user = userAccessor.getUser(username);
+        if(user.get("UserID").toString().equals("-1")) {
             throw new UserNotFoundException(path);
         }
         return user;

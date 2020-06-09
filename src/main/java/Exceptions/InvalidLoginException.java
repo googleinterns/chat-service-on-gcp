@@ -6,9 +6,9 @@ import Exceptions.APIException;
 
 public class InvalidLoginException extends RuntimeException implements APIException {
 
-    private HttpStatus http_status = HttpStatus.CONFLICT;
-    private String message = "Invalid Username or Password";
-    private String path;
+    private static final HttpStatus HTTP_STATUS = HttpStatus.NOT_FOUND;
+    private static final String message = "Invalid Username or Password";
+    private final String path;
 
     public InvalidLoginException(String path) {
         super();
@@ -16,7 +16,7 @@ public class InvalidLoginException extends RuntimeException implements APIExcept
     }
 
     public HttpStatus getHttpStatus() {
-        return this.http_status;
+        return this.HTTP_STATUS;
     }
 
     public String getMessage() {

@@ -14,14 +14,17 @@ import java.util.Map;
 import java.util.HashMap;
 
 @Component
-public class QueryUser {
+public class UserAccessor {
     
     @Autowired
     SpannerTemplate spannerTemplate;
 
-    public boolean checkIfUserExists(String username, String emailID) {
+    public void insertAll(User user) {
+        spannerTemplate.insert(user);
+    }
 
-        String SQLStatment = "SELECT Username FROM User WHERE Username=@Username or EmailID=@EmailID";
+    public boolean checkIfUserExists(String username, String emailID) {
+        String SQLStatment = "SELECT Username FROM User WHERE Username=@Username OR EmailID=@EmailID";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
                                 .to(username)
@@ -30,11 +33,10 @@ public class QueryUser {
                                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)); //setAllowPartialRead for reading specific columns
  
-        return (resultSet.size() > 0);
+        return !resultSet.isEmpty();
     }
 
     public boolean checkIfUserIDExists(long userID) {
-
         String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userID";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("UserID")
@@ -42,11 +44,10 @@ public class QueryUser {
                                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        return (resultSet.size() > 0);
+        return !resultSet.isEmpty();
     }
 
     public long getUserIDFromUsername(String username) {
-
         String SQLStatment = "SELECT UserID FROM User WHERE Username=@Username";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
@@ -58,7 +59,7 @@ public class QueryUser {
     }
 
     public long login(String username, String password) {
-        String SQLStatment = "SELECT UserID from User WHERE Username=@username and Password=@password";
+        String SQLStatment = "SELECT UserID from User WHERE Username=@username AND Password=@password";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("username")
                                 .to(username)
@@ -66,7 +67,7 @@ public class QueryUser {
                                 .to(password)
                                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
-        if(resultSet.size() == 0) {
+        if(resultSet.isEmpty()) {
             return -1;
         }
         return resultSet.get(0).getUserID();
@@ -80,13 +81,13 @@ public class QueryUser {
                                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
         Map<String, Object> response = new HashMap<String, Object>();
-        if(resultSet.size() == 0) {
-            response.put("userID", -1);
+        if(resultSet.isEmpty()) {
+            response.put("UserID", -1);
             return response;
         }
         User user = resultSet.get(0);
-        response.put("userID", user.getUserID());
-        response.put("username", username);
+        response.put("UserID", user.getUserID());
+        response.put("Username", username);
         response.put("EmailID", user.getEmailID());
         response.put("MobileNo", user.getMobileNumber());
         if(user.getPicture() != null) {
