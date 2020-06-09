@@ -1,4 +1,4 @@
-package Entity.Class;
+package Entity;
 
 import java.sql.Timestamp;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;

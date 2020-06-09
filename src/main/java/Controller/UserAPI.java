@@ -1,6 +1,6 @@
 package Controller;
 
-import Entity.Class.User;
+import Entity.User;
 import DBAccesser.User.UserAccessor;
 import Helper.*;
 import Exceptions.UserRequiredFieldMissingException;
