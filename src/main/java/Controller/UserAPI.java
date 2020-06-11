@@ -85,7 +85,7 @@ public class UserAPI {
             throw new UserAlreadyExistsException(path);
         }
         //generate unique userID
-        long id = uniqueIDGenerator.generateUniqueID("User", false, false);
+        long id = uniqueIDGenerator.generateUniqueID("User");
         User newUser = new User(id, username, password, emailID, mobileNo, base64Image);
         //insert new entry into User
         userAccessor.insert(newUser);

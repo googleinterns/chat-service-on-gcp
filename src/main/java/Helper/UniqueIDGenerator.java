@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class UniqueIDGenerator {
@@ -21,21 +22,11 @@ public class UniqueIDGenerator {
     UserAccessor queryUser;
     
     // Generates long type unique ID value for the given table and its corres ID attribute
-    public long generateUniqueID(String tableName, boolean zeroAllowed, boolean negativeAllowed) {
+    public long generateUniqueID(String tableName) {
         long ID;
-        Random random = new Random();
-
         while (true) {
-            ID = random.nextLong();
-
-            if (zeroAllowed == false && ID == 0) {
-                continue;
-            }
-
-            if (negativeAllowed == false && ID < 0) {
-                continue;
-            }
-
+            // Generates ID in range [1, Long.MAX_VALUE)
+            ID = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
             switch (tableName) {
                 case "User": 
                     if (queryUser.checkIfUserIDExists(ID)) {continue;} else {return ID;}
