@@ -7,7 +7,7 @@ CREATE TABLE User (
   EmailID STRING(MAX),
   MobileNo STRING(MAX),
   Password STRING(MAX),
-  Picture BYTES(MAX),
+  Picture STRING(MAX),
 ) PRIMARY KEY(UserID);
 
 CREATE TABLE Chat (
