@@ -33,9 +33,9 @@ public class UserAccessor {
                                 .bind("EmailID")
                                 .to(emailID)
                                 .build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)); //setAllowPartialRead for reading specific columns
- 
-        return !resultSet.isEmpty();
+        return !spannerTemplate
+                .query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)) //setAllowPartialRead for reading specific columns
+                .isEmpty();
     }
 
     // Check if there is a row in the User table having the given UserID
@@ -45,9 +45,9 @@ public class UserAccessor {
                                 .bind("UserID")
                                 .to(id)
                                 .build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
- 
-        return !resultSet.isEmpty();
+        return !spannerTemplate
+                .query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true))
+                .isEmpty();
     }
 
     // Retrieve UserID of user having the given username
@@ -57,9 +57,9 @@ public class UserAccessor {
                                 .bind("Username")
                                 .to(username)
                                 .build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
- 
-        return resultSet.get(0).getUserID();
+        return spannerTemplate
+                .query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true))
+                .get(0).getUserID();
     }
 
     // Retrieve the UserID of the user having the given username and password
