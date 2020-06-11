@@ -26,6 +26,7 @@ public final class ChatProviderContract
         public static final String COLUMN_EMAIL_ID = "email_id";
         public static final String COLUMN_PASSWORD = "password";
         public static final String COLUMN_LAST_MESSAGE = "last_message";
+        public static final String COLUMN_SERVER_USER_ID = "server_user_id";
     }
     protected interface ChatColumns
     {

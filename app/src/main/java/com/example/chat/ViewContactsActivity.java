@@ -469,31 +469,4 @@ public class ViewContactsActivity extends AppCompatActivity
         LoginManager.getInstance().logOut();
     }
 
-
-    public void ConnectURL(String url)
-    {
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response)
-                    {
-                        // Display the first 500 characters of the response string.
-                        Log.d("Response is: ", response.substring(0,500));
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error)
-                    {
-                        Log.d("That didn't work!" , error.toString());
-                    }
-                });
-
-        // Add the request to the RequestQueue.
-        RequestSingleton.getInstance(this).addToRequestQueue(stringRequest);
-    }
-
 }

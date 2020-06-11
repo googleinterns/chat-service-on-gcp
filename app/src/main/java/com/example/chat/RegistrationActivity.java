@@ -16,9 +16,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.ClientError;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.chat.DatabaseContract.chatEntry;
@@ -27,6 +29,7 @@ import com.example.chat.DatabaseContract.userEntry;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,7 +45,7 @@ public class RegistrationActivity extends AppCompatActivity
     private EditText nameEditText;
     private EditText emailEditText;
     private EditText passwordEditText;
-
+    private volatile boolean newEntryInserted;
     private EditText confirmPasswordEditText;
 
     @Override
@@ -57,7 +60,7 @@ public class RegistrationActivity extends AppCompatActivity
         emailEditText=findViewById(R.id.email_input_register);
         passwordEditText =findViewById(R.id.password_input_register);
         confirmPasswordEditText =findViewById(R.id.confirm_password_input);
-
+        newEntryInserted=false;
 
 
         //Button
@@ -109,28 +112,30 @@ public class RegistrationActivity extends AppCompatActivity
 
         JSONObject jsonBody = new JSONObject();
 
-//        Log.d("here","email sent to server "+ userName);
+        Log.d("username sent to server: ",userName);
 
         jsonBody.put("username", userName);
 
 
+        final Long mRequestStartTime = System.currentTimeMillis();
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>() {
+                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
+                {
 
 
                     @Override
                     public void onResponse(JSONObject response)
                     {
                         Log.d("hereResponseMessage: " , response.toString());
+                        long totalRequestTime = System.currentTimeMillis() - mRequestStartTime;
+                        Log.d("successLatencyTime: ",Long.toString(totalRequestTime));
                         try
                         {
                             String message = response.getString("message");
                             if(message.equals("Success"))
                             {
                                 String userID = response.getString("UserID");
-//                                Log.d("here", "userID: " + userID);
-
-
 
                                 String name = nameEditText.getText().toString();
                                 ContentValues values = new ContentValues();
@@ -142,27 +147,18 @@ public class RegistrationActivity extends AppCompatActivity
 
 
                                 new addUserDb().execute(values);
-
+                                if(newEntryInserted)
+                                {
+                                    //In this prototype all possible pairs of chats are inserted in the CHAT TABLE
+                                    new UpdateChats().execute(emailEditText.getText().toString());
+                                }
                                 Toast.makeText(getApplicationContext(), "Successfully registered", Toast.LENGTH_LONG).show();
                                 finish();
                             }
-                            else if(message.equals("Username Already Exists"))
-                            {
-                                Toast.makeText(getApplicationContext(), "This email ID is already registered", Toast.LENGTH_SHORT).show();
-                                emailEditText.setText("");
-                                passwordEditText.setText("");
-                                confirmPasswordEditText.setText("");
-                                emailEditText.requestFocus();
-                            }
-                            else
-                            {
-                                Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
-                            }
-
                         }
                         catch (JSONException e)
                         {
-                            Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Parse Error", Toast.LENGTH_SHORT).show();
                             Log.d("JsonError: ",e.toString());
                             e.printStackTrace();
                         }
@@ -173,10 +169,41 @@ public class RegistrationActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        long totalRequestTime = System.currentTimeMillis() - mRequestStartTime;
+                        Log.d("failureLatencyTime: ",Long.toString(totalRequestTime));
 
+
+                        Log.d("errorMessage",error.toString());
+                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
+                        {
+                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
+                        }
+                        else if(error instanceof ClientError)
+                        {
+                            String responseBody = null;
+                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = null;
+                            try
+                            {
+                                data = new JSONObject(responseBody);
+                            }
+                            catch (JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            assert data != null;
+                            String message = data.optString("message");
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+
+                            emailEditText.setText("");
+                            passwordEditText.setText("");
+                            confirmPasswordEditText.setText("");
+                            emailEditText.requestFocus();
+                        }
+                    }
+
+                });
         RequestSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
@@ -259,6 +286,8 @@ public class RegistrationActivity extends AppCompatActivity
         protected Void doInBackground(ContentValues... contentValues)
         {
             Uri uri = getContentResolver().insert(ChatProviderContract.Users.CONTENT_URI,contentValues[0]);
+            if(uri==null)
+                newEntryInserted=false;
             return null;
         }
         @Override
@@ -268,65 +297,64 @@ public class RegistrationActivity extends AppCompatActivity
         }
     }
 
-//    private class UpdateChats extends AsyncTask<String,Void,Void>
-//    {
-//        @Override
-//        protected Void doInBackground(String... email)
-//        {
-//            Uri uri = ChatProviderContract.Users.CONTENT_URI;
-//            String emailId=email[0];
-//
-//            while(!addedToDb);
-//            if(!rowInserted)
-//                return null;
-//
-//            Cursor cursor1 = getContentResolver().query(uri,new String[]{"_id"}," email_id = ? ",new String[]{emailId},null);
-//            if(cursor1==null)
-//                return null;
-//            cursor1.moveToFirst();
-//            int userId1=cursor1.getInt(cursor1.getColumnIndex("_id"));
-//            Log.d("userID1",""+userId1);
-//            cursor1.close();
-//
-//            String[] user_columns =
-//                    {
-//                            BaseColumns._ID,
-//                            userEntry.COLUMN_NAME,
-//                            userEntry.COLUMN_EMAIL_ID,
-//                            userEntry.COLUMN_LAST_MESSAGE
-//                    };
-//            String selection = userEntry._ID + " != ? ";
-//            String selectionArgs[]=
-//                    {
-//                            Integer.toString(userId1)
-//                    };
-//            Cursor cursor = getContentResolver().query(uri,user_columns,selection,selectionArgs,null);
-//
-//            if(cursor==null)
-//                return null;
-//
-//
-//            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
-//            {
-//                int userId2=cursor.getInt(cursor.getColumnIndex("_id"));
-//                ContentValues values = new ContentValues();
-//                values.put(chatEntry.COLUMN_USER1,userId2);
-//                values.put(chatEntry.COLUMN_USER2,userId1);
-//                values.put(chatEntry.COLUMN_LAST_MESSAGE,"");
-//
-//                getContentResolver().insert(ChatProviderContract.Chat.CONTENT_URI,values);
-//            }
-//
-//            cursor.close();
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void aVoid)
-//        {
-//            super.onPostExecute(aVoid);
-//        }
-//    }
+    private class UpdateChats extends AsyncTask<String,Void,Void>
+    {
+        @Override
+        protected Void doInBackground(String... email)
+        {
+            Uri uri = ChatProviderContract.Users.CONTENT_URI;
+            String emailId=email[0];
+
+            if(!newEntryInserted)
+                return null;
+
+            Cursor cursor1 = getContentResolver().query(uri,new String[]{"_id"}," email_id = ? ",new String[]{emailId},null);
+            if(cursor1==null)
+                return null;
+            cursor1.moveToFirst();
+            int userId1=cursor1.getInt(cursor1.getColumnIndex("_id"));
+            Log.d("userID1",""+userId1);
+            cursor1.close();
+
+            String[] user_columns =
+                    {
+                            BaseColumns._ID,
+                            userEntry.COLUMN_NAME,
+                            userEntry.COLUMN_EMAIL_ID,
+                            userEntry.COLUMN_LAST_MESSAGE
+                    };
+            String selection = userEntry._ID + " != ? ";
+            String selectionArgs[]=
+                    {
+                            Integer.toString(userId1)
+                    };
+            Cursor cursor = getContentResolver().query(uri,user_columns,selection,selectionArgs,null);
+
+            if(cursor==null)
+                return null;
+
+
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+            {
+                int userId2=cursor.getInt(cursor.getColumnIndex("_id"));
+                ContentValues values = new ContentValues();
+                values.put(chatEntry.COLUMN_USER1,userId2);
+                values.put(chatEntry.COLUMN_USER2,userId1);
+                values.put(chatEntry.COLUMN_LAST_MESSAGE,"");
+
+                getContentResolver().insert(ChatProviderContract.Chat.CONTENT_URI,values);
+            }
+
+            cursor.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            super.onPostExecute(aVoid);
+        }
+    }
 
 
 }

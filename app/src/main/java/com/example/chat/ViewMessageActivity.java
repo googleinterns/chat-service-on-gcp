@@ -325,7 +325,7 @@ public class ViewMessageActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Void aVoid)
         {
-            //TODO display it in the recyclerView
+            //TODO display it in the recyclerView (notifyDataSetChanged)
         }
     }
 

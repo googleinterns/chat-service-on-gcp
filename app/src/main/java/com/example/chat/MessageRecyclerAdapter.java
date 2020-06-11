@@ -128,14 +128,13 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         else//image
         {
             File imgFile = new File(text);
-            if(imgFile.exists()){
+            if(imgFile.exists())
+            {
 
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                 holder.mImage.setImageBitmap(myBitmap);
             }
         }
-
-
     }
 
 
