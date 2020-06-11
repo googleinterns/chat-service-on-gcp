@@ -280,14 +280,19 @@ public class ViewMessageActivity extends AppCompatActivity
         protected void onPostExecute(Void aVoid)
         {
             super.onPostExecute(aVoid);
-            HideSoftKeyboard();
-
-            findViewById(R.id.view_message_constraint_layout).requestFocus();
-            messageRecyclerAdapter.addRow(new message(currentUser,contactId,false,message_text,System.currentTimeMillis()));
-            recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
-            messageEditText.setText("");
+            addMessageToScreen();
         }
     }
+
+    private void addMessageToScreen()
+    {
+        HideSoftKeyboard();
+        findViewById(R.id.view_message_constraint_layout).requestFocus();
+        messageRecyclerAdapter.addRow(new message(currentUser,contactId,false,message_text,System.currentTimeMillis()));
+        recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
+        messageEditText.setText("");
+    }
+
 
     private void HideSoftKeyboard()
     {

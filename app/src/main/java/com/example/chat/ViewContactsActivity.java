@@ -104,7 +104,7 @@ public class ViewContactsActivity extends AppCompatActivity
 //    private void LoadChatsFromServer()
 //    {
 //        String url = "https://gcp-chat-service.an.r.appspot.com/users/3441453482889885209/chats";
-//        RequestQueue queue = RequestSingleton.getInstance(this.getApplicationContext()).
+//        RequestQueue queue = VolleyController.getInstance(this.getApplicationContext()).
 //                getRequestQueue();
 //        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
 //                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -121,7 +121,7 @@ public class ViewContactsActivity extends AppCompatActivity
 //
 //                    }
 //                });
-//        RequestSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+//        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
 //    }
 
 

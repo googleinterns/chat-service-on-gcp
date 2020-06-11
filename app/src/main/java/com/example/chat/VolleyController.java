@@ -7,27 +7,26 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-public class RequestSingleton
+public class VolleyController
 {
-    private static RequestSingleton instance;
+    private static VolleyController instance;
     private RequestQueue requestQueue;
     private static Context ctx;
 
-    public static synchronized RequestSingleton getInstance(Context context)
+    public static synchronized VolleyController getInstance(Context context)
     {
         if (instance == null)
         {
-            instance = new RequestSingleton(context);
+            instance = new VolleyController(context);
         }
         return instance;
     }
 
 
-    private RequestSingleton(Context context)
+    private VolleyController(Context context)
     {
         ctx = context;
         requestQueue = getRequestQueue();
-
     }
 
     public RequestQueue getRequestQueue()
@@ -39,14 +38,18 @@ public class RequestSingleton
         return requestQueue;
     }
 
-    public <T> void addToRequestQueue(Request<T> req)
+    public <T> void addToRequestQueueWithRetry(Request<T> req)
     {
         //retry policy
         req.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
+                3000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
+        getRequestQueue().add(req);
+    }
+    public <T> void addToRequestQueue(Request<T> req)
+    {
         getRequestQueue().add(req);
     }
 }

@@ -22,7 +22,7 @@ public final class DatabaseContract
                         COLUMN_EMAIL_ID+" TEXT UNIQUE NOT NULL , "+
                         COLUMN_PASSWORD+" TEXT , "+
                         COLUMN_LAST_MESSAGE+" TEXT , " +
-                        COLUMN_SERVER_USER_ID+" TEXT ) ";
+                        COLUMN_SERVER_USER_ID+" TEXT UNIQUE ) ";
 
 
 

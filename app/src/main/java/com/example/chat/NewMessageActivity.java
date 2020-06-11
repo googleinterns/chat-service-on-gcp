@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.TargetApi;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,16 +16,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -123,6 +119,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
                     cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,  null, ContactsContract.CommonDataKinds.Email.CONTACT_ID+" =? ", new String[] {id}, null);
 
+                    assert cursor != null;
                     int nameId = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
 
                     int emailIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA);
@@ -154,7 +151,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
                     emailEntry.setText(email);
                     if (email.length() == 0 && name.length() == 0)
                     {
-                        Toast.makeText(this, "No Email found for Selected Contact",Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "No Email found for selected contact",Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -174,6 +171,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
             HideSoftKeyboard();
             return;
         }
+        getContactId();
         if(contactId==null)
         {
             Toast.makeText(this, "Enter a valid username", Toast.LENGTH_LONG).show();
@@ -181,12 +179,21 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         }
 
         String message_text=messageEditText.getText().toString();
-        Log.d("here",message_text);
+
+
+
         messages.add(message_text);
         messageRecyclerAdapter.notifyItemInserted(messages.size()-1);
         recyclerMessages.smoothScrollToPosition(messages.size()-1);
         messageEditText.setText("");
         HideSoftKeyboard();
+    }
+
+    private void getContactId()
+    {
+        //TODO call an API with which I can get "server userID" corresponding to the "username" provided & then add it to the cache
+
+
     }
 
 

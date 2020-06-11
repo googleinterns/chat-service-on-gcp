@@ -120,7 +120,7 @@ public class RegistrationActivity extends AppCompatActivity
         final Long mRequestStartTime = System.currentTimeMillis();
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
+                 (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
                 {
 
 
@@ -203,8 +203,14 @@ public class RegistrationActivity extends AppCompatActivity
                         }
                     }
 
-                });
-        RequestSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+                }) {
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
+            }
+        };
+        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
     public boolean validateForm()

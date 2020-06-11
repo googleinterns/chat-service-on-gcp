@@ -20,16 +20,17 @@
             android:label="Contacts"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.example.chat.LoginActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.example.chat.ViewMessageActivity"
             android:parentActivityName="com.example.chat.ViewContactsActivity" />
         <activity android:name="com.example.chat.RegistrationActivity" />
-        <activity android:name=".NewMessageActivity" android:label="New Message" android:parentActivityName=".ViewContactsActivity"/>
+        <activity android:name=".NewMessageActivity" android:label="New Message" android:parentActivityName=".ViewContactsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
 
         <activity
