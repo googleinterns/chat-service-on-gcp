@@ -38,6 +38,16 @@ public final class ListChats {
     @Autowired
     private UniqueIDGenerator uniqueIDGenerator;
 
+    Map<String, Object> getChatInfoOfChatInMap(Chat chat, String usernameOfSecondUser) {
+        
+        Map<String, Object> chatInfoOfChatInMap = new LinkedHashMap<String, Object>();
+        chatInfoOfChatInMap.put("ChatID", chat.getChatID());
+        chatInfoOfChatInMap.put("Username", usernameOfSecondUser);
+        chatInfoOfChatInMap.put("LastSentMessageID", chat.getLastSentMessageID());
+
+        return chatInfoOfChatInMap;
+    }
+
     @GetMapping("/users/chats")
     public void listChatsWithoutUserIDPathVariable(HttpServletRequest request) {
 
@@ -47,10 +57,9 @@ public final class ListChats {
     }
 
     @GetMapping("/users/{userID}/chats")
-    public Map<String, List<String>> listChats(@PathVariable("userID") String userIDString, HttpServletRequest request) {
+    public Map<String,List<Map<String, Object>>> listChats(@PathVariable("userID") String userIDString, HttpServletRequest request) {
         
         String path = request.getRequestURI();
-        Map<String, List<String>> responseBody;
 
         long userID = Long.parseLong(userIDString);
         
@@ -72,12 +81,12 @@ public final class ListChats {
         
         Collections.sort(chatsOfUser, Chat.LastSentTimeDescComparator);
 
-        List<String> usernamesOfChatsOfUser = new ArrayList<String>();
+        List<Map<String, Object>> chatInfoOfChatsOfUser = new ArrayList<Map<String, Object>>();
         
         for (Chat chat : chatsOfUser) {
-            usernamesOfChatsOfUser.add(queryUser.getSecondUserForChat(user, chat).get(0).getUsername());
+            chatInfoOfChatsOfUser.add(getChatInfoOfChatInMap(chat, queryUser.getSecondUserForChat(user, chat).get(0).getUsername()));
         }
 
-        return SuccessResponseGenerator.getSuccessResponseForListChats(usernamesOfChatsOfUser);
+        return SuccessResponseGenerator.getSuccessResponseForListChats(chatInfoOfChatsOfUser);
     }
 }

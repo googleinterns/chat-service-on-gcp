@@ -57,11 +57,11 @@ public class SuccessResponseGenerator {
         return responseBody;
     }
 
-    public static Map<String,List<String>> getSuccessResponseForListChats(List<String> usernamesOfChatsOfUser) {
+    public static Map<String,List<Map<String, Object>>> getSuccessResponseForListChats(List<Map<String, Object>> chatInfoOfChatsOfUser) {
 
-        Map<String,List<String>> responseBody = new LinkedHashMap<String,List<String>>();
+        Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
 
-        responseBody.put("payload", usernamesOfChatsOfUser);
+        responseBody.put("payload", chatInfoOfChatsOfUser);
 
         return responseBody;
     }
