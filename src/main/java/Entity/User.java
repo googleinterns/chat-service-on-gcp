@@ -30,7 +30,7 @@ public class User {
   private String MobileNo;
 
   @Column(name = "Picture")
-  private byte[] Picture;
+  private String Picture;
 
   public User() {
 
@@ -51,7 +51,7 @@ public class User {
     this.EmailID = emailID;
     this.MobileNo = mobileNo;
     if(base64Image.length() != 0){
-      this.Picture = base64Image.getBytes();
+      this.Picture = base64Image;
     } else {
       this.Picture = null;
     }
@@ -91,7 +91,7 @@ public class User {
     return this.MobileNo;
   }
 
-  public byte[] getPicture(){
+  public String getPicture(){
     return this.Picture;
   }
 
@@ -115,7 +115,7 @@ public class User {
     this.MobileNo = mobileNo;
   }
 
-  public void setPicture(byte[] picture){
+  public void setPicture(String picture){
     this.Picture = picture;
   }
 
