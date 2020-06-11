@@ -20,7 +20,7 @@ public class UniqueIDGenerator {
     @Autowired
     UserAccessor queryUser;
     
-    //generates long type unique ID value for the given table and its corres ID attribute
+    // Generates long type unique ID value for the given table and its corres ID attribute
     public long generateUniqueID(String tableName, boolean zeroAllowed, boolean negativeAllowed) {
         long ID;
         Random random = new Random();

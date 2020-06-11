@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
-//this annotation tells that this class can contain methods which map to URL requests
+//This annotation tells that this class can contain methods which map to URL requests
 @RestController
 public class UserAPI {
 
