@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.chat">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,33 +16,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ViewContactsActivity"
+            android:name="com.example.chat.ViewContactsActivity"
             android:label="Contacts"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity android:name=".LoginActivity">
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name="com.example.chat.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.example.chat.ViewMessageActivity"
+            android:parentActivityName="com.example.chat.ViewContactsActivity" />
+        <activity android:name="com.example.chat.RegistrationActivity" />
+        <activity android:name=".NewMessageActivity" android:label="New Message" android:parentActivityName=".ViewContactsActivity"/>
 
-        <activity android:name=".ViewMessageActivity"
-            android:parentActivityName=".ViewContactsActivity"/>
 
-        <activity android:name=".RegistrationActivity" />
-
-        <provider
-            android:name=".ChatContentProvider"
-            android:authorities="com.example.chat.provider"
-            android:enabled="true"
-            android:exported="true"/>
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
-
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
 
         <activity
@@ -50,11 +48,14 @@
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <provider
+            android:name="com.example.chat.ChatContentProvider"
+            android:authorities="com.example.chat.provider"
+            android:enabled="true"
+            android:exported="true" />
     </application>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

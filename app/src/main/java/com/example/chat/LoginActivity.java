@@ -57,8 +57,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText mPasswordField;
     private volatile String stored_hash;
     private volatile boolean received;
-    private volatile int current_user;
-    private volatile boolean currentUserUpdated;
+    private int current_user;
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_GOOGLE_SIGN_IN = 9001;
     private static final String TAG = "SignInActivity";
@@ -198,18 +197,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void getCurrentUser()
     {
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>()
-        {
-            @Override
-            protected Void doInBackground(Void... voids)
-            {
-                SharedPreferences mPrefs = getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
-                current_user = mPrefs.getInt("currentUser", -1);
-                currentUserUpdated = true;
-                return null;
-            }
-        };
-        task.execute();
+        SharedPreferences mPrefs = getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
+        current_user = mPrefs.getInt("currentUser", -1);
     }
 
     @Override
@@ -228,7 +217,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void checkCurrentUser()
     {
-        while (!currentUserUpdated) ;
         if (current_user >= 0)
         {
             startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));

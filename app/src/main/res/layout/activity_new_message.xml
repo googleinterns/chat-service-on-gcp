@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NewMessageActivity"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+
+    <RelativeLayout
+        android:id="@+id/new_message_username_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/new_message_recyclerView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp">
+
+        <EditText
+            android:id="@+id/new_message_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/view_contacts_button"
+            android:layout_alignParentLeft="true"
+            android:layout_marginEnd="3dp"
+            android:layout_marginLeft="-2dp"
+            android:layout_toStartOf="@id/view_contacts_button"
+            android:hint="Enter Username" />
+
+        <ImageButton
+            android:id="@+id/view_contacts_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:backgroundTint="#FAFAFA"
+
+            android:src="@drawable/baseline_contacts_black" />
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/new_message_recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@+id/send_new_message_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/new_message_username_linear_layout"
+        tools:listitem="@layout/item_send_message_list"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
+    <EditText
+        android:id="@+id/send_new_message_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_input"
+        android:hint="@string/type_your_message"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/send_new_message_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/new_message_recyclerView"
+        android:inputType="textMultiLine" android:importantForAutofill="no"/>
+
+    <Button
+        android:id="@+id/send_new_message_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_button"
+        android:text="@string/send"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/send_new_message_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/send_new_message_text" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -66,7 +66,6 @@ public class ViewContactsActivity extends AppCompatActivity
 
     public static int LOADER_CONTACTS = 0;
     private volatile boolean lastMessageUpdated;
-    private volatile boolean currentUserUpdated;
 
     public volatile int currentUser;
     private volatile boolean receivedMessageUpdated;
@@ -91,7 +90,7 @@ public class ViewContactsActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                //TODO Launch NewContactActivity
+                startActivity(new Intent(ViewContactsActivity.this, NewMessageActivity.class));
             }
         });
 
@@ -126,9 +125,11 @@ public class ViewContactsActivity extends AppCompatActivity
 //    }
 
 
-    private void HideSoftKeyboard() {
+    private void HideSoftKeyboard()
+    {
         View view = this.getCurrentFocus();
-        if (view != null) {
+        if (view != null)
+        {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             assert imm != null;
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -136,20 +137,8 @@ public class ViewContactsActivity extends AppCompatActivity
     }
     private void getCurrentUser()
     {
-        AsyncTask<Void,Void,Void> task = new AsyncTask<Void, Void, Void>()
-        {
-            @Override
-            protected Void doInBackground(Void... voids)
-            {
-                SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
-                currentUser = mPrefs.getInt("currentUser",-1);
-                currentUserUpdated=true;
-                return null;
-            }
-        };
-        currentUserUpdated = false;
-        task.execute();
-        while(!currentUserUpdated);
+        SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
+        currentUser = mPrefs.getInt("currentUser",-1);
         if(currentUser==-1)
         {
             startActivity(new Intent(this,LoginActivity.class));

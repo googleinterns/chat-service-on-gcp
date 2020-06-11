@@ -147,11 +147,11 @@ public class RegistrationActivity extends AppCompatActivity
 
 
                                 new addUserDb().execute(values);
-                                if(newEntryInserted)
-                                {
-                                    //In this prototype all possible pairs of chats are inserted in the CHAT TABLE
-                                    new UpdateChats().execute(emailEditText.getText().toString());
-                                }
+                                //TODO chats were previously updated over here.
+//                                if(newEntryInserted)
+//                                {
+//                                    new UpdateChats().execute(emailEditText.getText().toString());
+//                                }
                                 Toast.makeText(getApplicationContext(), "Successfully registered", Toast.LENGTH_LONG).show();
                                 finish();
                             }

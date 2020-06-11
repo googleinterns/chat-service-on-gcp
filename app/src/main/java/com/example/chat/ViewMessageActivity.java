@@ -49,7 +49,7 @@ public class ViewMessageActivity extends AppCompatActivity
     public int help_count;
     private volatile boolean currentUserUpdated;
 
-    public int currentUser;
+    private int currentUser;
     private int contactId;
 
     private Timer mTimer;
@@ -289,9 +289,11 @@ public class ViewMessageActivity extends AppCompatActivity
         }
     }
 
-    public void HideSoftKeyboard() {
+    private void HideSoftKeyboard()
+    {
         View view = this.getCurrentFocus();
-        if (view != null) {
+        if (view != null)
+        {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             assert imm != null;
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
