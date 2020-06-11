@@ -19,7 +19,7 @@ public class UserAccessor {
     @Autowired
     SpannerTemplate spannerTemplate;
 
-    public void insertAll(User user) {
+    public void insert(User user) {
         spannerTemplate.insert(user);
     }
 

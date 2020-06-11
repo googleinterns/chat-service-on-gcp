@@ -88,7 +88,7 @@ public class UserAPI {
         long id = uniqueIDGenerator.generateUniqueID("User", false, false);
         User newUser = new User(id, username, password, emailID, mobileNo, base64Image);
         //insert new entry into User
-        userAccessor.insertAll(newUser);
+        userAccessor.insert(newUser);
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", id);
     }
 
