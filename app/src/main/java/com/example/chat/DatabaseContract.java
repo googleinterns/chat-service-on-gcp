@@ -8,7 +8,7 @@ public final class DatabaseContract
 
     public static final class userEntry implements BaseColumns
     {
-        public static final String TABLE_NAME = "user";
+        public static final String TABLE_NAME = "User";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_EMAIL_ID = "email_id";
         public static final String COLUMN_PASSWORD = "password";
@@ -33,7 +33,7 @@ public final class DatabaseContract
     }
     public static final class messageEntry implements BaseColumns
     {
-        public static final String TABLE_NAME = "message";
+        public static final String TABLE_NAME = "Message";
         public static final String COLUMN_SENDER = "sender";
         public static final String COLUMN_RECEIVER = "receiver";
         public static final String COLUMN_RECEIVED = "received";
@@ -75,7 +75,7 @@ public final class DatabaseContract
     }
     public static final class chatEntry implements BaseColumns
     {
-        public static final String TABLE_NAME = "chat";
+        public static final String TABLE_NAME = "Chat";
         public static final String COLUMN_USER1 = "user1";
         public static final String COLUMN_USER2 = "user2";
         public static final String COLUMN_LAST_MESSAGE = "last_message";

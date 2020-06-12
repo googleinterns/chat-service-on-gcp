@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 
 public class OpenHelper extends SQLiteOpenHelper
 {
-    private static final String DATABASE_NAME = "chat.db";
+    private static final String DATABASE_NAME = "Chat.db";
     private static final int DATABASE_VERSION = 1;
     private static OpenHelper instance;
 

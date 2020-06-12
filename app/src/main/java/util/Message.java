@@ -1,23 +1,23 @@
 package util;
 
 
-public class message
+public class Message
 {
     public int senderId;
     public int receiverId;
     public boolean received;
     public String text;
     public Long send_time;
-    public message()
+    public Message()
     {
 
     }
-    public message(int mSenderID,int mReceiverID,boolean mreceived,String mtext,Long msend_time)
+    public Message(int mSenderID, int mReceiverID, boolean mReceived, String mText, Long mSendTime)
     {
         senderId = mSenderID;
         receiverId = mReceiverID;
-        received = mreceived;
-        text = mtext;
-        send_time = msend_time;
+        received = mReceived;
+        text = mText;
+        send_time = mSendTime;
     }
 }

@@ -30,7 +30,7 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import util.message;
+import util.Message;
 
 public class ViewMessageActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>
@@ -288,7 +288,7 @@ public class ViewMessageActivity extends AppCompatActivity
     {
         HideSoftKeyboard();
         findViewById(R.id.view_message_constraint_layout).requestFocus();
-        messageRecyclerAdapter.addRow(new message(currentUser,contactId,false,message_text,System.currentTimeMillis()));
+        messageRecyclerAdapter.addRow(new Message(currentUser,contactId,false,message_text,System.currentTimeMillis()));
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
         messageEditText.setText("");
     }
@@ -311,7 +311,7 @@ public class ViewMessageActivity extends AppCompatActivity
         @Override
         protected Void doInBackground(ContentValues... contentValues)
         {
-            // TODO send message to the server
+            // TODO send Message to the server
             return null;
         }
     }
@@ -323,7 +323,7 @@ public class ViewMessageActivity extends AppCompatActivity
         @Override
         protected Void doInBackground(Void... voids)
         {
-            //TODO receive message from the server & store it in DB
+            //TODO receive Message from the server & store it in DB
             Log.d("hello","server_message "+Integer.toString(help_count));
             help_count++;
 
@@ -405,7 +405,7 @@ public class ViewMessageActivity extends AppCompatActivity
 //                        if (imgFile.exists())
 //                        {
 //
-////                            messages.add(new message(false, s, 3));
+////                            messages.add(new Message(false, s, 3));
 ////                            messageRecyclerAdapter.notifyItemInserted(messages.size() - 1);
 ////                            recyclerMessages.smoothScrollToPosition(messages.size() - 1);
 //                        }

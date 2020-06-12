@@ -1,16 +1,16 @@
 package util;
 
 
-public class user
+public class User
 {
     public int userID;
     public String name;
     public String email_id;
     public String last_message;
-    public user()
+    public User()
     {
     }
-    public user(int mUserID,String mName,String mEmailId,String mLastMessage)
+    public User(int mUserID, String mName, String mEmailId, String mLastMessage)
     {
         userID = mUserID;
         name = mName;

@@ -3,17 +3,17 @@ package util;
 
 
 
-public class chat
+public class Chat
 {
     public int user1;
     public int user2;
     public String last_message;
 
-    public chat()
+    public Chat()
     {
 
     }
-    public chat(int mUser1,int mUser2,String mLastMessage)
+    public Chat(int mUser1, int mUser2, String mLastMessage)
     {
         user1=mUser1;
         user2=mUser2;

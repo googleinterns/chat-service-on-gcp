@@ -67,7 +67,7 @@ public class RegistrationActivity extends AppCompatActivity
         //Buttons
         Button registrationButton = (Button) findViewById(R.id.register_button);
 
-        registrationButton.setOnClickListener(new View.OnClickListener() //add new user to firebase after someone clicks on this
+        registrationButton.setOnClickListener(new View.OnClickListener() //add new User to firebase after someone clicks on this
         {
             @Override
             public void onClick(View view)
@@ -132,7 +132,7 @@ public class RegistrationActivity extends AppCompatActivity
                         Log.d("successLatencyTime: ",Long.toString(totalRequestTime));
                         try
                         {
-                            String message = response.getString("message");
+                            String message = response.getString("Message");
                             if(message.equals("Success"))
                             {
                                 String userID = response.getString("UserID");
@@ -193,7 +193,7 @@ public class RegistrationActivity extends AppCompatActivity
                             }
 
                             assert data != null;
-                            String message = data.optString("message");
+                            String message = data.optString("Message");
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
 
                             emailEditText.setText("");

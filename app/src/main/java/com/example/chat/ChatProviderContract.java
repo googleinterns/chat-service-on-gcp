@@ -7,7 +7,7 @@ public final class ChatProviderContract
 {
     private ChatProviderContract() {};
 
-    public static final String AUTHORITY = "com.example.chat.provider";
+    public static final String AUTHORITY = "com.example.Chat.provider";
     public static final Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
 
 
@@ -51,7 +51,7 @@ public final class ChatProviderContract
 
     public static final class Chat implements BaseColumns,ChatColumns
     {
-        public static final String PATH = "chat";
+        public static final String PATH = "Chat";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(AUTHORITY_URI,PATH);
     }
 }

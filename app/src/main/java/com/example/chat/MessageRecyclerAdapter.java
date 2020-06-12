@@ -19,7 +19,7 @@ import java.io.File;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import util.message;
+import util.Message;
 
 public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecyclerAdapter.ViewHolder>
 {
@@ -41,7 +41,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         if(mCursor.isClosed())
             return 0;
         mCursor.moveToPosition(position);
-        if(mCursor.getInt(mReceivedPos)==1)//message is received
+        if(mCursor.getInt(mReceivedPos)==1)//Message is received
         {
             viewType =0;
         }
@@ -80,7 +80,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         notifyDataSetChanged();
     }
 
-    public void addRow(message m)
+    public void addRow(Message m)
     {
         MatrixCursor matrixCursor = new MatrixCursor(new String[] { messageEntry.COLUMN_RECEIVED, messageEntry.COLUMN_TEXT,messageEntry.COLUMN_SEND_TIME });
         if(m.received)

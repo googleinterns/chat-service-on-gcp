@@ -63,12 +63,13 @@ public class ViewContactsActivity extends AppCompatActivity
     public static final String CURRENT_USER = "currentUser";
     ContactsRecyclerAdapter contactsRecyclerAdapter;
     LinearLayoutManager contactLayoutManager;
+    private FloatingActionButton fab;
 
     public static int LOADER_CONTACTS = 0;
     private volatile boolean lastMessageUpdated;
 
     public volatile int currentUser;
-    private volatile boolean receivedMessageUpdated;
+//    private volatile boolean receivedMessageUpdated;
     RecyclerView recyclerContacts;
 
     @Override
@@ -84,7 +85,7 @@ public class ViewContactsActivity extends AppCompatActivity
 
         initializeDisplayContent();
 
-        final FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -101,28 +102,31 @@ public class ViewContactsActivity extends AppCompatActivity
 //        LoadChatsFromServer();
     }
 
-//    private void LoadChatsFromServer()
-//    {
-//        String url = "https://gcp-chat-service.an.r.appspot.com/users/3441453482889885209/chats";
-//        RequestQueue queue = VolleyController.getInstance(this.getApplicationContext()).
-//                getRequestQueue();
-//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-//                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-//
-//                    @Override
-//                    public void onResponse(JSONObject response) {
+    private void LoadChatsFromServer()
+    {
+        String url = "https://gcp-chat-service.an.r.appspot.com/users/3441453482889885209/chats";
+        RequestQueue queue = VolleyController.getInstance(this.getApplicationContext()).
+                getRequestQueue();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>()
+                {
+
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
 //                        textView.setText("Response: " + response.toString());
-//                    }
-//                }, new Response.ErrorListener() {
-//
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        // TODO: Handle error
-//
-//                    }
-//                });
-//        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
-//    }
+                    }
+                }, new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        // TODO: Handle error
+
+                    }
+                });
+        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
+    }
 
 
     private void HideSoftKeyboard()
@@ -139,10 +143,10 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
         currentUser = mPrefs.getInt("currentUser",-1);
-        if(currentUser==-1)
-        {
-            startActivity(new Intent(this,LoginActivity.class));
-        }
+//        if(currentUser==-1)
+//        {
+//            startActivity(new Intent(this,LoginActivity.class));
+//        }
     }
 
     private void enableStrictMode()
@@ -170,14 +174,25 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         super.onResume();
         getCurrentUser();
+        Log.d("currentUser",Integer.toString(currentUser));
 
-
-        receivedMessageUpdated=false;
+//        receivedMessageUpdated=false;
         new UpdateReceivedMessageDb().execute();
         lastMessageUpdated=false;
         new UpdateLastMessageDb().execute();
-        while(!lastMessageUpdated);
-
+        Log.d("here1","lol");
+        while(!lastMessageUpdated)
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        Log.d("here2","lol");
         LoaderManager.getInstance(this).restartLoader(LOADER_CONTACTS,null,this);
     }
 
@@ -207,7 +222,7 @@ public class ViewContactsActivity extends AppCompatActivity
                     {
                            Integer.toString(currentUser)
                     };
-            while(!receivedMessageUpdated);
+//            while(!receivedMessageUpdated);
             loader = new CursorLoader(this,uri,user_columns,selection,selectionArgs,null);
         }
         return loader;
@@ -253,7 +268,7 @@ public class ViewContactsActivity extends AppCompatActivity
             ContentValues argSent = new ContentValues();
             argSent.put(Messages.COLUMN_RECEIVED, "0");
             getContentResolver().update(Messages.CONTENT_URI,argSent,Messages.COLUMN_SENDER+" = ? ",new String []{Integer.toString(currentUser)});
-            receivedMessageUpdated=true;
+//            receivedMessageUpdated=true;
             return null;
         }
         @Override
@@ -362,6 +377,7 @@ public class ViewContactsActivity extends AppCompatActivity
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 searchView.setQuery("",false);
+                fab.setVisibility(View.VISIBLE);
                 HideSoftKeyboard();
                 restartLoader();
                 return true;
@@ -373,6 +389,7 @@ public class ViewContactsActivity extends AppCompatActivity
             public boolean onClose()
             {
                 searchView.setQuery("",false);
+                fab.setVisibility(View.VISIBLE);
                 restartLoader();
                 HideSoftKeyboard();
                 return true;
@@ -407,6 +424,7 @@ public class ViewContactsActivity extends AppCompatActivity
         }
         else if(item.getItemId()==R.id.contacts_search_menu)
         {
+            fab.setVisibility(View.INVISIBLE);
         }
         return true;
     }
