@@ -57,20 +57,6 @@ public class User {
     }
   }
 
-  public User(
-              String username, 
-              String password, 
-              String emailID, 
-              String mobileNo
-            ) {
-
-    this.Username = username;
-    this.Password = password;
-    this.EmailID = emailID;
-    this.MobileNo = mobileNo;
-    this.Picture = null;
-  }
-
   public long getUserID(){
     return this.UserID;
   }

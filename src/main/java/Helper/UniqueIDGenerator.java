@@ -21,15 +21,15 @@ public class UniqueIDGenerator {
     @Autowired
     UserAccessor queryUser;
     
-    // Generates long type unique ID value for the given table and its corres ID attribute
+    /* Generates long type unique ID value for the given table and its corres ID attribute */
     public long generateUniqueID(String tableName) {
-        long ID;
+        long id;
         while (true) {
             // Generates ID in range [1, Long.MAX_VALUE)
-            ID = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
+            id = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
             switch (tableName) {
                 case "User": 
-                    if (queryUser.checkIfUserIDExists(ID)) {continue;} else {return ID;}
+                    if (queryUser.checkIfUserIDExists(id)) {continue;} else {return id;}
             }
         }
     }

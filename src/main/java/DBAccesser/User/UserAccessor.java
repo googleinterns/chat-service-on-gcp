@@ -19,12 +19,12 @@ public class UserAccessor {
     @Autowired
     SpannerTemplate spannerTemplate;
 
-    // Insert new entry in User Table
+    /* Inserts new entry in User Table */
     public void insert(User user) {
         spannerTemplate.insert(user);
     }
 
-    // Check if a user with the given username or email-id already exists in User table
+    /* Checks if a user with the given username or email-id already exists in User table */
     public boolean checkIfUserExists(String username, String emailID) {
         String SQLStatment = "SELECT Username FROM User WHERE Username=@Username OR EmailID=@EmailID";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -38,7 +38,7 @@ public class UserAccessor {
                 .isEmpty();
     }
 
-    // Check if there is a row in the User table having the given UserID
+    /* Checks if there is a row in the User table having the given UserID */
     public boolean checkIfUserIDExists(long id) {
         String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userID";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -50,7 +50,7 @@ public class UserAccessor {
                 .isEmpty();
     }
 
-    // Retrieve UserID of user having the given username
+    /* Retrieves UserID of user having the given username */
     public long getUserIDFromUsername(String username) {
         String SQLStatment = "SELECT UserID FROM User WHERE Username=@Username";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -62,8 +62,8 @@ public class UserAccessor {
                 .get(0).getUserID();
     }
 
-    // Retrieve the UserID of the user having the given username and password
-    // If no such user exists, return -1
+    /* Retrieves the UserID of the user having the given username and password
+        If no such user exists, returns -1 */
     public long login(String username, String password) {
         String SQLStatment = "SELECT UserID from User WHERE Username=@username AND Password=@password";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -79,8 +79,8 @@ public class UserAccessor {
         return resultSet.get(0).getUserID();
     }
 
-    // Retrieve UserID, Username, EmailID, MobileNo and Picture of the user having the given username
-    // If no such user exists, return just the UserID as -1
+    /* Retrieves UserID, Username, EmailID, MobileNo and Picture of the user having the given username
+        If no such user exists, returns just the UserID as -1 */
     public Map<String, Object> getUser(String username) {
         String SQLStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User WHERE Username=@Username";
         Statement statement = Statement.newBuilder(SQLStatment)

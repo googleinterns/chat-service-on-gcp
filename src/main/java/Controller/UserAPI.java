@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
-//This annotation tells that this class can contain methods which map to URL requests
 @RestController
 public class UserAPI {
 
@@ -68,26 +67,26 @@ public class UserAPI {
             throw new UserRequiredFieldMissingException(path, missing_fields);
         }
 
-        // necessary fields
+        /* necessary fields */
         String username = data.get("Username").toString();
         String emailID = data.get("EmailID").toString();
         String password = data.get("Password").toString();
         String mobileNo = data.get("MobileNo").toString();
 
-        // optional field
+        /* optional field */
         String base64Image = "";
         if(data.get("Picture") != null){
             base64Image = data.get("Picture").toString();
         }
 
-        // check if Username or email exists - return error if it does
+        /* Checks if Username or email exists - throws exception if it does */
         if (userAccessor.checkIfUserExists(username, emailID)) {
             throw new UserAlreadyExistsException(path);
         }
-        //generate unique userID
+        /* Generates unique userID */
         long id = uniqueIDGenerator.generateUniqueID("User");
         User newUser = new User(id, username, password, emailID, mobileNo, base64Image);
-        //insert new entry into User
+        /* Inserts new entry into User table */
         userAccessor.insert(newUser);
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", id);
     }
