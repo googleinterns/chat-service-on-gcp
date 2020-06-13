@@ -220,4 +220,17 @@ public class ExceptionHandlerAdvice {
 
         return new ResponseEntity<Object>(responseBody, MessageIDMissingFromRequestURLParameterException.HTTP_STATUS);
     }
+
+    @ExceptionHandler(InvalidCountValueInRequestURLParameterException.class)
+    public ResponseEntity<Object> handleInvalidCountValueInRequestURLParameterException(InvalidCountValueInRequestURLParameterException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", InvalidCountValueInRequestURLParameterException.HTTP_STATUS.value());
+        responseBody.put("error", InvalidCountValueInRequestURLParameterException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, InvalidCountValueInRequestURLParameterException.HTTP_STATUS);
+    }  
 } 

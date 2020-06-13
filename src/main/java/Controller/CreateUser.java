@@ -31,8 +31,6 @@ public final class CreateUser {
 
     @Autowired
     private UniqueIDGenerator uniqueIDGenerator;
-
-    //this annotation tells that when a URL POST request of the given form comes to the server, the following method should be called
     
     @PostMapping("/users")
     public Map<String, Object> createUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {

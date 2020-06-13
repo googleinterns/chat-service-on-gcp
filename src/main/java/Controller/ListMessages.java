@@ -13,6 +13,7 @@ import Exceptions.MessageIDDoesNotExistException;
 import Exceptions.MessageIDDoesNotBelongToChatIDException;
 import Exceptions.UserIDMissingFromRequestURLPathException;
 import Exceptions.ChatIDMissingFromRequestURLPathException;
+import Exceptions.InvalidCountValueInRequestURLParameterException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -110,7 +111,11 @@ public final class ListMessages {
         if (countString == null) {
             count = LOWER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN;
         } else {
-            count = Math.abs(Integer.parseInt(countString));
+            count = Integer.parseInt(countString);
+
+            if (count < 0) {
+                throw new InvalidCountValueInRequestURLParameterException(path);
+            }
             count = Math.min(count, UPPER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN);
             count = Math.max(count, LOWER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN);
         }
