@@ -1,7 +1,6 @@
 package Entity;
 
 import com.google.cloud.Timestamp;
-import java.util.Comparator;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
@@ -73,15 +72,4 @@ public final class Chat {
   
         return this.lastSentTime;
     }
-
-    public static final Comparator<Chat> LastSentTimeDescComparator = new Comparator<Chat>() {
-
-        public int compare(Chat chat1, Chat chat2) {
-            
-            Timestamp lastSentTime1 = chat1.getLastSentTime();
-            Timestamp lastSentTime2 = chat2.getLastSentTime();
-
-            return lastSentTime2.compareTo(lastSentTime1);
-        }
-    };
 }

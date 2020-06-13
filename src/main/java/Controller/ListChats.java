@@ -14,6 +14,7 @@ import Exceptions.UserIDMissingFromRequestURLPathException;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import javax.servlet.http.HttpServletRequest;  
@@ -79,7 +80,7 @@ public final class ListChats {
             }
         }
         
-        Collections.sort(chatsOfUser, Chat.LastSentTimeDescComparator);
+        Collections.sort(chatsOfUser, Comparator.comparing(Chat::getLastSentTime).reversed());
 
         List<Map<String, Object>> chatInfoOfChatsOfUser = new ArrayList<Map<String, Object>>();
         
