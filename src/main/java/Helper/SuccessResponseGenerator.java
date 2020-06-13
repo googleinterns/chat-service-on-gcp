@@ -6,6 +6,8 @@ import Entity.Message;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -84,11 +86,12 @@ public final class SuccessResponseGenerator {
 
     public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(List<Message> messages) {
 
-        //messages passed would be in descending order of CreationTS
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
 
-        //traversed in the reverse order since we want to return messages in ascending order of CreationTS
-        for (int i = messages.size()-1; i >= 0; --i) {
+        //sort the messages in  ascending order of CreationTS
+        Collections.sort(messages, Comparator.comparing(Message::getCreationTS));
+        
+        for (int i = 0; i < messages.size(); ++i) {
             listOfMessages.add(getMessageForResponseBody(messages.get(i)));
         }
 
