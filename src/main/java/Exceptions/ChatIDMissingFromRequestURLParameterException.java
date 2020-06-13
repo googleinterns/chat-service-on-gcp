@@ -3,9 +3,9 @@ package Exceptions;
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
 
-public class ChatIDMissingFromRequestURLParameterException extends RuntimeException {
+public final class ChatIDMissingFromRequestURLParameterException extends RuntimeException {
 
-    public static HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;
+    public static final HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;
     private static final String message = "Parameter: 'chatID' Missing From Request URL";
     private final String path;
 

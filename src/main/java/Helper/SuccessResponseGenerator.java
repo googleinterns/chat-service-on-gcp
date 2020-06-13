@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-public class SuccessResponseGenerator {
+public final class SuccessResponseGenerator {
 
     public static Map<String, Object> getSuccessResponseForCreateEntity(String className, long ID) {
 

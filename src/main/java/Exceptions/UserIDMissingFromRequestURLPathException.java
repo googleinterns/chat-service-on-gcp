@@ -3,9 +3,9 @@ package Exceptions;
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
 
-public class UserIDMissingFromRequestURLPathException extends RuntimeException {
+public final class UserIDMissingFromRequestURLPathException extends RuntimeException {
 
-    public static HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;
+    public static final HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;
     private static final String message = "Variable: 'userID' Missing From Request URL Path";
     private final String path;
 

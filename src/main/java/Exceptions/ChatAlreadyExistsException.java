@@ -3,9 +3,9 @@ package Exceptions;
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
 
-public class ChatAlreadyExistsException extends RuntimeException {
+public final class ChatAlreadyExistsException extends RuntimeException {
 
-    public static HttpStatus HTTP_STATUS = HttpStatus.CONFLICT;
+    public static final HttpStatus HTTP_STATUS = HttpStatus.CONFLICT;
     private static final String message = "Chat Already Exists";
     private final String path;
 

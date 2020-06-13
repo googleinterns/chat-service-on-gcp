@@ -10,7 +10,7 @@ import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
 @Component
-public class UserChatAccessor {
+public final class UserChatAccessor {
     
     @Autowired
     private SpannerTemplate spannerTemplate;

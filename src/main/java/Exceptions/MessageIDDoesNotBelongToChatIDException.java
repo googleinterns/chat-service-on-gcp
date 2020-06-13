@@ -3,9 +3,9 @@ package Exceptions;
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
 
-public class MessageIDDoesNotBelongToChatIDException extends RuntimeException {
+public final class MessageIDDoesNotBelongToChatIDException extends RuntimeException {
 
-    public static HttpStatus HTTP_STATUS = HttpStatus.FORBIDDEN;
+    public static final HttpStatus HTTP_STATUS = HttpStatus.FORBIDDEN;
     private static final String message = "MessageID Does Not Belong To ChatID";
     private final String path;
 

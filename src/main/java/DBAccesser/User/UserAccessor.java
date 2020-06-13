@@ -11,7 +11,7 @@ import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
 @Component
-public class UserAccessor {
+public final class UserAccessor {
     
     @Autowired
     private SpannerTemplate spannerTemplate;
