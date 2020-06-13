@@ -117,4 +117,13 @@ public final class MessageAccessor {
 
         return listCountMessagesOfChatID(null, null, count, chatID);
     }
+
+    public List<Message> getLastSentMessageIDCreationTSForChatsOfUser(long userID) {
+
+        String SQLStatment = "SELECT ChatID, CreationTS FROM Message WHERE MessageID IN (SELECT LastSentMessageID FROM Chat WHERE ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userID) AND LastSentMessageID IS NOT NULL)";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(userID).build();
+        List<Message> resultSet = spannerTemplate.query(Message.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+ 
+        return resultSet;
+    }
 }

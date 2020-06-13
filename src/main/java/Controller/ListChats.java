@@ -2,6 +2,7 @@ package Controller;
 
 import Entity.User;
 import Entity.Chat;
+import Entity.Message;
 import Helper.UniqueIDGenerator;
 import DBAccesser.User.UserAccessor;
 import DBAccesser.Chat.ChatAccessor;
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
+import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
+import com.google.cloud.Timestamp;
 
 @RestController
 public final class ListChats {
@@ -38,6 +42,30 @@ public final class ListChats {
 
     @Autowired
     private UniqueIDGenerator uniqueIDGenerator;
+
+    public static final class UsernameChatID {
+
+        @Column(name = "Username")
+        private String username;
+
+        @Column(name = "ChatID")
+        private long chatID;
+
+        public UsernameChatID () {}
+
+        public UsernameChatID (String username, long chatID) {
+            this.username = username;
+            this.chatID = chatID;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public long getChatID() {
+            return chatID;
+        }
+    }
 
     Map<String, Object> getChatInfoOfChatInMap(Chat chat, String usernameOfSecondUser) {
         
@@ -71,21 +99,40 @@ public final class ListChats {
         
         User user = new User(userID);
         List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
+        List<Message> listOfChatIDCreationTSOfLastSentMessageID = queryMessage.getLastSentMessageIDCreationTSForChatsOfUser(userID);
+        Map<Long, Timestamp> chatIDCreationTSOflastSentMessageIDMap = new LinkedHashMap<Long, Timestamp>();
+
+        for (Message chatIDCreationTSOfLastSentMessageID : listOfChatIDCreationTSOfLastSentMessageID) {
+            chatIDCreationTSOflastSentMessageIDMap.put(chatIDCreationTSOfLastSentMessageID.getChatID(), chatIDCreationTSOfLastSentMessageID.getCreationTS());
+        }
         
         for (Chat chat : chatsOfUser) {
             if (chat.getLastSentMessageID() == 0) { 
                 chat.setLastSentTime(chat.getCreationTS());
             } else {
-                chat.setLastSentTime(queryMessage.getCreationTSForMessageID(chat.getLastSentMessageID()));
+                chat.setLastSentTime(chatIDCreationTSOflastSentMessageIDMap.get(chat.getChatID()));
             }
         }
         
         Collections.sort(chatsOfUser, Comparator.comparing(Chat::getLastSentTime).reversed());
 
-        List<Map<String, Object>> chatInfoOfChatsOfUser = new ArrayList<Map<String, Object>>();
-        
+        List<Long> listOfChatIDDesc = new ArrayList<Long>();
+
         for (Chat chat : chatsOfUser) {
-            chatInfoOfChatsOfUser.add(getChatInfoOfChatInMap(chat, queryUser.getSecondUserForChat(user, chat).get(0).getUsername()));
+            listOfChatIDDesc.add(chat.getChatID());
+        }
+
+        List<UsernameChatID> usernameChatIDForSecondUsers = queryUser.getUsernameChatIDForSecondUsers(userID);
+        Map<Long, String> chatIDSecondUsernameMap = new LinkedHashMap<Long, String>();
+
+        for (UsernameChatID usernameChatID : usernameChatIDForSecondUsers) {
+            chatIDSecondUsernameMap.put(usernameChatID.getChatID(), usernameChatID.getUsername());
+        }
+
+        List<Map<String, Object>> chatInfoOfChatsOfUser = new ArrayList<Map<String, Object>>();
+
+        for (Chat chat : chatsOfUser) {
+            chatInfoOfChatsOfUser.add(getChatInfoOfChatInMap(chat, chatIDSecondUsernameMap.get(chat.getChatID())));
         }
 
         return SuccessResponseGenerator.getSuccessResponseForListChats(chatInfoOfChatsOfUser);

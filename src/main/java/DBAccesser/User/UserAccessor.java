@@ -2,6 +2,7 @@ package DBAccesser.User;
 
 import Entity.User;
 import Entity.Chat;
+import Controller.ListChats;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,11 +57,20 @@ public final class UserAccessor {
         return resultSet.get(0).getUserID();
     }
 
-    public List<User> getSecondUserForChat(User firstUser, Chat chat) {
+    // public List<User> getSecondUserForChat(User firstUser, Chat chat) {
 
-        String SQLStatment = "SELECT * FROM User WHERE UserID IN (SELECT UserID FROM UserChat WHERE ChatID=@chatID AND UserID!=@userID)";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("chatID").to(chat.getChatID()).bind("userID").to(firstUser.getUserID()).build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+    //     String SQLStatment = "SELECT * FROM User WHERE UserID IN (SELECT UserID FROM UserChat WHERE ChatID=@chatID AND UserID!=@userID)";
+    //     Statement statement = Statement.newBuilder(SQLStatment).bind("chatID").to(chat.getChatID()).bind("userID").to(firstUser.getUserID()).build();
+    //     List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+ 
+    //     return resultSet;
+    // }
+
+    public List<ListChats.UsernameChatID> getUsernameChatIDForSecondUsers(long userID) {
+
+        String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userID) AND UserChat.UserID != @userID";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(userID).build();
+        List<ListChats.UsernameChatID> resultSet = spannerTemplate.query(ListChats.UsernameChatID.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return resultSet;
     }
