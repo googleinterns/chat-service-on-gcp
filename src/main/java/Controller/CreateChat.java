@@ -94,12 +94,7 @@ public final class CreateChat {
         newUserChat1.setChatID(newChat.getChatID());
         newUserChat2.setChatID(newChat.getChatID());
 
-        //insert new chat entry into Chat
-        insertChat.insertAllExceptLastSentMessageID(newChat);
-
-        //insert two new user-chat entries into UserChat
-        insertUserChat.insertAll(newUserChat1);
-        insertUserChat.insertAll(newUserChat2);
+        insertChat.insertForCreateChatTransaction(newChat, newUserChat1, newUserChat2);
 
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", newChat.getChatID());
     }

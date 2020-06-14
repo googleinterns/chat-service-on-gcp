@@ -2,6 +2,7 @@ package DBAccesser.Chat;
 
 import Entity.User;
 import Entity.Chat;
+import Entity.UserChat;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,21 +10,32 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
 import java.util.List;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
+import org.springframework.cloud.gcp.data.spanner.core.SpannerOperations;
 
 @Component
 public final class ChatAccessor {
     
     @Autowired
-    private SpannerTemplate spannerTemplate;
+    SpannerOperations spannerOperations;
 
-    public void insertAllExceptLastSentMessageID(Chat chat) {
-        //must mention to add CreationTS even if it is set to be automatically committed
-        spannerTemplate.upsert(chat, "ChatID", "CreationTS");
-    }
+    @Autowired
+    private SpannerTemplate spannerTemplate;
 
     public void insertLastSentMessageID(Chat chat) {
         //must insert PK even in partial update
         spannerTemplate.update(chat, "ChatID", "LastSentMessageID");
+    }
+
+    public boolean insertForCreateChatTransaction(Chat chat, UserChat userChat1, UserChat userChat2) {
+        return spannerOperations.performReadWriteTransaction(
+            transactionSpannerOperations -> {
+                transactionSpannerOperations.upsert(chat, "ChatID", "CreationTS");
+                transactionSpannerOperations.insert(userChat1);
+                transactionSpannerOperations.insert(userChat2);
+
+                return true;
+            }
+        );
     }
 
     public boolean checkIfChatIDExists(long chatID) {
