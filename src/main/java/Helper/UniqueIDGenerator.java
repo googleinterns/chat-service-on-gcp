@@ -38,10 +38,26 @@ public final class UniqueIDGenerator {
             }
 
             switch (tableName) {
-                case "User": if (queryUser.checkIfUserIDExists(id)) {continue;} else {return id;}
-                case "Chat": if (queryChat.checkIfChatIDExists(id)) {continue;} else {return id;}
-                case "Message": if (queryMessage.checkIfMessageIDExists(id)) {continue;} else {return id;}
-                default: throw new IllegalArgumentException("Invalid DB Relation Name passed to UniqueIDGenerator");
+                case "User": 
+                    if (queryUser.checkIfUserIDExists(id)) {
+                        continue;
+                    } else {
+                        return id;
+                    }
+                case "Chat": 
+                    if (queryChat.checkIfChatIDExists(id)) {
+                        continue;
+                    } else {
+                        return id;
+                    }
+                case "Message": 
+                    if (queryMessage.checkIfMessageIDExists(id)) {
+                        continue;
+                    } else {
+                            return id;
+                    }
+                default: 
+                    throw new IllegalArgumentException("Invalid DB Relation Name passed to UniqueIDGenerator");
             }
         }
     }
