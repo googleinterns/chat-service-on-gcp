@@ -10,42 +10,42 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.NotMapped;
 public final class Chat {
     
     @Column(name = "CreationTS", spannerCommitTimestamp = true) 
-    private Timestamp creationTS;
+    private Timestamp creationTs;
     
     @PrimaryKey
     @Column(name = "ChatID")
-    private long chatID;
+    private long chatId;
 
     @Column(name = "LastSentMessageID")
-    private long lastSentMessageID;
+    private long lastSentMessageId;
 
     @NotMapped
     private Timestamp lastSentTime;
 
     public Chat() {}
   
-    public Chat(long chatID, long lastSentMessageID) {
+    public Chat(long chatId, long lastSentMessageId) {
       
-        this.chatID = chatID;
-        this.lastSentMessageID = lastSentMessageID;
+        this.chatId = chatId;
+        this.lastSentMessageId = lastSentMessageId;
     }
 
-    public static Chat newChatWithChatID(long chatID) {
-        return new Chat(chatID, 0);
+    public static Chat newChatWithChatId(long chatId) {
+        return new Chat(chatId, 0);
     }
 
-    public static Chat newChatWithLastSentMessageID(long lastSentMessageID) {
-        return new Chat(0, lastSentMessageID);
+    public static Chat newChatWithLastSentMessageId(long lastSentMessageId) {
+        return new Chat(0, lastSentMessageId);
     }
   
-    public void setChatID(long chatID) {
+    public void setChatId(long chatId) {
       
-        this.chatID = chatID;
+        this.chatId = chatId;
     }
 
-    public void setLastSentMessageID(long lastSentMessageID) {
+    public void setLastSentMessageId(long lastSentMessageId) {
       
-        this.lastSentMessageID = lastSentMessageID;
+        this.lastSentMessageId = lastSentMessageId;
     }
 
     public void setLastSentTime(Timestamp lastSentTime) {
@@ -53,19 +53,19 @@ public final class Chat {
         this.lastSentTime = lastSentTime;
     }
 
-    public Timestamp getCreationTS() {
+    public Timestamp getCreationTs() {
   
-        return this.creationTS;
+        return this.creationTs;
     }
   
-    public long getChatID() {
+    public long getChatId() {
   
-        return this.chatID;
+        return this.chatId;
     }
 
-    public long getLastSentMessageID() {
+    public long getLastSentMessageId() {
   
-        return this.lastSentMessageID;
+        return this.lastSentMessageId;
     }
 
     public Timestamp getLastSentTime() {

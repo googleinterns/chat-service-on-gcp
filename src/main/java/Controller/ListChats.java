@@ -3,14 +3,14 @@ package Controller;
 import Entity.User;
 import Entity.Chat;
 import Entity.Message;
-import Helper.UniqueIDGenerator;
+import Helper.UniqueIdGenerator;
 import DBAccesser.User.UserAccessor;
 import DBAccesser.Chat.ChatAccessor;
 import DBAccesser.Message.MessageAccessor;
 import Helper.SuccessResponseGenerator;
-import Exceptions.UserIDDoesNotExistException;
-import Exceptions.ChatIDDoesNotExistException;
-import Exceptions.UserIDMissingFromRequestURLPathException;
+import Exceptions.UserIdDoesNotExistException;
+import Exceptions.ChatIdDoesNotExistException;
+import Exceptions.UserIdMissingFromRequestURLPathException;
 
 import java.util.Map;
 import java.util.List;
@@ -41,98 +41,98 @@ public final class ListChats {
     private MessageAccessor queryMessage;
 
     @Autowired
-    private UniqueIDGenerator uniqueIDGenerator;
+    private UniqueIdGenerator uniqueIdGenerator;
 
-    public static final class UsernameChatID {
+    public static final class UsernameChatId {
 
         @Column(name = "Username")
         private String username;
 
         @Column(name = "ChatID")
-        private long chatID;
+        private long chatId;
 
-        public UsernameChatID () {}
+        public UsernameChatId () {}
 
-        public UsernameChatID (String username, long chatID) {
+        public UsernameChatId (String username, long chatId) {
             this.username = username;
-            this.chatID = chatID;
+            this.chatId = chatId;
         }
 
         public String getUsername() {
             return username;
         }
 
-        public long getChatID() {
-            return chatID;
+        public long getChatId() {
+            return chatId;
         }
     }
 
     Map<String, Object> getChatInfoOfChatInMap(Chat chat, String usernameOfSecondUser) {
         
         Map<String, Object> chatInfoOfChatInMap = new LinkedHashMap<String, Object>();
-        chatInfoOfChatInMap.put("ChatID", chat.getChatID());
+        chatInfoOfChatInMap.put("ChatId", chat.getChatId());
         chatInfoOfChatInMap.put("Username", usernameOfSecondUser);
-        chatInfoOfChatInMap.put("LastSentMessageID", chat.getLastSentMessageID());
+        chatInfoOfChatInMap.put("LastSentMessageId", chat.getLastSentMessageId());
 
         return chatInfoOfChatInMap;
     }
 
     @GetMapping("/users/chats")
-    public void listChatsWithoutUserIDPathVariable(HttpServletRequest request) {
+    public void listChatsWithoutUserIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
-        throw new UserIDMissingFromRequestURLPathException(path);
+        throw new UserIdMissingFromRequestURLPathException(path);
     }
 
-    @GetMapping("/users/{userID}/chats")
-    public Map<String,List<Map<String, Object>>> listChats(@PathVariable("userID") String userIDString, HttpServletRequest request) {
+    @GetMapping("/users/{userId}/chats")
+    public Map<String,List<Map<String, Object>>> listChats(@PathVariable("userId") String userIdString, HttpServletRequest request) {
         
         String path = request.getRequestURI();
 
-        long userID = Long.parseLong(userIDString);
+        long userId = Long.parseLong(userIdString);
         
-        //check if the passed userID is valid
-        if (!queryUser.checkIfUserIDExists(userID)) {
-            throw new UserIDDoesNotExistException(path);
+        //check if the passed userId is valid
+        if (!queryUser.checkIfUserIdExists(userId)) {
+            throw new UserIdDoesNotExistException(path);
         }
         
-        User user = new User(userID);
+        User user = new User(userId);
         List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
-        List<Message> listOfChatIDCreationTSOfLastSentMessageID = queryMessage.getLastSentMessageIDCreationTSForChatsOfUser(userID);
-        Map<Long, Timestamp> chatIDCreationTSOflastSentMessageIDMap = new LinkedHashMap<Long, Timestamp>();
+        List<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getLastSentMessageIdCreationTsForChatsOfUser(userId);
+        Map<Long, Timestamp> chatIdCreationTsOflastSentMessageIdMap = new LinkedHashMap<Long, Timestamp>();
 
-        for (Message chatIDCreationTSOfLastSentMessageID : listOfChatIDCreationTSOfLastSentMessageID) {
-            chatIDCreationTSOflastSentMessageIDMap.put(chatIDCreationTSOfLastSentMessageID.getChatID(), chatIDCreationTSOfLastSentMessageID.getCreationTS());
+        for (Message chatIdCreationTsOfLastSentMessageId : listOfChatIdCreationTsOfLastSentMessageId) {
+            chatIdCreationTsOflastSentMessageIdMap.put(chatIdCreationTsOfLastSentMessageId.getChatId(), chatIdCreationTsOfLastSentMessageId.getCreationTs());
         }
         
         for (Chat chat : chatsOfUser) {
-            if (chat.getLastSentMessageID() == 0) { 
-                chat.setLastSentTime(chat.getCreationTS());
+            if (chat.getLastSentMessageId() == 0) { 
+                chat.setLastSentTime(chat.getCreationTs());
             } else {
-                chat.setLastSentTime(chatIDCreationTSOflastSentMessageIDMap.get(chat.getChatID()));
+                chat.setLastSentTime(chatIdCreationTsOflastSentMessageIdMap.get(chat.getChatId()));
             }
         }
         
         Collections.sort(chatsOfUser, Comparator.comparing(Chat::getLastSentTime).reversed());
 
-        List<Long> listOfChatIDDesc = new ArrayList<Long>();
+        List<Long> listOfChatIdDesc = new ArrayList<Long>();
 
         for (Chat chat : chatsOfUser) {
-            listOfChatIDDesc.add(chat.getChatID());
+            listOfChatIdDesc.add(chat.getChatId());
         }
 
-        List<UsernameChatID> usernameChatIDForSecondUsers = queryUser.getUsernameChatIDForSecondUsers(userID);
-        Map<Long, String> chatIDSecondUsernameMap = new LinkedHashMap<Long, String>();
+        List<UsernameChatId> usernameChatIdForSecondUsers = queryUser.getUsernameChatIdForSecondUsers(userId);
+        Map<Long, String> chatIdSecondUsernameMap = new LinkedHashMap<Long, String>();
 
-        for (UsernameChatID usernameChatID : usernameChatIDForSecondUsers) {
-            chatIDSecondUsernameMap.put(usernameChatID.getChatID(), usernameChatID.getUsername());
+        for (UsernameChatId usernameChatId : usernameChatIdForSecondUsers) {
+            chatIdSecondUsernameMap.put(usernameChatId.getChatId(), usernameChatId.getUsername());
         }
 
         List<Map<String, Object>> chatInfoOfChatsOfUser = new ArrayList<Map<String, Object>>();
 
         for (Chat chat : chatsOfUser) {
-            chatInfoOfChatsOfUser.add(getChatInfoOfChatInMap(chat, chatIDSecondUsernameMap.get(chat.getChatID())));
+            chatInfoOfChatsOfUser.add(getChatInfoOfChatInMap(chat, chatIdSecondUsernameMap.get(chat.getChatId())));
         }
 
         return SuccessResponseGenerator.getSuccessResponseForListChats(chatInfoOfChatsOfUser);

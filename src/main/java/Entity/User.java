@@ -9,43 +9,43 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 public final class User {
 
   @Column(name = "CreationTS", spannerCommitTimestamp = true) 
-  public Timestamp creationTS;
+  public Timestamp creationTs;
   
   @PrimaryKey
   @Column(name = "UserID")
-  private long userID;
+  private long userId;
 
   @Column(name = "Username")
   private String username;
 
   public User() {}
 
-  public User(long userID, String username) {
+  public User(long userId, String username) {
     
-    this.userID = userID;
+    this.userId = userId;
     this.username = username;
   }
 
-  public User(long userID) {
+  public User(long userId) {
 
-    this.userID = userID;
+    this.userId = userId;
     this.username = null;
   }
 
   public User(String username) {
 
-    this.userID = 0;
+    this.userId = 0;
     this.username = username;
   }
 
-  public void setCreationTS(Timestamp creationTS) {
+  public void setCreationTs(Timestamp creationTs) {
 
-    this.creationTS = creationTS;
+    this.creationTs = creationTs;
   }
 
-  public void setUserID(long userID) {
+  public void setUserId(long userId) {
     
-    this.userID = userID;
+    this.userId = userId;
   }
 
   public void setUsername(String username) {
@@ -53,14 +53,14 @@ public final class User {
     this.username = username;
   }
 
-  public Timestamp getCreationTS() {
+  public Timestamp getCreationTs() {
   
-    return this.creationTS;
+    return this.creationTs;
   }
 
-  public long getUserID() {
+  public long getUserId() {
 
-    return this.userID;
+    return this.userId;
   }
   
   public String getUsername() {

@@ -1,6 +1,6 @@
 package Controller;
 
-import Helper.UniqueIDGenerator;
+import Helper.UniqueIdGenerator;
 import Entity.Chat;
 import Entity.Message;
 import DBAccesser.User.UserAccessor;
@@ -8,12 +8,12 @@ import DBAccesser.Chat.ChatAccessor;
 import DBAccesser.Message.MessageAccessor;
 import DBAccesser.UserChat.UserChatAccessor;
 import Helper.SuccessResponseGenerator;
-import Exceptions.UserIDDoesNotExistException;
-import Exceptions.ChatIDDoesNotExistException;
-import Exceptions.MessageIDDoesNotExistException;
-import Exceptions.UserChatIDDoesNotExistException;
-import Exceptions.UserIDMissingFromRequestURLPathException;
-import Exceptions.ChatIDMissingFromRequestURLPathException;
+import Exceptions.UserIdDoesNotExistException;
+import Exceptions.ChatIdDoesNotExistException;
+import Exceptions.MessageIdDoesNotExistException;
+import Exceptions.UserChatIdDoesNotExistException;
+import Exceptions.UserIdMissingFromRequestURLPathException;
+import Exceptions.ChatIdMissingFromRequestURLPathException;
 import Exceptions.ContentTypeMissingFromRequestBodyException;
 import Exceptions.TextContentMissingFromRequestBodyException;
 
@@ -47,38 +47,38 @@ public final class CreateMessage {
     private ChatAccessor insertChat;
 
     @Autowired
-    private UniqueIDGenerator uniqueIDGenerator; 
+    private UniqueIdGenerator uniqueIdGenerator; 
 
     @PostMapping("/users/chats/messages")
-    public void createMessageWithoutUserIDChatIDPathVariable(HttpServletRequest request) {
+    public void createMessageWithoutUserIdChatIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
-        throw new UserIDMissingFromRequestURLPathException(path);
+        throw new UserIdMissingFromRequestURLPathException(path);
     }
 
-    @PostMapping("/users/chats/{chatID}/messages")
-    public void createMessageWithoutUserIDPathVariable(HttpServletRequest request) {
+    @PostMapping("/users/chats/{chatId}/messages")
+    public void createMessageWithoutUserIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
-        throw new UserIDMissingFromRequestURLPathException(path);
+        throw new UserIdMissingFromRequestURLPathException(path);
     }
 
-    @PostMapping("/users/{userID}/chats/messages")
-    public void createMessageWithoutChatIDPathVariable(HttpServletRequest request) {
+    @PostMapping("/users/{userId}/chats/messages")
+    public void createMessageWithoutChatIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
-        throw new ChatIDMissingFromRequestURLPathException(path);
+        throw new ChatIdMissingFromRequestURLPathException(path);
     }
     
-    @PostMapping("/users/{userID}/chats/{chatID}/messages")
-    public Map<String, Object> createMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
+    @PostMapping("/users/{userId}/chats/{chatId}/messages")
+    public Map<String, Object> createMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         
         String path = request.getRequestURI();
 
-        long userID = Long.parseLong(userIDString);
-        long chatID = Long.parseLong(chatIDString);
+        long userId = Long.parseLong(userIdString);
+        long chatId = Long.parseLong(chatIdString);
 
         //check if request body is as required
         if (!requestBody.containsKey("contentType")) {
@@ -94,29 +94,29 @@ public final class CreateMessage {
 
         String textContent = requestBody.get("textContent");
         
-        //check if the passed userID is valid
-        if (!queryUser.checkIfUserIDExists(userID)) {
-            throw new UserIDDoesNotExistException(path);
+        //check if the passed userId is valid
+        if (!queryUser.checkIfUserIdExists(userId)) {
+            throw new UserIdDoesNotExistException(path);
         }
         
-        //check if the passed chatID is valid
-        if (!queryChat.checkIfChatIDExists(chatID)) {
-            throw new ChatIDDoesNotExistException(path);
+        //check if the passed chatId is valid
+        if (!queryChat.checkIfChatIdExists(chatId)) {
+            throw new ChatIdDoesNotExistException(path);
         }
 
         //check if user is part of chat
-        if (!queryUserChat.checkIfUserChatIDExists(userID, chatID)) {
-            throw new UserChatIDDoesNotExistException(path);
+        if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
+            throw new UserChatIdDoesNotExistException(path);
         }
         
-        Message newMessage = new Message(chatID, userID, contentType, textContent);
+        Message newMessage = new Message(chatId, userId, contentType, textContent);
 
-        newMessage.setMessageID(uniqueIDGenerator.generateUniqueID("Message", false, false));
+        newMessage.setMessageId(uniqueIdGenerator.generateUniqueId("Message", false, false));
 
         insertMessage.insertAllForTextMessage(newMessage);
 
-        insertChat.insertLastSentMessageID(new Chat(chatID, newMessage.getMessageID()));
+        insertChat.insertLastSentMessageId(new Chat(chatId, newMessage.getMessageId()));
         
-        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Message", newMessage.getMessageID());
+        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Message", newMessage.getMessageId());
     }
 }

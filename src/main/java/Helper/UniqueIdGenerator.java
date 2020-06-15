@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class UniqueIDGenerator {
+public final class UniqueIdGenerator {
 
     @Autowired
     private UserAccessor queryUser;
@@ -20,8 +20,8 @@ public final class UniqueIDGenerator {
     @Autowired
     private MessageAccessor queryMessage; 
     
-    //generates long type unique ID value for the given table and its corres ID attribute
-    public long generateUniqueID(String tableName, boolean zeroAllowed, boolean negativeAllowed) {
+    //generates long type unique Id value for the given table and its corres Id attribute
+    public long generateUniqueId(String tableName, boolean zeroAllowed, boolean negativeAllowed) {
 
         long id;
         Random random = new Random();
@@ -39,25 +39,25 @@ public final class UniqueIDGenerator {
 
             switch (tableName) {
                 case "User": 
-                    if (queryUser.checkIfUserIDExists(id)) {
+                    if (queryUser.checkIfUserIdExists(id)) {
                         continue;
                     } else {
                         return id;
                     }
                 case "Chat": 
-                    if (queryChat.checkIfChatIDExists(id)) {
+                    if (queryChat.checkIfChatIdExists(id)) {
                         continue;
                     } else {
                         return id;
                     }
                 case "Message": 
-                    if (queryMessage.checkIfMessageIDExists(id)) {
+                    if (queryMessage.checkIfMessageIdExists(id)) {
                         continue;
                     } else {
                             return id;
                     }
                 default: 
-                    throw new IllegalArgumentException("Invalid DB Relation Name passed to UniqueIDGenerator");
+                    throw new IllegalArgumentException("Invalid DB Relation Name passed to UniqueIdGenerator");
             }
         }
     }

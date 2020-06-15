@@ -1,11 +1,11 @@
 package Controller;
 
-import Helper.UniqueIDGenerator;
+import Helper.UniqueIdGenerator;
 import Entity.User;
 import DBAccesser.User.UserAccessor;
 import Helper.SuccessResponseGenerator;
 import Exceptions.UsernameAlreadyExistsException;
-import Exceptions.UserIDDoesNotExistException;
+import Exceptions.UserIdDoesNotExistException;
 import Exceptions.UsernameMissingFromRequestBodyException;
 
 import java.util.Map;
@@ -30,7 +30,7 @@ public final class CreateUser {
     private UserAccessor insertUser;
 
     @Autowired
-    private UniqueIDGenerator uniqueIDGenerator;
+    private UniqueIdGenerator uniqueIdGenerator;
     
     @PostMapping("/users")
     public Map<String, Object> createUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
@@ -50,11 +50,11 @@ public final class CreateUser {
         } 
 
         User newUser = new User(username);
-        //generate unique userID
-        newUser.setUserID(uniqueIDGenerator.generateUniqueID("User", false, false));
+        //generate unique userId
+        newUser.setUserId(uniqueIdGenerator.generateUniqueId("User", false, false));
         //insert new entry into User
         insertUser.insertAll(newUser);
 
-        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", newUser.getUserID());
+        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", newUser.getUserId());
     }
 }

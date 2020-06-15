@@ -6,14 +6,14 @@ import DBAccesser.Chat.ChatAccessor;
 import DBAccesser.Message.MessageAccessor;
 import DBAccesser.UserChat.UserChatAccessor;
 import Helper.SuccessResponseGenerator;
-import Exceptions.UserIDDoesNotExistException;
-import Exceptions.ChatIDDoesNotExistException;
-import Exceptions.MessageIDDoesNotExistException;
-import Exceptions.UserChatIDDoesNotExistException;
-import Exceptions.UserIDMissingFromRequestURLPathException;
-import Exceptions.ChatIDMissingFromRequestURLPathException;
-import Exceptions.MessageIDMissingFromRequestURLParameterException;
-import Exceptions.MessageIDDoesNotBelongToChatIDException;
+import Exceptions.UserIdDoesNotExistException;
+import Exceptions.ChatIdDoesNotExistException;
+import Exceptions.MessageIdDoesNotExistException;
+import Exceptions.UserChatIdDoesNotExistException;
+import Exceptions.UserIdMissingFromRequestURLPathException;
+import Exceptions.ChatIdMissingFromRequestURLPathException;
+import Exceptions.MessageIdMissingFromRequestURLParameterException;
+import Exceptions.MessageIdDoesNotBelongToChatIdException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -39,58 +39,58 @@ public final class GetMessage {
     @Autowired
     private UserChatAccessor queryUserChat;
 
-    @GetMapping("/users/{userID}/chats/messages/{messageID}")
-    public void getMessageWithoutChatIDPathVariable(HttpServletRequest request) {
+    @GetMapping("/users/{userId}/chats/messages/{messageId}")
+    public void getMessageWithoutChatIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
-        throw new ChatIDMissingFromRequestURLPathException(path);
+        throw new ChatIdMissingFromRequestURLPathException(path);
     }
 
-    @GetMapping("/users/chats/{chatID}/messages/{messageID}")
-    public void getMessageWithoutUserIDPathVariable(HttpServletRequest request) {
+    @GetMapping("/users/chats/{chatId}/messages/{messageId}")
+    public void getMessageWithoutUserIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
-        throw new UserIDMissingFromRequestURLPathException(path);
+        throw new UserIdMissingFromRequestURLPathException(path);
     }
 
-    @GetMapping("/users/{userID}/chats/{chatID}/messages/{messageID}")
-    public Map<String, Object> getMessage(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, @PathVariable("messageID") String messageIDString, HttpServletRequest request) {
+    @GetMapping("/users/{userId}/chats/{chatId}/messages/{messageId}")
+    public Map<String, Object> getMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @PathVariable("messageId") String messageIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
         Map<String, Object> responseBody;
 
-        long userID = Long.parseLong(userIDString);
-        long chatID = Long.parseLong(chatIDString);
-        long messageID = Long.parseLong(messageIDString);
+        long userId = Long.parseLong(userIdString);
+        long chatId = Long.parseLong(chatIdString);
+        long messageId = Long.parseLong(messageIdString);
 
-        //check if the passed userID is valid
-        if (!queryUser.checkIfUserIDExists(userID)) {
-            throw new UserIDDoesNotExistException(path);
+        //check if the passed userId is valid
+        if (!queryUser.checkIfUserIdExists(userId)) {
+            throw new UserIdDoesNotExistException(path);
         }
         
-        //check if the passed chatID is valid
-        if (!queryChat.checkIfChatIDExists(chatID)) {
-            throw new ChatIDDoesNotExistException(path);
+        //check if the passed chatId is valid
+        if (!queryChat.checkIfChatIdExists(chatId)) {
+            throw new ChatIdDoesNotExistException(path);
         }
 
         //check if user is part of chat
-        if (!queryUserChat.checkIfUserChatIDExists(userID, chatID)) {
-            throw new UserChatIDDoesNotExistException(path);
+        if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
+            throw new UserChatIdDoesNotExistException(path);
         }
         
-        //check if the passed messageID is valid
-        if (!queryMessage.checkIfMessageIDExists(messageID)) {
-            throw new MessageIDDoesNotExistException(path);
+        //check if the passed messageId is valid
+        if (!queryMessage.checkIfMessageIdExists(messageId)) {
+            throw new MessageIdDoesNotExistException(path);
         }
 
         //check if passed message belongs to chat 
-        if (!queryMessage.checkIfMessageIDBelongsToChatID(messageID, chatID)) {
-            throw new MessageIDDoesNotBelongToChatIDException(path);
+        if (!queryMessage.checkIfMessageIdBelongsToChatId(messageId, chatId)) {
+            throw new MessageIdDoesNotBelongToChatIdException(path);
         }
 
-        Message message = queryMessage.getMessage(messageID);
+        Message message = queryMessage.getMessage(messageId);
     
         return SuccessResponseGenerator.getSuccessResponseForGetMessage(message);
     }

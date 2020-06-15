@@ -9,45 +9,45 @@ public final class UserChat {
     
     @PrimaryKey(keyOrder = 1) //in the case of composite pk - key order must show how the pk is defined in the DDL of the table
     @Column(name = "UserID")
-    private long userID;
+    private long userId;
 
     @PrimaryKey(keyOrder = 2)
     @Column(name = "ChatID")
-    private long chatID;
+    private long chatId;
 
     public UserChat() {}
   
-    public UserChat(long userID, long chatID) {
+    public UserChat(long userId, long chatId) {
       
-        this.userID = userID;
-        this.chatID = chatID;
+        this.userId = userId;
+        this.chatId = chatId;
     }
 
-    public static UserChat newUserChatWithUserID(long userID) {
-        return new UserChat(userID, 0);
+    public static UserChat newUserChatWithUserId(long userId) {
+        return new UserChat(userId, 0);
     }
 
-    public static UserChat newUserChatWithChatID(long chatID) {
-        return new UserChat(0, chatID);
+    public static UserChat newUserChatWithChatId(long chatId) {
+        return new UserChat(0, chatId);
     }
   
-    public void setUserID(long userID) {
+    public void setUserId(long userId) {
       
-        this.userID = userID;
+        this.userId = userId;
     }
   
-    public void setChatID(long chatID) {
+    public void setChatId(long chatId) {
       
-        this.chatID = chatID;
+        this.chatId = chatId;
     }
   
-    public long getUserID() {
+    public long getUserId() {
   
-        return this.userID;
+        return this.userId;
     }
     
-    public long getChatID() {
+    public long getChatId() {
   
-        return this.chatID;
+        return this.chatId;
     }
 }

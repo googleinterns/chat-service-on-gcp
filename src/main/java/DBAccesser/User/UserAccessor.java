@@ -30,47 +30,38 @@ public final class UserAccessor {
         return (!resultSet.isEmpty());
     }
 
-    public User getUser(long userID) {
+    public User getUser(long userId) {
 
-        String SQLStatment = "SELECT * FROM User WHERE UserID=@userID";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(userID).build();
+        String SQLStatment = "SELECT * FROM User WHERE UserID=@userId";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
         List<User> resultSet = spannerTemplate.query(User.class, statement, null);
  
         return resultSet.get(0);
     }
 
-    public boolean checkIfUserIDExists(long userID) {
+    public boolean checkIfUserIdExists(long userId) {
 
-        String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userID";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(userID).build();
+        String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userId";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
         List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return (!resultSet.isEmpty());
     }
 
-    public long getUserIDFromUsername(String username) {
+    public long getUserIdFromUsername(String username) {
 
         String SQLStatment = "SELECT UserID FROM User WHERE Username=@username";
         Statement statement = Statement.newBuilder(SQLStatment).bind("username").to(username).build();
         List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        return resultSet.get(0).getUserID();
+        return resultSet.get(0).getUserId();
     }
 
-    // public List<User> getSecondUserForChat(User firstUser, Chat chat) {
+    public List<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
 
-    //     String SQLStatment = "SELECT * FROM User WHERE UserID IN (SELECT UserID FROM UserChat WHERE ChatID=@chatID AND UserID!=@userID)";
-    //     Statement statement = Statement.newBuilder(SQLStatment).bind("chatID").to(chat.getChatID()).bind("userID").to(firstUser.getUserID()).build();
-    //     List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
- 
-    //     return resultSet;
-    // }
-
-    public List<ListChats.UsernameChatID> getUsernameChatIDForSecondUsers(long userID) {
-
-        String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userID) AND UserChat.UserID != @userID";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(userID).build();
-        List<ListChats.UsernameChatID> resultSet = spannerTemplate.query(ListChats.UsernameChatID.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+        String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
+        List<ListChats.UsernameChatId> resultSet = spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return resultSet;
     }

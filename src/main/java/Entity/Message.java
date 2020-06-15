@@ -9,17 +9,17 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 public final class Message {
     
     @Column(name = "CreationTS", spannerCommitTimestamp = true) 
-    private Timestamp creationTS;
+    private Timestamp creationTs;
 
     @PrimaryKey
     @Column(name = "MessageID")
-    private long messageID;
+    private long messageId;
 
     @Column(name = "ChatID")
-    private long chatID;
+    private long chatId;
 
     @Column(name = "SenderID")
-    private long senderID;
+    private long senderId;
 
     @Column(name = "ContentType")
     private String contentType;
@@ -28,74 +28,74 @@ public final class Message {
     private String textContent;
     
     @Column(name = "ContentID")
-    private long contentID;
+    private long contentId;
 
     @Column(name = "LinkToBlob")
     private String linkToBlob;
 
     @Column(name = "SentTS", spannerCommitTimestamp = true) 
-    private Timestamp sentTS;
+    private Timestamp sentTs;
 
     @Column(name = "ReceivedTS") 
-    private Timestamp receivedTS;
+    private Timestamp receivedTs;
 
     public Message() {}
 
-    public Message(long messageID, long chatID, long senderID, String contentType) {
-        this.messageID = messageID;
-        this.chatID = chatID;
-        this.senderID = senderID;
+    public Message(long messageId, long chatId, long senderId, String contentType) {
+        this.messageId = messageId;
+        this.chatId = chatId;
+        this.senderId = senderId;
         this.contentType = contentType;
     }
 
-    public Message(long chatID, long senderID, String contentType) {
-        this.chatID = chatID;
-        this.senderID = senderID;
+    public Message(long chatId, long senderId, String contentType) {
+        this.chatId = chatId;
+        this.senderId = senderId;
         this.contentType = contentType;
     }
 
-    public Message(long messageID, long chatID, long senderID, String contentType, String textContent) {
-        this.messageID = messageID;
-        this.chatID = chatID;
-        this.senderID = senderID;
-        this.contentType = contentType;
-        this.textContent = textContent;
-    }
-
-    public Message(long chatID, long senderID, String contentType, String textContent) {
-        this.chatID = chatID;
-        this.senderID = senderID;
+    public Message(long messageId, long chatId, long senderId, String contentType, String textContent) {
+        this.messageId = messageId;
+        this.chatId = chatId;
+        this.senderId = senderId;
         this.contentType = contentType;
         this.textContent = textContent;
     }
 
-    public Message(long messageID, long chatID, long senderID, String contentType, long contentID, String linkToBlob) {
-        this.messageID = messageID;
-        this.chatID = chatID;
-        this.senderID = senderID;
+    public Message(long chatId, long senderId, String contentType, String textContent) {
+        this.chatId = chatId;
+        this.senderId = senderId;
         this.contentType = contentType;
-        this.contentID = contentID;
+        this.textContent = textContent;
+    }
+
+    public Message(long messageId, long chatId, long senderId, String contentType, long contentId, String linkToBlob) {
+        this.messageId = messageId;
+        this.chatId = chatId;
+        this.senderId = senderId;
+        this.contentType = contentType;
+        this.contentId = contentId;
         this.linkToBlob = linkToBlob;
     }
 
-    public Message(long chatID, long senderID, String contentType, long contentID, String linkToBlob) {
-        this.chatID = chatID;
-        this.senderID = senderID;
+    public Message(long chatId, long senderId, String contentType, long contentId, String linkToBlob) {
+        this.chatId = chatId;
+        this.senderId = senderId;
         this.contentType = contentType;
-        this.contentID = contentID;
+        this.contentId = contentId;
         this.linkToBlob = linkToBlob;
     }
 
-    public void setMessageID (long messageID) {
-        this.messageID = messageID;
+    public void setMessageId (long messageId) {
+        this.messageId = messageId;
     }
 
-    public void setChatID (long chatID) {
-        this.chatID = chatID;
+    public void setChatId (long chatId) {
+        this.chatId = chatId;
     }
 
-    public void setSenderID (long senderID) {
-        this.senderID = senderID;
+    public void setSenderId (long senderId) {
+        this.senderId = senderId;
     }
 
     public void setContentType (String contentType) {
@@ -106,32 +106,32 @@ public final class Message {
         this.textContent = textContent;
     }
 
-    public void setContentID (long contentID) {
-        this.contentID = contentID;
+    public void setContentId (long contentId) {
+        this.contentId = contentId;
     }
 
     public void setLinkToBlob (String linkToBlob) {
         this.linkToBlob = linkToBlob;
     }
 
-    public void setReceivedTS (Timestamp receivedTS) {
-        this.receivedTS = receivedTS;
+    public void setReceivedTs (Timestamp receivedTs) {
+        this.receivedTs = receivedTs;
     }
 
-    public Timestamp getCreationTS () {
-        return creationTS;
+    public Timestamp getCreationTs () {
+        return creationTs;
     }
 
-    public long getMessageID () {
-        return messageID;
+    public long getMessageId () {
+        return messageId;
     }
 
-    public long getChatID () {
-        return chatID;
+    public long getChatId () {
+        return chatId;
     }
 
-    public long getSenderID () {
-        return senderID;
+    public long getSenderId () {
+        return senderId;
     }
 
     public String getContentType () {
@@ -142,19 +142,19 @@ public final class Message {
         return textContent;
     }
 
-    public long getContentID () {
-        return contentID;
+    public long getContentId () {
+        return contentId;
     }
 
     public String getLinkToBlob () {
         return linkToBlob;
     }
 
-    public Timestamp getSentTS () {
-        return sentTS;
+    public Timestamp getSentTs () {
+        return sentTs;
     }
 
-    public Timestamp getReceivedTS () {
-        return receivedTS;
+    public Timestamp getReceivedTs () {
+        return receivedTs;
     }
 }

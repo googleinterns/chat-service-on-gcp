@@ -13,12 +13,12 @@ import java.util.ArrayList;
 
 public final class SuccessResponseGenerator {
 
-    public static Map<String, Object> getSuccessResponseForCreateEntity(String className, long ID) {
+    public static Map<String, Object> getSuccessResponseForCreateEntity(String className, long Id) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
 
         responseBody.put("message", "Success");
-        responseBody.put(className+"ID", ID);
+        responseBody.put(className+"Id", Id);
 
         return responseBody;
     }
@@ -26,9 +26,9 @@ public final class SuccessResponseGenerator {
     public static Map<String, Object> getSuccessResponseForGetUser(User user) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("UserID", user.getUserID());
+        responseBody.put("UserId", user.getUserId());
         responseBody.put("Username", user.getUsername());
-        responseBody.put("CreationTS", user.getCreationTS());
+        responseBody.put("CreationTs", user.getCreationTs());
 
         return responseBody;
         
@@ -37,9 +37,9 @@ public final class SuccessResponseGenerator {
     public static Map<String, Object> getSuccessResponseForGetChat(Chat chat) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("ChatID", chat.getChatID());
-        responseBody.put("LastSentMessageID", chat.getLastSentMessageID());
-        responseBody.put("CreationTS", chat.getCreationTS());
+        responseBody.put("ChatId", chat.getChatId());
+        responseBody.put("LastSentMessageId", chat.getLastSentMessageId());
+        responseBody.put("CreationTs", chat.getCreationTs());
 
         return responseBody;
     }
@@ -47,14 +47,14 @@ public final class SuccessResponseGenerator {
     public static Map<String, Object> getSuccessResponseForGetMessage(Message message) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("MessageID", message.getMessageID());
-        responseBody.put("ChatID", message.getChatID());
-        responseBody.put("SenderID", message.getSenderID());
+        responseBody.put("MessageId", message.getMessageId());
+        responseBody.put("ChatId", message.getChatId());
+        responseBody.put("SenderId", message.getSenderId());
         responseBody.put("ContentType", message.getContentType());
         responseBody.put("TextContent", message.getTextContent());
-        responseBody.put("SentTS", message.getSentTS());
-        responseBody.put("ReceivedTS", message.getReceivedTS());
-        responseBody.put("CreationTS", message.getCreationTS());
+        responseBody.put("SentTs", message.getSentTs());
+        responseBody.put("ReceivedTs", message.getReceivedTs());
+        responseBody.put("CreationTs", message.getCreationTs());
 
         return responseBody;
     }
@@ -68,15 +68,15 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
-    private static Map<String, Object> getMessageForResponseBody(long userID, Message message) {
+    private static Map<String, Object> getMessageForResponseBody(long userId, Message message) {
     
         Map<String, Object> messageForResponseBody = new LinkedHashMap<String, Object>();
 
-        messageForResponseBody.put("MessageID", message.getMessageID());
-        messageForResponseBody.put("CreationTS", message.getCreationTS());
-        messageForResponseBody.put("ChatID", message.getChatID());
+        messageForResponseBody.put("MessageId", message.getMessageId());
+        messageForResponseBody.put("CreationTs", message.getCreationTs());
+        messageForResponseBody.put("ChatId", message.getChatId());
 
-        if (message.getSenderID() == userID) {
+        if (message.getSenderId() == userId) {
             messageForResponseBody.put("SentByCurrentUser", true);
         } else {
             messageForResponseBody.put("SentByCurrentUser", false);
@@ -84,21 +84,21 @@ public final class SuccessResponseGenerator {
         
         messageForResponseBody.put("ContentType", message.getContentType());
         messageForResponseBody.put("TextContent", message.getTextContent());
-        messageForResponseBody.put("SentTS", message.getSentTS());
-        messageForResponseBody.put("ReceivedTS", message.getReceivedTS());
+        messageForResponseBody.put("SentTs", message.getSentTs());
+        messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
 
         return messageForResponseBody;
     }
 
-    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userID, List<Message> messages) {
+    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userId, List<Message> messages) {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
 
-        //sort the messages in  ascending order of CreationTS
-        Collections.sort(messages, Comparator.comparing(Message::getCreationTS));
+        //sort the messages in  ascending order of CreationTs
+        Collections.sort(messages, Comparator.comparing(Message::getCreationTs));
         
         for (int i = 0; i < messages.size(); ++i) {
-            listOfMessages.add(getMessageForResponseBody(userID, messages.get(i)));
+            listOfMessages.add(getMessageForResponseBody(userId, messages.get(i)));
         }
 
         Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();

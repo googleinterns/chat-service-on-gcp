@@ -5,10 +5,10 @@ import DBAccesser.User.UserAccessor;
 import DBAccesser.Chat.ChatAccessor;
 import DBAccesser.UserChat.UserChatAccessor;
 import Helper.SuccessResponseGenerator;
-import Exceptions.UserIDDoesNotExistException;
-import Exceptions.ChatIDDoesNotExistException;
-import Exceptions.UserChatIDDoesNotExistException;
-import Exceptions.UserIDMissingFromRequestURLPathException;
+import Exceptions.UserIdDoesNotExistException;
+import Exceptions.ChatIdDoesNotExistException;
+import Exceptions.UserChatIdDoesNotExistException;
+import Exceptions.UserIdMissingFromRequestURLPathException;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -31,38 +31,38 @@ public final class GetChat {
     @Autowired
     private UserChatAccessor queryUserChat;
 
-    @GetMapping("/users/chats/{chatID}")
-    public void getChatWithoutUserIDPathVariable(HttpServletRequest request) {
+    @GetMapping("/users/chats/{chatId}")
+    public void getChatWithoutUserIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
-        throw new UserIDMissingFromRequestURLPathException(path);
+        throw new UserIdMissingFromRequestURLPathException(path);
     }
 
-    @GetMapping("/users/{userID}/chats/{chatID}")
-    public Map<String, Object> getChat(@PathVariable("userID") String userIDString, @PathVariable("chatID") String chatIDString, HttpServletRequest request) {
+    @GetMapping("/users/{userId}/chats/{chatId}")
+    public Map<String, Object> getChat(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
         Map<String, Object> responseBody;
 
-        long userID = Long.parseLong(userIDString);
-        long chatID = Long.parseLong(chatIDString);
+        long userId = Long.parseLong(userIdString);
+        long chatId = Long.parseLong(chatIdString);
 
-        //check if the passed userID is valid
-        if (!queryUser.checkIfUserIDExists(userID)) {
-            throw new UserIDDoesNotExistException(path);
+        //check if the passed userId is valid
+        if (!queryUser.checkIfUserIdExists(userId)) {
+            throw new UserIdDoesNotExistException(path);
         }
         
-        //check if the passed chatID is valid
-        if (!queryChat.checkIfChatIDExists(chatID)) {
-            throw new ChatIDDoesNotExistException(path);
+        //check if the passed chatId is valid
+        if (!queryChat.checkIfChatIdExists(chatId)) {
+            throw new ChatIdDoesNotExistException(path);
         } 
 
-        if (!queryUserChat.checkIfUserChatIDExists(userID, chatID)) {
-            throw new UserChatIDDoesNotExistException(path);
+        if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
+            throw new UserChatIdDoesNotExistException(path);
         }
         
-        Chat chat = queryChat.getChat(chatID);
+        Chat chat = queryChat.getChat(chatId);
 
         return SuccessResponseGenerator.getSuccessResponseForGetChat(chat);
     }

@@ -21,7 +21,7 @@ public final class ChatAccessor {
     @Autowired
     private SpannerTemplate spannerTemplate;
 
-    public void insertLastSentMessageID(Chat chat) {
+    public void insertLastSentMessageId(Chat chat) {
         //must insert PK even in partial update
         spannerTemplate.update(chat, "ChatID", "LastSentMessageID");
     }
@@ -38,19 +38,19 @@ public final class ChatAccessor {
         );
     }
 
-    public boolean checkIfChatIDExists(long chatID) {
+    public boolean checkIfChatIdExists(long chatId) {
 
-        String SQLStatment = "SELECT ChatID FROM Chat WHERE ChatID=@chatID";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("chatID").to(chatID).build();
+        String SQLStatment = "SELECT ChatID FROM Chat WHERE ChatID=@chatId";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("chatId").to(chatId).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return (!resultSet.isEmpty());        
     }
 
-    public Chat getChat(long chatID) {
+    public Chat getChat(long chatId) {
 
-        String SQLStatment = "SELECT * FROM Chat WHERE ChatID=@chatID";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("chatID").to(chatID).build();
+        String SQLStatment = "SELECT * FROM Chat WHERE ChatID=@chatId";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("chatId").to(chatId).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement, null);
  
         return resultSet.get(0);
@@ -58,8 +58,8 @@ public final class ChatAccessor {
 
     public List<Chat> getChatsForUser(User user) {
 
-        String SQLStatment = "SELECT * FROM Chat WHERE ChatID in (SELECT ChatID FROM UserChat WHERE UserID=@userID)";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userID").to(user.getUserID()).build();
+        String SQLStatment = "SELECT * FROM Chat WHERE ChatID in (SELECT ChatID FROM UserChat WHERE UserID=@userId)";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(user.getUserId()).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement, null);
  
         return resultSet;

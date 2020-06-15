@@ -2,8 +2,8 @@ package Controller;
 
 import Entity.User;
 import DBAccesser.User.UserAccessor;
-import Exceptions.UserIDDoesNotExistException;
-import Exceptions.UserIDMissingFromRequestURLPathException;
+import Exceptions.UserIdDoesNotExistException;
+import Exceptions.UserIdMissingFromRequestURLPathException;
 import Helper.SuccessResponseGenerator;
 
 import java.util.Map;
@@ -23,27 +23,27 @@ public final class GetUser {
     private UserAccessor queryUser;
 
     @GetMapping("/users")
-    public void getUserWithoutUserIDPathVariable(HttpServletRequest request) {
+    public void getUserWithoutUserIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
-        throw new UserIDMissingFromRequestURLPathException(path);
+        throw new UserIdMissingFromRequestURLPathException(path);
     }
 
-    @GetMapping("/users/{userID}")
-    public Map<String, Object> getUser(@PathVariable("userID") String userIDString, HttpServletRequest request) {
+    @GetMapping("/users/{userId}")
+    public Map<String, Object> getUser(@PathVariable("userId") String userIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
         Map<String, Object> responseBody;
 
-        long userID = Long.parseLong(userIDString);
+        long userId = Long.parseLong(userIdString);
 
-        //check if UserID is valid
-        if (!queryUser.checkIfUserIDExists(userID)) {
-            throw new UserIDDoesNotExistException(path);
+        //check if UserId is valid
+        if (!queryUser.checkIfUserIdExists(userId)) {
+            throw new UserIdDoesNotExistException(path);
         } 
 
-        User user = queryUser.getUser(userID);
+        User user = queryUser.getUser(userId);
 
         return SuccessResponseGenerator.getSuccessResponseForGetUser(user);
     }

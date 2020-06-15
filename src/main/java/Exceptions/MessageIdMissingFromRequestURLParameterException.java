@@ -3,13 +3,13 @@ package Exceptions;
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
 
-public final class UserIDMissingFromRequestURLParameterException extends RuntimeException {
+public final class MessageIdMissingFromRequestURLParameterException extends RuntimeException {
 
     public static final HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;
-    private static final String message = "Parameter: 'userID' Missing From Request URL";
+    private static final String message = "Parameter: 'messageId' Missing From Request URL";
     private final String path;
 
-    public UserIDMissingFromRequestURLParameterException(String path) {
+    public MessageIdMissingFromRequestURLParameterException(String path) {
         super();
         this.path = path;
     }

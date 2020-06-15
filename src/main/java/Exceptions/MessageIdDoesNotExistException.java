@@ -3,13 +3,13 @@ package Exceptions;
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
 
-public final class MessageIDDoesNotExistException extends RuntimeException {
+public final class MessageIdDoesNotExistException extends RuntimeException {
 
     public static final HttpStatus HTTP_STATUS = HttpStatus.NOT_FOUND;
-    private static final String message = "MessageID Does Not Exist";
+    private static final String message = "MessageId Does Not Exist";
     private final String path;
 
-    public MessageIDDoesNotExistException(String path) {
+    public MessageIdDoesNotExistException(String path) {
         super();
         this.path = path;
     }

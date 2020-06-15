@@ -3,13 +3,13 @@ package Exceptions;
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
 
-public final class UserChatIDDoesNotExistException extends RuntimeException {
+public final class ChatIdDoesNotExistException extends RuntimeException {
 
-    public static final HttpStatus HTTP_STATUS = HttpStatus.FORBIDDEN;
-    private static final String message = "User is not part of this Chat";
+    public static final HttpStatus HTTP_STATUS = HttpStatus.NOT_FOUND;
+    private static final String message = "ChatId Does Not Exist";
     private final String path;
 
-    public UserChatIDDoesNotExistException(String path) {
+    public ChatIdDoesNotExistException(String path) {
         super();
         this.path = path;
     }
