@@ -32,7 +32,7 @@ public class UserAPI {
     private UniqueIDGenerator uniqueIDGenerator;
 
     @Autowired
-    private MissingFields missingFields;
+    private RequestValidator requestValidator;
 
     @Autowired
     private ErrorResponseBody errorResponseBody;
@@ -61,12 +61,7 @@ public class UserAPI {
     public Map<String, Object> signup(@RequestBody Map<String, Object> data, HttpServletRequest request) {
 
         String path = request.getRequestURI();
-        String[] required = {"Username", "EmailID", "Password", "MobileNo"};
-        List<String> missing_fields = missingFields.getMissingFields(data, required);
-        if( missing_fields.size() > 0 ) {
-            throw new UserRequiredFieldMissingException(path, missing_fields);
-        }
-
+        requestValidator.signupRequestValidator(data, path);
         /* necessary fields */
         String username = data.get("Username").toString();
         String emailID = data.get("EmailID").toString();
@@ -94,11 +89,7 @@ public class UserAPI {
     @PostMapping(value = "/login", consumes={"application/json"})
     public Map<String, Object> login(@RequestBody Map<String, Object> data, HttpServletRequest request) {
         String path = request.getRequestURI();
-        String[] required = {"Username", "Password"};
-        List<String> missing_fields = missingFields.getMissingFields(data, required);
-        if(missing_fields.size() > 0) {
-            throw new UserRequiredFieldMissingException(path, missing_fields);
-        }
+        requestValidator.loginRequestValidator(data, path);
         String username = data.get("Username").toString();
         String password = data.get("Password").toString();
         long id = userAccessor.login(username, password);
