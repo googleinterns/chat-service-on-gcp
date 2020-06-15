@@ -1,8 +1,8 @@
-package Helper;
+package helper;
 
-import Exceptions.APIException;
+import exceptions.APIException;
 
-import DBAccesser.User.UserAccessor;
+import dbaccessor.user.UserAccessor;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

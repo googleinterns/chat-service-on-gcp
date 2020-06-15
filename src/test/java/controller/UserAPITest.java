@@ -1,6 +1,6 @@
-package Controller;
+package controller;
 
-import Main.MainClass;
+import main.MainClass;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;

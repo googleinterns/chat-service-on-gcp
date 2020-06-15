@@ -1,16 +1,15 @@
-package Exceptions;
+package exceptions;
 
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
-import Exceptions.APIException;
 
-public class InvalidLoginException extends RuntimeException implements APIException {
+public class UserAlreadyExistsException extends RuntimeException implements APIException {
 
-    private static final HttpStatus HTTP_STATUS = HttpStatus.NOT_FOUND;
-    private static final String MESSAGE = "Invalid Username or Password";
+    private static final HttpStatus HTTP_STATUS = HttpStatus.CONFLICT;
+    private static final String MESSAGE = "Username or Email-ID already exists";
     private final String path;
 
-    public InvalidLoginException(String path) {
+    public UserAlreadyExistsException(String path) {
         super();
         this.path = path;
     }

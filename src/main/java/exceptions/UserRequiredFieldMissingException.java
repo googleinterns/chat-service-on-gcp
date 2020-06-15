@@ -1,8 +1,7 @@
-package Exceptions;
+package exceptions;
 
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
-import Exceptions.APIException;
 import java.util.List;
 
 public class UserRequiredFieldMissingException extends RuntimeException implements APIException {

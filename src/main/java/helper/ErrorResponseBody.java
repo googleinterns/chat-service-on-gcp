@@ -1,6 +1,6 @@
-package Helper;
+package helper;
 
-import Exceptions.APIException;
+import exceptions.APIException;
 
 import java.util.LinkedHashMap;
 import java.time.LocalDateTime;

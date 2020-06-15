@@ -1,10 +1,10 @@
-package Helper;
+package helper;
 
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
-import Exceptions.UserRequiredFieldMissingException;
+import exceptions.UserRequiredFieldMissingException;
 import org.springframework.stereotype.Component;
 
 @Component

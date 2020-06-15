@@ -1,6 +1,6 @@
-package DBAccesser.User;
+package dbaccessor.user;
 
-import Entity.User;
+import entity.User;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,6 @@ import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 @Component
 public class UserAccessor {

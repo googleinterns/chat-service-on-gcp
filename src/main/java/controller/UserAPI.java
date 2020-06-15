@@ -1,13 +1,12 @@
-package Controller;
+package controller;
 
-import Entity.User;
-import DBAccesser.User.UserAccessor;
-import Helper.*;
-import Exceptions.UserRequiredFieldMissingException;
-import Exceptions.UserAlreadyExistsException;
-import Exceptions.InvalidLoginException;
-import Exceptions.UserNotFoundException;
-import Exceptions.APIException;
+import entity.User;
+import dbaccessor.user.UserAccessor;
+import helper.*;
+import exceptions.UserRequiredFieldMissingException;
+import exceptions.UserAlreadyExistsException;
+import exceptions.InvalidLoginException;
+import exceptions.UserNotFoundException;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
