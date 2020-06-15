@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
@@ -35,11 +34,7 @@ public class UserAPITest {
     }
 
     @Test
-    public void contextLoads() {
-    }
-
-    @Test
-    public void testSignup() {
+    public void signup() {
         String url = getRootUrl() + "/signup";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -60,7 +55,7 @@ public class UserAPITest {
     }
 
     @Test
-    public void testLogin() {
+    public void login() {
         String url = getRootUrl() + "/login";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -77,7 +72,7 @@ public class UserAPITest {
     }
 
     @Test
-    public void testViewUser() {
+    public void viewUser() {
         String url = getRootUrl() + "/viewUser?username=user1";
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.GET, null, typeRef);
         assertEquals(200, response.getStatusCodeValue());
