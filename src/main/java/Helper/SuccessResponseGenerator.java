@@ -68,14 +68,20 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
-    private static Map<String, Object> getMessageForResponseBody(Message message) {
+    private static Map<String, Object> getMessageForResponseBody(long userID, Message message) {
     
         Map<String, Object> messageForResponseBody = new LinkedHashMap<String, Object>();
 
         messageForResponseBody.put("MessageID", message.getMessageID());
         messageForResponseBody.put("CreationTS", message.getCreationTS());
         messageForResponseBody.put("ChatID", message.getChatID());
-        messageForResponseBody.put("SenderID", message.getSenderID());
+
+        if (message.getSenderID() == userID) {
+            messageForResponseBody.put("SentByCurrentUser", true);
+        } else {
+            messageForResponseBody.put("SentByCurrentUser", false);
+        }
+        
         messageForResponseBody.put("ContentType", message.getContentType());
         messageForResponseBody.put("TextContent", message.getTextContent());
         messageForResponseBody.put("SentTS", message.getSentTS());
@@ -84,7 +90,7 @@ public final class SuccessResponseGenerator {
         return messageForResponseBody;
     }
 
-    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(List<Message> messages) {
+    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userID, List<Message> messages) {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
 
@@ -92,7 +98,7 @@ public final class SuccessResponseGenerator {
         Collections.sort(messages, Comparator.comparing(Message::getCreationTS));
         
         for (int i = 0; i < messages.size(); ++i) {
-            listOfMessages.add(getMessageForResponseBody(messages.get(i)));
+            listOfMessages.add(getMessageForResponseBody(userID, messages.get(i)));
         }
 
         Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();

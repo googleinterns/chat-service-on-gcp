@@ -184,6 +184,6 @@ public final class ListMessages {
             }
         }
         
-        return SuccessResponseGenerator.getSuccessResponseForListMessages(messages);
+        return SuccessResponseGenerator.getSuccessResponseForListMessages(userID, messages);
     }
 }
