@@ -7,7 +7,7 @@ import Exceptions.APIException;
 public class UserAlreadyExistsException extends RuntimeException implements APIException {
 
     private static final HttpStatus HTTP_STATUS = HttpStatus.CONFLICT;
-    private String message = "Username or Email-ID already exists";
+    private static final String MESSAGE = "Username or Email-ID already exists";
     private final String path;
 
     public UserAlreadyExistsException(String path) {
@@ -20,7 +20,7 @@ public class UserAlreadyExistsException extends RuntimeException implements APIE
     }
 
     public String getMessage() {
-        return this.message;
+        return this.MESSAGE;
     }
 
     public String getPath() {

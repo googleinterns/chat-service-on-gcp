@@ -7,7 +7,7 @@ import Exceptions.APIException;
 public class UserNotFoundException extends RuntimeException implements APIException {
 
     private static final HttpStatus HTTP_STATUS = HttpStatus.NOT_FOUND;
-    private static final String message = "Invalid Username";
+    private static final String MESSAGE = "Invalid Username";
     private final String path;
 
     public UserNotFoundException(String path) {
@@ -20,7 +20,7 @@ public class UserNotFoundException extends RuntimeException implements APIExcept
     }
 
     public String getMessage() {
-        return this.message;
+        return this.MESSAGE;
     }
 
     public String getPath() {
