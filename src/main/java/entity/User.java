@@ -57,6 +57,16 @@ public class User {
     }
   }
 
+  public User(
+          String username,
+          String password,
+          String emailID,
+          String mobileNo,
+          String base64Image
+  ) {
+    this(-1, username, password, emailID, mobileNo, base64Image);
+  }
+
   public long getUserID(){
     return this.UserID;
   }

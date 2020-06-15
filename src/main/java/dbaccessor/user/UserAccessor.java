@@ -2,6 +2,7 @@ package dbaccessor.user;
 
 import entity.User;
 
+import helper.UniqueIDGenerator;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
@@ -17,9 +18,15 @@ public class UserAccessor {
     @Autowired
     SpannerTemplate spannerTemplate;
 
+    @Autowired
+    private UniqueIDGenerator uniqueIDGenerator;
+
     /* Inserts new entry in User Table */
-    public void insert(User user) {
+    public long insert(User user) {
+        long id = uniqueIDGenerator.generateUniqueID("User");
+        user.setUserID(id);
         spannerTemplate.insert(user);
+        return id;
     }
 
     /* Checks if a user with the given username or email-id already exists in User table */

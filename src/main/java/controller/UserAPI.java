@@ -28,9 +28,6 @@ public class UserAPI {
     private UserAccessor userAccessor;
 
     @Autowired
-    private UniqueIDGenerator uniqueIDGenerator;
-
-    @Autowired
     private RequestValidator requestValidator;
 
     @Autowired
@@ -77,11 +74,9 @@ public class UserAPI {
         if (userAccessor.checkIfUserExists(username, emailID)) {
             throw new UserAlreadyExistsException(path);
         }
-        /* Generates unique userID */
-        long id = uniqueIDGenerator.generateUniqueID("User");
-        User newUser = new User(id, username, password, emailID, mobileNo, base64Image);
+        User newUser = new User(username, password, emailID, mobileNo, base64Image);
         /* Inserts new entry into User table */
-        userAccessor.insert(newUser);
+        long id = userAccessor.insert(newUser);
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", id);
     }
 
