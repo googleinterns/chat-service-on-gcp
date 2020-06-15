@@ -111,7 +111,7 @@ public final class CreateMessage {
         
         Message newMessage = new Message(chatId, userId, contentType, textContent);
 
-        newMessage.setMessageId(uniqueIdGenerator.generateUniqueId("Message", false, false));
+        newMessage.setMessageId(uniqueIdGenerator.generateUniqueId("Message"));
 
         insertMessage.insertAllForTextMessage(newMessage);
 

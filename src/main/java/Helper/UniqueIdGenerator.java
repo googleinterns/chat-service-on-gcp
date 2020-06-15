@@ -4,9 +4,9 @@ import DBAccesser.User.UserAccessor;
 import DBAccesser.Chat.ChatAccessor;
 import DBAccesser.Message.MessageAccessor;
 
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public final class UniqueIdGenerator {
@@ -21,21 +21,12 @@ public final class UniqueIdGenerator {
     private MessageAccessor queryMessage; 
     
     //generates long type unique Id value for the given table and its corres Id attribute
-    public long generateUniqueId(String tableName, boolean zeroAllowed, boolean negativeAllowed) {
+    public long generateUniqueId(String tableName) {
 
         long id;
-        Random random = new Random();
 
         while (true) {
-            id = random.nextLong();
-
-            if (zeroAllowed == false && id == 0) {
-                continue;
-            }
-
-            if (negativeAllowed == false && id < 0) {
-                continue;
-            }
+            id = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
 
             switch (tableName) {
                 case "User": 

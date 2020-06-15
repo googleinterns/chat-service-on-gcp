@@ -89,7 +89,7 @@ public final class CreateChat {
         } 
         
         //generate unique chatId
-        newChat.setChatId(uniqueIdGenerator.generateUniqueId("Chat", false, false));
+        newChat.setChatId(uniqueIdGenerator.generateUniqueId("Chat"));
 
         newUserChat1.setChatId(newChat.getChatId());
         newUserChat2.setChatId(newChat.getChatId());

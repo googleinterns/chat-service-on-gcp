@@ -51,7 +51,7 @@ public final class CreateUser {
 
         User newUser = new User(username);
         //generate unique userId
-        newUser.setUserId(uniqueIdGenerator.generateUniqueId("User", false, false));
+        newUser.setUserId(uniqueIdGenerator.generateUniqueId("User"));
         //insert new entry into User
         insertUser.insertAll(newUser);
 
