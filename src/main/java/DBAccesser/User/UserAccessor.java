@@ -81,26 +81,16 @@ public class UserAccessor {
 
     /* Retrieves UserID, Username, EmailID, MobileNo and Picture of the user having the given username
         If no such user exists, returns just the UserID as -1 */
-    public Map<String, Object> getUser(String username) {
+    public User getUser(String username) {
         String SQLStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User WHERE Username=@Username";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
                                 .to(username)
                                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
-        Map<String, Object> response = new HashMap<String, Object>();
         if(resultSet.isEmpty()) {
-            response.put("UserID", -1);
-            return response;
+            return null;
         }
-        User user = resultSet.get(0);
-        response.put("UserID", user.getUserID());
-        response.put("Username", username);
-        response.put("EmailID", user.getEmailID());
-        response.put("MobileNo", user.getMobileNumber());
-        if(user.getPicture() != null) {
-            response.put("Picture", user.getPicture());
-        }
-        return response;
+        return resultSet.get(0);
     }
 }

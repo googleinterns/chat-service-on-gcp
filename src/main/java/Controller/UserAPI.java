@@ -17,8 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
-import javax.servlet.http.HttpServletRequest; 
+import javax.servlet.http.HttpServletRequest;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,10 +103,18 @@ public class UserAPI {
     @GetMapping("/viewUser")
     public Map<String, Object> viewUser(@RequestParam(value = "username", required = true) String username, HttpServletRequest request) {
         String path = request.getRequestURI();
-        Map<String, Object> user = userAccessor.getUser(username);
-        if(user.get("UserID").toString().equals("-1")) {
+        User user = userAccessor.getUser(username);
+        if(user == null) {
             throw new UserNotFoundException(path);
         }
-        return user;
+        Map<String, Object> response = new HashMap<>();
+        response.put("UserID", user.getUserID());
+        response.put("Username", username);
+        response.put("EmailID", user.getEmailID());
+        response.put("MobileNo", user.getMobileNumber());
+        if(user.getPicture() != null) {
+            response.put("Picture", user.getPicture());
+        }
+        return response;
     }
 }
