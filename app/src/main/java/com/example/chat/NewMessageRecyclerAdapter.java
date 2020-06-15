@@ -33,10 +33,10 @@ public class NewMessageRecyclerAdapter extends RecyclerView.Adapter <NewMessageR
         return 1;
     }
 
-    public NewMessageRecyclerAdapter(Context Context, List<String> Messages)
+    public NewMessageRecyclerAdapter(Context context, List<String> messages)
     {
-        mContext = Context;
-        mMessages=Messages;
+        mContext = context;
+        mMessages=messages;
         mLayoutInflater = LayoutInflater.from(mContext);
     }
 

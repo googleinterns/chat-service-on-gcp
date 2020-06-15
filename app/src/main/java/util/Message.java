@@ -3,21 +3,19 @@ package util;
 
 public class Message
 {
-    public int senderId;
-    public int receiverId;
+    public String chatID;
     public boolean received;
     public String text;
-    public Long send_time;
+    public Long sendTime;
     public Message()
     {
 
     }
-    public Message(int mSenderID, int mReceiverID, boolean mReceived, String mText, Long mSendTime)
+    public Message(String mChatID, boolean mReceived, String mText, Long mSendTime)
     {
-        senderId = mSenderID;
-        receiverId = mReceiverID;
+        chatID = mChatID;
         received = mReceived;
         text = mText;
-        send_time = mSendTime;
+        sendTime = mSendTime;
     }
 }

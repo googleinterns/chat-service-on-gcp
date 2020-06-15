@@ -3,11 +3,8 @@ package com.example.chat;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.provider.BaseColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,109 +13,79 @@ import android.widget.Filterable;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.chat.DatabaseContract.userEntry;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import util.User;
 
 public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyclerAdapter.ViewHolder>
     implements Filterable
 {
     private final Context mContext;
-    private final LayoutInflater mlayoutInflater;
-    private Cursor mCursor;
-    private int mUserIdPos;
-    private int mNamePos;
-    private int mEmailIdPos;
-    private int mLastMessagePos;
+    private final LayoutInflater mLayoutInflater;
 
-    //viewType 0: left side text
-    //viewType 1: right side text
+    private List<User> mUsers;
 
-    public ContactsRecyclerAdapter(Context Context, Cursor cursor)
+
+    public ContactsRecyclerAdapter(Context context, List <User> users)
     {
-        mContext = Context;
-        mCursor = cursor;
-        mlayoutInflater = LayoutInflater.from(mContext);
-        populateColumnPositions();
+        mContext = context;
+        mUsers = users;
+        mLayoutInflater = LayoutInflater.from(mContext);
+
     }
 
-    private void populateColumnPositions()
-    {
-        if(mCursor==null)
-            return;
-        //Get column indices from mCursor
-        mUserIdPos = mCursor.getColumnIndex(BaseColumns._ID);
-        mNamePos = mCursor.getColumnIndex(userEntry.COLUMN_NAME);
-        mEmailIdPos = mCursor.getColumnIndex(userEntry.COLUMN_EMAIL_ID);
-        mLastMessagePos = mCursor.getColumnIndex(userEntry.COLUMN_LAST_MESSAGE);
-    }
-
-    public void changeCursor(Cursor cursor)
-    {
-        if(mCursor != null)
-            mCursor.close();
-        mCursor=cursor;
-        populateColumnPositions();
-        notifyDataSetChanged();
-    }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
 
-        View itemView = mlayoutInflater.inflate(R.layout.item_contact,parent,false);
+        View itemView = mLayoutInflater.inflate(R.layout.item_contact,parent,false);
         return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
-        if(mCursor.isClosed())
-            return;
-        mCursor.moveToPosition(position);
+        if(position>=mUsers.size())
+            return ;
 
-        String name = mCursor.getString(mNamePos);
-        String last_message = mCursor.getString(mLastMessagePos);
+        String name = mUsers.get(position).username;
+        String chatID = mUsers.get(position).chatID;
+        String lastMessageID = mUsers.get(position).lastMessageID;
 
-        holder.mUserId = mCursor.getInt(mUserIdPos);
-        holder.mContactName = name;
-        holder.mName.setText(name);
-        holder.mMessage.setText(last_message.trim());
+        holder.mUsername.setText(name);
         holder.mPicName.setText((Character.toString(name.charAt(0))).toUpperCase());
+        holder.mChatID = chatID;
+        holder.mLastMessageID = lastMessageID;
 
         int random_color=getRandomColor();
         holder.mContactIcon.getBackground().setColorFilter(random_color, PorterDuff.Mode.SRC_ATOP);
-
-
 
     }
 
     @Override
     public int getItemCount()
     {
-        if(mCursor==null)
-            return 0;
-        else
-            return mCursor.getCount();
+        return mUsers.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder
     {
-        public final TextView mName;
-        public final TextView mMessage;
+        public final TextView mUsername;
         public final TextView mPicName;
         public final RelativeLayout mContactIcon;
-        public int mUserId;
-        public String mContactName;
+        public String mChatID;
+        public String mLastMessageID;
         public ViewHolder(@NonNull View itemView)
         {
             super(itemView);
-            mName = (TextView) itemView.findViewById(R.id.contact_name);
-            mMessage = (TextView) itemView.findViewById(R.id.view_contact_message);
+            mUsername = (TextView) itemView.findViewById(R.id.contact_name);
             mPicName = (TextView) itemView.findViewById(R.id.tvWeekDayFirstLetter);
             mContactIcon = (RelativeLayout) itemView.findViewById(R.id.rlWeekDay);
 
@@ -129,13 +96,23 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                 public void onClick(View v)
                 {
                     Intent intent = new Intent(mContext,ViewMessageActivity.class);
-                    intent.putExtra(ViewMessageActivity.CONTACT_ID,mUserId);
-                    intent.putExtra(ViewMessageActivity.CONTACT_NAME,mContactName);
+
+                    intent.putExtra(ViewMessageActivity.CHAT_ID,mChatID);
+                    intent.putExtra(ViewMessageActivity.CONTACT_USERNAME,mUsername.getText().toString());
+                    intent.putExtra(ViewMessageActivity.LAST_MESSAGE_ID,mLastMessageID);
+
                     mContext.startActivity(intent);
                 }
             });
         }
 
+    }
+
+    public void updateContactsList(List <User> contactList)
+    {
+        mUsers.clear();
+        mUsers.addAll(contactList);
+        this.notifyDataSetChanged();
     }
 
 
@@ -149,27 +126,20 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             protected FilterResults performFiltering(CharSequence constraint)
             {
 
-
                 FilterResults results = new FilterResults();
-                MatrixCursor matrixCursor = new MatrixCursor(new String[] {BaseColumns._ID,userEntry.COLUMN_NAME,userEntry.COLUMN_EMAIL_ID,userEntry.COLUMN_LAST_MESSAGE});
-                if(constraint.length()>0 && !(mCursor.isClosed()))
+                List <User> filteredResult = new ArrayList<>();
+                if(constraint.length()>0 && !(mUsers.isEmpty()))
                 {
-                    populateColumnPositions();
-
-
-                    for (mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext())
+                    for(User u : mUsers)
                     {
-                        int ID = mCursor.getInt(mUserIdPos);
-                        String name = mCursor.getString(mNamePos);
-                        String email = mCursor.getString(mEmailIdPos);
-                        String last_message = mCursor.getString(mLastMessagePos);
-                        if(name.toLowerCase().contains(constraint.toString()))
+                        String userName = u.username;
+                        if(userName.toLowerCase().contains(constraint.toString()))
                         {
-                            matrixCursor.addRow(new Object[]{ID, name, email, last_message});
+                            filteredResult.add(u);
                         }
                     }
                 }
-                results.values = matrixCursor;
+                results.values = filteredResult;
 
                 return results;
             }
@@ -177,8 +147,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results)
             {
-                MatrixCursor matrixCursor = (MatrixCursor) results.values;
-                changeCursor(matrixCursor);
+                mUsers = (List<User>) results.values;
                 notifyDataSetChanged();
             }
         };

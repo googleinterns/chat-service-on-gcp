@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import util.User;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -25,6 +26,19 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.ClientError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,12 +49,11 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
     NewMessageRecyclerAdapter messageRecyclerAdapter;
     private RecyclerView recyclerMessages;
     LinearLayoutManager messageLayoutManager;
-    private volatile Integer contactId;
-    private volatile int currentUser;
+    private String currentUser;
     private List<String> messages = new ArrayList<String>();
     private static final int CONTACT_PICKER_RESULT = 1;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
-
+    private String chatID;
 
 
     @Override
@@ -62,10 +75,9 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         findViewById(R.id.send_new_message_button).setOnClickListener(this);
         findViewById(R.id.view_contacts_button).setOnClickListener(this);
 
-
+        chatID = null;
         initializeDisplayContent();
         getCurrentUser();
-        contactId=null;
 
     }
 
@@ -83,7 +95,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
     private void getCurrentUser()
     {
         SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
-        currentUser = mPrefs.getInt("currentUser",-1);
+        currentUser = mPrefs.getString("currentUser","");
     }
 
     @Override
@@ -96,7 +108,14 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         }
         else if(v.getId() == R.id.send_new_message_button)
         {
-            sendNewMessage();
+            try
+            {
+                sendNewMessage();
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -163,41 +182,187 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void sendNewMessage()
+    private void sendNewMessage() throws JSONException
     {
-        String message_text1 = messageEditText.getText().toString().trim();
-        if(message_text1.equals(""))
+        String messageText = messageEditText.getText().toString().trim();
+        if(messageText.equals(""))
         {
-            HideSoftKeyboard();
+            hideSoftKeyboard();
             return;
         }
-        getContactId();
-        if(contactId==null)
-        {
-            Toast.makeText(this, "Enter a valid username", Toast.LENGTH_LONG).show();
-            return ;
-        }
-
-        String message_text=messageEditText.getText().toString();
-
-
-
-        messages.add(message_text);
-        messageRecyclerAdapter.notifyItemInserted(messages.size()-1);
-        recyclerMessages.smoothScrollToPosition(messages.size()-1);
-        messageEditText.setText("");
-        HideSoftKeyboard();
+        getChatID();
     }
 
-    private void getContactId()
+    private void getChatID() throws JSONException
     {
-        //TODO call an API with which I can get "server userID" corresponding to the "username" provided & then add it to the cache
+        String SAMPLE_CURRENT_USER = "3441453482889885209";
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + SAMPLE_CURRENT_USER+"/chats";
+
+        String username = ((EditText)findViewById(R.id.new_message_username)).getText().toString();
+
+
+        JSONObject jsonBody = new JSONObject();
+        Log.d("username sent to server: ",username);
+        jsonBody.put("username",username);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
+                {
+
+
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        Log.d("ResponseMessage: " , response.toString());
+
+                        try
+                        {
+                            String message = response.getString("message");
+                            if(message.equals("Success"))
+                            {
+                                chatID = response.getString("ChatId");
+                                sendFirstMessageToServer();
+                                switchToViewMessages();
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            Toast.makeText(getApplicationContext(), "Parse Error", Toast.LENGTH_SHORT).show();
+                            Log.d("JsonError: ",e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        Log.d("errorMessage",error.toString());
+                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
+                        {
+                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
+                        }
+                        else if(error instanceof ClientError)
+                        {
+                            String responseBody = null;
+                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = null;
+                            try
+                            {
+                                data = new JSONObject(responseBody);
+                            }
+                            catch (JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            assert data != null;
+                            String message = data.optString("Message");
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }) {
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
+            }
+        };
+        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
+
+    }
+
+    private void sendFirstMessageToServer() throws JSONException
+    {
+        String SAMPLE_CURRENT_USER = "3441453482889885209";
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + SAMPLE_CURRENT_USER
+                +"/chats/"+chatID+"/messages";
+
+        final String messageText  = messageEditText.getText().toString();
+        Log.d("message sent to server: ",messageText);
+
+        JSONObject jsonBody = new JSONObject();
+
+        jsonBody.put("contentType","text");
+        jsonBody.put("textContent",messageText);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
+                {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        Log.d("ResponseMessage: " , response.toString());
+
+                        try
+                        {
+                            String message = response.getString("message");
+                            if(message.equals("Success"))
+                            {
+                                String messageID = response.getString("MessageId");
+                                messages.add(messageText);
+                                messageRecyclerAdapter.notifyItemInserted(messages.size()-1);
+                                recyclerMessages.smoothScrollToPosition(messages.size()-1);
+                                messageEditText.setText("");
+                                hideSoftKeyboard();
+                                switchToViewMessages();
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            Toast.makeText(getApplicationContext(), "Parse Error", Toast.LENGTH_SHORT).show();
+                            Log.d("JsonError: ",e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        Log.d("errorMessage",error.toString());
+                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
+                        {
+                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
+                        }
+                        else if(error instanceof ClientError)
+                        {
+                            String responseBody = null;
+                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = null;
+                            try
+                            {
+                                data = new JSONObject(responseBody);
+                            }
+                            catch (JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            assert data != null;
+                            String message = data.optString("Message");
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }) {
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
+            }
+        };
+        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
 
 
     }
 
+    private void switchToViewMessages()
+    {
 
-    private void HideSoftKeyboard()
+    }
+
+
+    private void hideSoftKeyboard()
     {
         View view = this.getCurrentFocus();
         if (view != null)

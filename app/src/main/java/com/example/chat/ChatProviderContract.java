@@ -7,7 +7,7 @@ public final class ChatProviderContract
 {
     private ChatProviderContract() {};
 
-    public static final String AUTHORITY = "com.example.Chat.provider";
+    public static final String AUTHORITY = "com.example.chat.provider";
     public static final Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
 
 

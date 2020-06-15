@@ -161,66 +161,6 @@
                 android:visibility="visible"
                 tools:visibility="visible" />
 
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/google_sign_in_button"
-                android:layout_centerHorizontal="true"
-                android:paddingRight="1dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="3dp"
-                android:id="@+id/facebook_login_relative_layout"
-                android:elevation="10dp"
-                android:clipToPadding="false"
-                >
-
-                <com.facebook.login.widget.LoginButton
-                    android:id="@+id/fb_login_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:visibility="invisible"
-                    android:textSize="2dp"
-                    />
-
-                <LinearLayout android:id="@+id/facebook_login_linear_layout"
-                    android:layout_height="45dp"
-                    android:layout_width="125dp"
-                    android:background="#4169E1"
-                    android:elevation="10dp"
-                    >
-
-                    <ImageView android:src="@drawable/fb"
-                        android:layout_height="42dp"
-                        android:layout_width="42dp"
-                        android:layout_gravity="center"
-                        android:paddingStart="10dp"/>
-
-                    <TextView
-                        android:layout_gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sign In"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:paddingStart="17dp"/>
-                </LinearLayout>
-            </RelativeLayout>
-
-
-<!--            <com.facebook.login.widget.LoginButton-->
-<!--                android:id="@+id/fb_login_button"-->
-<!--                android:layout_width="130dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_centerHorizontal="true"-->
-<!--                android:layout_below="@id/google_sign_in_button"-->
-<!--                android:paddingTop="16dp"-->
-<!--                android:paddingBottom="16dp"-->
-<!--                android:paddingStart="20dp"-->
-<!--                android:paddingEnd="20dp"-->
-<!--                />-->
-
             <TextView
                 android:id="@+id/new_user_register"
 
@@ -237,7 +177,7 @@
 
                 android:layout_centerHorizontal="true"
 
-                android:layout_below="@id/facebook_login_relative_layout"
+                android:layout_below="@id/google_sign_in_button"
 
                 />
             <TextView

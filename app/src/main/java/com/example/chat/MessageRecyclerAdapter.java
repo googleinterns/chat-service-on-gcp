@@ -80,22 +80,22 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         notifyDataSetChanged();
     }
 
-    public void addRow(Message m)
-    {
-        MatrixCursor matrixCursor = new MatrixCursor(new String[] { messageEntry.COLUMN_RECEIVED, messageEntry.COLUMN_TEXT,messageEntry.COLUMN_SEND_TIME });
-        if(m.received)
-        {
-            matrixCursor.addRow(new Object[]{1, m.text, m.send_time});
-        }
-        else
-        {
-            matrixCursor.addRow(new Object[]{0, m.text, m.send_time});
-        }
-        mCursor = new MergeCursor(new Cursor[] {  mCursor,matrixCursor });
-
-        populateColumnPositions();
-        this.notifyDataSetChanged();
-    }
+//    public void addRow(Message m)
+//    {
+//        MatrixCursor matrixCursor = new MatrixCursor(new String[] { messageEntry.COLUMN_RECEIVED, messageEntry.COLUMN_TEXT,messageEntry.COLUMN_SEND_TIME });
+//        if(m.received)
+//        {
+//            matrixCursor.addRow(new Object[]{1, m.text, m.send_time});
+//        }
+//        else
+//        {
+//            matrixCursor.addRow(new Object[]{0, m.text, m.send_time});
+//        }
+//        mCursor = new MergeCursor(new Cursor[] {  mCursor,matrixCursor });
+//
+//        populateColumnPositions();
+//        this.notifyDataSetChanged();
+//    }
 
     @NonNull
     @Override

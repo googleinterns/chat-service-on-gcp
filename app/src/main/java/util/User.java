@@ -3,18 +3,16 @@ package util;
 
 public class User
 {
-    public int userID;
-    public String name;
-    public String email_id;
-    public String last_message;
+    public String username;
+    public String chatID;
+    public String lastMessageID;
     public User()
     {
     }
-    public User(int mUserID, String mName, String mEmailId, String mLastMessage)
+    public User(String mUsername, String mChatID, String mLastMessageID)
     {
-        userID = mUserID;
-        name = mName;
-        email_id = mEmailId;
-        last_message = mLastMessage;
+        username = mUsername;
+        chatID = mChatID;
+        lastMessageID = mLastMessageID;
     }
 }

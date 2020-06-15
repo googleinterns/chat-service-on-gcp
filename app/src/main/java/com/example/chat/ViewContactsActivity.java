@@ -1,19 +1,11 @@
 package com.example.chat;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.provider.BaseColumns;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,53 +15,41 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.example.chat.ChatProviderContract.Chat;
-import com.example.chat.ChatProviderContract.Messages;
-import com.example.chat.ChatProviderContract.Users;
-import com.example.chat.DatabaseContract.userEntry;
-import com.facebook.AccessToken;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.login.LoginManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import util.User;
 
 public class ViewContactsActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor>
 {
     public static final String CHAT_LOGGED_IN_USER = "CHAT_LOGGED_IN_USER";
     public static final String CURRENT_USER = "currentUser";
+
+
     ContactsRecyclerAdapter contactsRecyclerAdapter;
     LinearLayoutManager contactLayoutManager;
     private FloatingActionButton fab;
+    private List<User> users = new ArrayList<User>();
 
-    public static int LOADER_CONTACTS = 0;
-    private volatile boolean lastMessageUpdated;
 
-    public volatile int currentUser;
-//    private volatile boolean receivedMessageUpdated;
+    private String currentUser;
     RecyclerView recyclerContacts;
 
     @Override
@@ -94,27 +74,44 @@ public class ViewContactsActivity extends AppCompatActivity
                 startActivity(new Intent(ViewContactsActivity.this, NewMessageActivity.class));
             }
         });
-
-        enableStrictMode();
-
-
-
-//        LoadChatsFromServer();
     }
 
-    private void LoadChatsFromServer()
+    private void loadChatsFromServer()
     {
-        String url = "https://gcp-chat-service.an.r.appspot.com/users/3441453482889885209/chats";
-        RequestQueue queue = VolleyController.getInstance(this.getApplicationContext()).
-                getRequestQueue();
+        Log.d("currentUser sent to server:",currentUser);
+
+        String SAMPLE_CURRENT_USER = "3441453482889885209";
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ SAMPLE_CURRENT_USER +"/chats";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>()
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {
 
                     @Override
                     public void onResponse(JSONObject response)
                     {
-//                        textView.setText("Response: " + response.toString());
+                        Log.d("ResponseMessage: " , response.toString());
+                        try
+                        {
+                            JSONArray chats = response.getJSONArray("payload");
+                            List <User> contacts = new ArrayList<User>();
+                            for(int i=0;i<chats.length();i++)
+                            {
+                                JSONObject chat = (JSONObject) chats.get(i);
+
+                                String username = chat.getString("Username");
+                                String chatID = chat.getString("ChatId");
+                                String lastMessageID = chat.getString("LastSentMessageId");
+
+                                Log.d("here",username);
+                                contacts.add(new User(username,chatID,lastMessageID));
+                            }
+
+                            contactsRecyclerAdapter.updateContactsList(contacts);
+                        }
+                        catch (JSONException e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
                 }, new Response.ErrorListener()
                 {
@@ -124,45 +121,33 @@ public class ViewContactsActivity extends AppCompatActivity
                         // TODO: Handle error
 
                     }
-                });
+                }){
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
+            }
+        };
+
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
 
-    private void HideSoftKeyboard()
-    {
-        View view = this.getCurrentFocus();
-        if (view != null)
-        {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            assert imm != null;
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
     private void getCurrentUser()
     {
         SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
-        currentUser = mPrefs.getInt("currentUser",-1);
-//        if(currentUser==-1)
+        currentUser = mPrefs.getString("currentUser","");
+//        if(currentUser.equals(""))
 //        {
 //            startActivity(new Intent(this,LoginActivity.class));
 //        }
-    }
-
-    private void enableStrictMode()
-    {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .build();
-        StrictMode.setThreadPolicy(policy);
     }
 
     private void initializeDisplayContent()
     {
         recyclerContacts = (RecyclerView) findViewById(R.id.contacts_recyclerView);
         contactLayoutManager = new LinearLayoutManager(this);
-        contactsRecyclerAdapter = new ContactsRecyclerAdapter(this,null);
+        contactsRecyclerAdapter = new ContactsRecyclerAdapter(this,users);
         recyclerContacts.addItemDecoration(new DividerItemDecoration(recyclerContacts.getContext(), DividerItemDecoration.VERTICAL));
         recyclerContacts.setLayoutManager(contactLayoutManager);
         recyclerContacts.setAdapter(contactsRecyclerAdapter);
@@ -174,68 +159,14 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         super.onResume();
         getCurrentUser();
-        Log.d("currentUser",Integer.toString(currentUser));
-
-//        receivedMessageUpdated=false;
-        new UpdateReceivedMessageDb().execute();
-        lastMessageUpdated=false;
-        new UpdateLastMessageDb().execute();
-        Log.d("here1","lol");
-        while(!lastMessageUpdated)
-        {
-            try
-            {
-                Thread.sleep(100);
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        Log.d("here2","lol");
-        LoaderManager.getInstance(this).restartLoader(LOADER_CONTACTS,null,this);
+        Log.d("currentUser",currentUser);
+        loadChatsFromServer();
     }
 
     @Override
     protected void onDestroy()
     {
         super.onDestroy();
-    }
-
-    @NonNull
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args)
-    {
-        CursorLoader loader = null;
-        if(id==LOADER_CONTACTS)
-        {
-            Uri uri = Users.CONTENT_URI;
-            String[] user_columns =
-                    {
-                            BaseColumns._ID,
-                            userEntry.COLUMN_NAME,
-                            userEntry.COLUMN_EMAIL_ID,
-                            userEntry.COLUMN_LAST_MESSAGE
-                    };
-            String selection = userEntry._ID + " != ? ";
-            String selectionArgs[]=
-                    {
-                           Integer.toString(currentUser)
-                    };
-//            while(!receivedMessageUpdated);
-            loader = new CursorLoader(this,uri,user_columns,selection,selectionArgs,null);
-        }
-        return loader;
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data)
-    {
-
-        if(loader.getId() == LOADER_CONTACTS)
-        {
-            contactsRecyclerAdapter.changeCursor(data);
-        }
     }
 
     @Override
@@ -245,85 +176,9 @@ public class ViewContactsActivity extends AppCompatActivity
         super.onPause();
     }
 
-    @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader)
-    {
-        if(loader.getId() == LOADER_CONTACTS)
-        {
-            contactsRecyclerAdapter.changeCursor(null);
-        }
-    }
 
-
-
-    private class UpdateReceivedMessageDb extends AsyncTask<Void,Void,Void>
-    {
-        @Override
-        protected Void doInBackground(Void... aVoid)
-        {
-            ContentValues argReceived = new ContentValues();
-            argReceived.put(Messages.COLUMN_RECEIVED, "1");
-            getContentResolver().update(Messages.CONTENT_URI,argReceived,Messages.COLUMN_RECEIVER+" = ? ",new String []{Integer.toString(currentUser)});
-
-            ContentValues argSent = new ContentValues();
-            argSent.put(Messages.COLUMN_RECEIVED, "0");
-            getContentResolver().update(Messages.CONTENT_URI,argSent,Messages.COLUMN_SENDER+" = ? ",new String []{Integer.toString(currentUser)});
-//            receivedMessageUpdated=true;
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void aVoid)
-        {
-            super.onPostExecute(aVoid);
-        }
-    }
-    private class UpdateLastMessageDb extends AsyncTask<Void,Void,Void>
-    {
-        @Override
-        protected Void doInBackground(Void... aVoid)
-        {
-            Uri uri = ChatProviderContract.Chat.CONTENT_URI;
-            //columns,where,whereArgs
-            String[] chatColumns = {Chat.COLUMN_USER1, Chat.COLUMN_USER2, Chat.COLUMN_LAST_MESSAGE};
-            String selection = " user1 = ? OR user2 = ? ";
-            String [] selectionArgs = new String[]
-                    {
-                            Integer.toString(currentUser),
-                            Integer.toString(currentUser)
-                    };
-            Cursor cursor = getContentResolver().query(uri, chatColumns,selection,selectionArgs,null);
-
-            if(cursor==null)
-                return null;
-            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
-            {
-                int user2 = cursor.getInt(cursor.getColumnIndex(Chat.COLUMN_USER1));
-                if(user2==currentUser)
-                {
-                    user2=cursor.getInt(cursor.getColumnIndex(Chat.COLUMN_USER2));
-                }
-                String lastMessage = cursor.getString(cursor.getColumnIndex(Chat.COLUMN_LAST_MESSAGE));
-
-
-                ContentValues values = new ContentValues();
-                values.put(Users.COLUMN_LAST_MESSAGE,lastMessage);
-                String where = "_id = ? ";
-                getContentResolver().update(Users.CONTENT_URI,values,where,new String []{Integer.toString(user2)});
-            }
-            lastMessageUpdated=true;
-            cursor.close();
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void aVoid)
-        {
-            super.onPostExecute(aVoid);
-        }
-    }
-
-
-    private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
-    private long mBackPressed;
+    private static final int TIME_INTERVAL = 2000; // (in milliseconds) desired time passed between two back presses.
+    private long mBackPressed=0;
 
 
     @Override
@@ -352,10 +207,6 @@ public class ViewContactsActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    private void restartLoader()
-    {
-        LoaderManager.getInstance(this).restartLoader(LOADER_CONTACTS,null,this);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -378,8 +229,8 @@ public class ViewContactsActivity extends AppCompatActivity
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 searchView.setQuery("",false);
                 fab.setVisibility(View.VISIBLE);
-                HideSoftKeyboard();
-                restartLoader();
+                hideSoftKeyboard();
+                loadChatsFromServer();
                 return true;
             }
         });
@@ -390,8 +241,8 @@ public class ViewContactsActivity extends AppCompatActivity
             {
                 searchView.setQuery("",false);
                 fab.setVisibility(View.VISIBLE);
-                restartLoader();
-                HideSoftKeyboard();
+                loadChatsFromServer();
+                hideSoftKeyboard();
                 return true;
             }
         });
@@ -433,8 +284,7 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         SharedPreferences mPrefs = getSharedPreferences(CHAT_LOGGED_IN_USER, 0);
         SharedPreferences.Editor mEditor = mPrefs.edit();
-        mEditor.putInt(CURRENT_USER,-1).apply();
-        disconnectFromFacebook();
+        mEditor.putString(CURRENT_USER,"").apply();
         startActivity(new Intent(this,LoginActivity.class));
     }
 
@@ -466,14 +316,14 @@ public class ViewContactsActivity extends AppCompatActivity
 
     }
 
-    public void disconnectFromFacebook()
+    private void hideSoftKeyboard()
     {
-
-        if (AccessToken.getCurrentAccessToken() == null)
+        View view = this.getCurrentFocus();
+        if (view != null)
         {
-            return; // already logged out
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            assert imm != null;
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-        LoginManager.getInstance().logOut();
     }
-
 }
