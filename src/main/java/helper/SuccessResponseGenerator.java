@@ -22,6 +22,13 @@ public final class SuccessResponseGenerator {
 
         return responseBody;
     }
+  
+    public static Map<String, Object> getSuccessResponseForLogin(long ID) {
+        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
+        responseBody.put("message", "Success");
+        responseBody.put("UserId", ID);
+        return responseBody;
+    }
 
     public static Map<String, Object> getSuccessResponseForGetUser(User user) {
 
@@ -103,7 +110,7 @@ public final class SuccessResponseGenerator {
 
         Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
         responseBody.put("payload", listOfMessages);
-        
+       
         return responseBody;
     }
 }
