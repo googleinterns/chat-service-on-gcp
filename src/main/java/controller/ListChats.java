@@ -48,7 +48,7 @@ public final class ListChats {
     private UniqueIdGenerator uniqueIdGenerator;
 
     /**
-     * Encapsulation for ChatId and Username of one of the Users engaged in that Chat 
+     * Encapsulation for ChatId and Username of one of the Users engaged in that Chat. 
      */
     public static final class UsernameChatId {
 
@@ -115,7 +115,7 @@ public final class ListChats {
         long userId = Long.parseLong(userIdString);
         
         /*
-         * Checks if the passed userId is valid
+         * Checks if the passed userId is valid.
          */
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);

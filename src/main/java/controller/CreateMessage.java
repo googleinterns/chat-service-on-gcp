@@ -99,7 +99,7 @@ public final class CreateMessage {
         long chatId = Long.parseLong(chatIdString);
 
         /*
-         * Checks if request body is as required
+         * Checks if request body is as required.
          */
         if (!requestBody.containsKey("contentType")) {
             throw new ContentTypeMissingFromRequestBodyException(path);
@@ -108,7 +108,7 @@ public final class CreateMessage {
         String contentType = requestBody.get("contentType");
 
         /*
-         * Checks if request body is as required
+         * Checks if request body is as required.
          */
         if (!requestBody.containsKey("textContent")) {
             throw new TextContentMissingFromRequestBodyException(path);
@@ -117,21 +117,21 @@ public final class CreateMessage {
         String textContent = requestBody.get("textContent");
         
         /*
-         * Checks if the passed userId is valid
+         * Checks if the passed userId is valid.
          */
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
         
         /*
-         * Checks if the passed chatId is valid
+         * Checks if the passed chatId is valid.
          */
         if (!queryChat.checkIfChatIdExists(chatId)) {
             throw new ChatIdDoesNotExistException(path);
         }
 
         /*
-         * Checks if user is part of chat
+         * Checks if user is part of chat.
          */
         if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
             throw new UserChatIdDoesNotExistException(path);
