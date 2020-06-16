@@ -19,10 +19,16 @@ public final class UserAccessor {
     @Autowired
     private SpannerTemplate spannerTemplate;
 
+    /**
+     * Inserts all attributes of the given User in the DB.
+     */
     public void insertAll(User user) {
         spannerTemplate.insert(user);
     } 
 
+    /**
+     * Checks if a User with the given username already exists.
+     */
     public boolean checkIfUsernameExists(String username) {
 
         String SQLStatment = "SELECT Username FROM User WHERE Username=@username";
@@ -32,6 +38,13 @@ public final class UserAccessor {
         return (!resultSet.isEmpty());
     }
 
+    /**
+     * Returns details of the User with the given UserId.
+     * Details include:
+     * (1)  UserId
+     * (2)  Username
+     * (3)  CreationTs 
+     */
     public User getUser(long userId) {
 
         String SQLStatment = "SELECT * FROM User WHERE UserID=@userId";
@@ -41,6 +54,9 @@ public final class UserAccessor {
         return resultSet.get(0);
     }
 
+    /**
+     * Checks if a User with the given userId already exists.
+     */
     public boolean checkIfUserIdExists(long userId) {
 
         String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userId";
@@ -50,6 +66,9 @@ public final class UserAccessor {
         return (!resultSet.isEmpty());
     }
 
+    /**
+     * Returns the UserId of the User with the given username.
+     */
     public long getUserIdFromUsername(String username) {
 
         String SQLStatment = "SELECT UserID FROM User WHERE Username=@username";
@@ -59,6 +78,12 @@ public final class UserAccessor {
         return resultSet.get(0).getUserId();
     }
 
+    /**
+     * Returns details of Users with whome the given User is engaged in a Chat with.
+     * Details include:
+     * (1) Username
+     * (2) ChatId
+     */
     public List<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
 
         String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";

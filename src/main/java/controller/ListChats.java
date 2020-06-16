@@ -123,7 +123,7 @@ public final class ListChats {
         
         User user = new User(userId);
         List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
-        List<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getLastSentMessageIdCreationTsForChatsOfUser(userId);
+        List<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getCreationTsOfLastSentMessageIdForChatsOfUser(userId);
         Map<Long, Timestamp> chatIdCreationTsOflastSentMessageIdMap = new LinkedHashMap<Long, Timestamp>();
 
         for (Message chatIdCreationTsOfLastSentMessageId : listOfChatIdCreationTsOfLastSentMessageId) {

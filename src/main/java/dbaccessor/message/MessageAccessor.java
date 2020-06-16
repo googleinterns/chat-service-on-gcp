@@ -21,21 +21,21 @@ public final class MessageAccessor {
     private SpannerTemplate spannerTemplate;
 
     /**
-     * Inserts all fields of a message in Message
+     * Inserts all attributes of a Message in the DB.
      */
     public void insertAllForTextMessage(Message message) {
         spannerTemplate.insert(message);
     } 
 
     /**
-     * Updates the ReceivedTs of a message
+     * Updates the ReceivedTs of a Message.
      */
-    public void insertReceivedTs(Message message) {
+    public void updateReceivedTs(Message message) {
         spannerTemplate.update(message, "MessageID", "ReceivedTS");
     }
 
     /**
-     * Checks if message with passed messageId exists
+     * Checks if a Message with the given messageId exists.
      */
     public boolean checkIfMessageIdExists(long messageId) {
 
@@ -47,7 +47,16 @@ public final class MessageAccessor {
     }
 
     /**
-     * Gets the message whose Id = passed messageId 
+     * Returns details of Message with the given MessageId.
+     * Details include:
+     * (1)  MessageId
+     * (2)  ChatId
+     * (3)  SenderId
+     * (4)  ContentType
+     * (5)  TextContent
+     * (6)  SentTs
+     * (7)  ReceivedTs
+     * (8)  CreationTs
      */
     public Message getMessage(long messageId) {
 
@@ -59,7 +68,7 @@ public final class MessageAccessor {
     }
 
     /**
-     * Gets only the CreationTs field of the message with the passed messageId
+     * Returns the CreationTs field of the Message with the given messageId.
      */
     public Timestamp getCreationTsForMessageId(long messageId) {
 
@@ -71,7 +80,7 @@ public final class MessageAccessor {
     }
 
     /**
-     * Checks if given message belongs to given chat
+     * Checks if the given Message belongs to the given Chat.
      */
     public boolean checkIfMessageIdBelongsToChatId(long messageId, long chatId) {
         
@@ -113,27 +122,45 @@ public final class MessageAccessor {
         return resultSet;
     }
 
+    /**
+     * Returns details of <b>count</b> number of Messages of the given Chat within the required time frame.
+     */
     public List<Message> listCountMessagesOfChatIdWithinGivenTime(Timestamp startCreationTs, Timestamp endCreationTs, int count, long chatId) {
 
         return listCountMessagesOfChatId(startCreationTs, endCreationTs, count, chatId);
     }
 
+    /**
+     * Returns details of <b>count</b> number of Messages of the given Chat beginning at the start time.
+     */
     public List<Message> listCountMessagesOfChatIdFromStartTime(Timestamp startCreationTs, int count, long chatId) {
 
         return listCountMessagesOfChatId(startCreationTs, null, count, chatId); 
     }
 
+    /**
+     * Returns details of <b>count</b> number of Messages of the given Chat before the end time.
+     */
     public List<Message> listCountMessagesOfChatIdBeforeEndTime(Timestamp endCreationTs, int count, long chatId) {
 
         return listCountMessagesOfChatId(null, endCreationTs, count, chatId);
     }
 
+    /**
+     * Returns details of <b>count</b> number of latest Messages.
+     */
     public List<Message> listLatestCountMessagesOfChatId(int count, long chatId) {
 
         return listCountMessagesOfChatId(null, null, count, chatId);
     }
 
-    public List<Message> getLastSentMessageIdCreationTsForChatsOfUser(long userId) {
+    /**
+     * Returns details of Messages which were sent last in the Chats which the given User is engaged in.
+     * Details include:
+     * (1)  ChatId
+     * (2)  CreationTs (of the Message)
+     */
+    public List<Message> getCreationTsOfLastSentMessageIdForChatsOfUser(long userId) {
 
         String SQLStatment = "SELECT ChatID, CreationTS FROM Message WHERE MessageID IN (SELECT LastSentMessageID FROM Chat WHERE ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND LastSentMessageID IS NOT NULL)";
         Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();

@@ -24,10 +24,16 @@ public final class ChatAccessor {
     @Autowired
     private SpannerTemplate spannerTemplate;
 
-    public void insertLastSentMessageId(Chat chat) {
+    /**
+     * Updates the LastSentMessageId attribute in a Chat object .
+     */
+    public void updateLastSentMessageId(Chat chat) {
         spannerTemplate.update(chat, "ChatID", "LastSentMessageID");
     }
 
+    /**
+     * Completes all DB insertions for the CreateChat API in a single transaction.
+     */
     public boolean insertForCreateChatTransaction(Chat chat, UserChat userChat1, UserChat userChat2) {
         return spannerOperations.performReadWriteTransaction(
             transactionSpannerOperations -> {
@@ -40,6 +46,9 @@ public final class ChatAccessor {
         );
     }
 
+    /**
+     * Checks if a Chat with the given chatId exists.
+     */
     public boolean checkIfChatIdExists(long chatId) {
 
         String SQLStatment = "SELECT ChatID FROM Chat WHERE ChatID=@chatId";
@@ -49,6 +58,13 @@ public final class ChatAccessor {
         return (!resultSet.isEmpty());        
     }
 
+    /**
+     * Returns details of the Chat with the given ChatId.
+     * Details include:
+     * (1)  ChatId
+     * (2)  LastSentMessageId
+     * (3)  CreationTs
+     */
     public Chat getChat(long chatId) {
 
         String SQLStatment = "SELECT * FROM Chat WHERE ChatID=@chatId";
@@ -58,6 +74,13 @@ public final class ChatAccessor {
         return resultSet.get(0);
     }
 
+    /**
+     * Returns details of all Chats which the given User id engaged in.
+     * Details include:
+     * (1)  ChatId
+     * (2)  LastSentMessageId
+     * (3)  CreationTs
+     */
     public List<Chat> getChatsForUser(User user) {
 
         String SQLStatment = "SELECT * FROM Chat WHERE ChatID in (SELECT ChatID FROM UserChat WHERE UserID=@userId)";
