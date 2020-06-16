@@ -32,8 +32,8 @@ public final class CreateUser {
         String path = request.getRequestURI();
 
         /*
-            * Checks if request body is as required
-            */
+         * Checks if request body is as required
+         */
         if (!requestBody.containsKey("username")) {
             throw new UsernameMissingFromRequestBodyException(path);
         }
@@ -41,8 +41,8 @@ public final class CreateUser {
         String username  = requestBody.get("username");
 
         /*
-            * Checks if username exists
-            */
+         * Checks if username exists
+         */
         if (queryUser.checkIfUsernameExists(username)) {
             throw new UsernameAlreadyExistsException(path);
         } 
@@ -50,13 +50,13 @@ public final class CreateUser {
         User newUser = new User(username);
 
         /*
-            * Generates unique userId
-            */
+         * Generates unique userId
+         */
         newUser.setUserId(uniqueIdGenerator.generateUniqueId("User"));
         
         /*
-            * Inserts new entry into User
-            */
+         * Inserts new entry into User
+         */
         insertUser.insertAll(newUser);
 
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", newUser.getUserId());

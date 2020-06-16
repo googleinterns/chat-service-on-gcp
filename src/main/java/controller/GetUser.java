@@ -36,8 +36,8 @@ public final class GetUser {
         long userId = Long.parseLong(userIdString);
 
         /*
-            * Checks if the passed userId is valid
-            */
+         * Checks if the passed userId is valid
+         */
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         } 
