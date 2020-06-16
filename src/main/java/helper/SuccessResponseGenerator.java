@@ -93,8 +93,9 @@ public final class SuccessResponseGenerator {
     public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userId, List<Message> messages) {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
-
-        //sort the messages in  ascending order of CreationTs
+        /*
+            * Sorts the messages in  ascending order of CreationTs
+            */
         Collections.sort(messages, Comparator.comparing(Message::getCreationTs));
         
         for (int i = 0; i < messages.size(); ++i) {

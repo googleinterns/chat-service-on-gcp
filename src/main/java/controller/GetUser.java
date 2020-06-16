@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 
-//this annotation tells that this class can contain methods which map to URL requests
 @RestController
 public final class GetUser {
 
@@ -36,7 +35,9 @@ public final class GetUser {
 
         long userId = Long.parseLong(userIdString);
 
-        //check if UserId is valid
+        /*
+            * Checks if the passed userId is valid
+            */
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         } 

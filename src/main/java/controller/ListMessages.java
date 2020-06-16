@@ -91,22 +91,30 @@ public final class ListMessages {
 
         List<Message> messages;
         
-        //check if the passed userId is valid
+        /*
+            * Checks if the passed userId is valid
+            */
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
         
-        //check if the passed chatId is valid
+        /*
+            * Checks if the passed chatId is valid
+            */
         if (!queryChat.checkIfChatIdExists(chatId)) {
             throw new ChatIdDoesNotExistException(path);
         }
 
-        //check if user is part of chat
+        /*
+            * Checks if user is part of chat
+            */
         if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
             throw new UserChatIdDoesNotExistException(path);
         }
 
-        //configure the value of count
+        /*
+            * Configures the value of count
+            */
         if (countString == null) {
             count = LOWER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN;
         } else {
@@ -121,17 +129,21 @@ public final class ListMessages {
 
         if (startMessageIdString != null) {
             startMessageId = Long.parseLong(startMessageIdString);
-            //check if startMessageId is valid
+            /*
+                * Checks if startMessageId is valid
+                */
             if (!queryMessage.checkIfMessageIdExists(startMessageId)) {
                 throw new MessageIdDoesNotExistException(path);
             } 
-
-            //check if startMessageId is part of this chat
+            /*
+                * Checks if startMessageId is part of this chat
+                */
             if (!queryMessage.checkIfMessageIdBelongsToChatId(startMessageId, chatId)) {
                 throw new MessageIdDoesNotBelongToChatIdException(path);
             } 
-
-            //get CreationTs of startMessageId 
+            /*
+                * Gets CreationTs of startMessageId
+                */
             startCreationTs = queryMessage.getCreationTsForMessageId(startMessageId);
         } else {
             startCreationTs = null;
@@ -139,43 +151,59 @@ public final class ListMessages {
 
         if (endMessageIdString != null) {
             endMessageId = Long.parseLong(endMessageIdString);
-            //check if endMessageId is valid
+            /*
+                * Checks if endMessageId is valid
+                */
             if (!queryMessage.checkIfMessageIdExists(endMessageId)) {
                 throw new MessageIdDoesNotExistException(path);
             } 
-
-            //check if endMessageId is part of this chat
+            /*
+                * Checks if endMessageId is part of this chat
+                */
             if (!queryMessage.checkIfMessageIdBelongsToChatId(endMessageId, chatId)) {
                 throw new MessageIdDoesNotBelongToChatIdException(path);
             }
-
-            //get CreationTs of endCreationTs 
+            /*
+                * Gets CreationTs of endMessageId
+                */
             endCreationTs = queryMessage.getCreationTsForMessageId(endMessageId);
         } else {
             endCreationTs = null;
         }
 
         if (startCreationTs != null && endCreationTs != null) {
-            //check if startMessageId is after endMessageId
+            /*
+                * Checks if startCreationTs is after endCreationTs
+                */
             if (startCreationTs.compareTo(endCreationTs) > 0) {
                 Timestamp temp = startCreationTs;
                 startCreationTs = endCreationTs;
                 endCreationTs = temp;
             }
-            //get messages within the required time frame
+            /*
+                * Gets messages within the required time frame
+                */
             messages = queryMessage.listCountMessagesOfChatIdWithinGivenTime(startCreationTs, endCreationTs, count, chatId);
         } else if (startCreationTs != null) {
-            //get messages beginning at the start time
+            /*
+                * Gets messages beginning at the start time
+                */
             messages = queryMessage.listCountMessagesOfChatIdFromStartTime(startCreationTs, count, chatId);
         } else if (endCreationTs != null) {
-            //get messages before the end time
+            /*
+                * Gets messages before the end time
+                */
             messages = queryMessage.listCountMessagesOfChatIdBeforeEndTime(endCreationTs, count, chatId);
         } else {
-            //get latest messages 
+            /*
+                * Gets latest messages
+                */ 
             messages = queryMessage.listLatestCountMessagesOfChatId(count, chatId);
         }
-
-        //check ReceivedTs of each message not sent by current user- if it is null set it to the time when listMessages was called
+        
+        /*
+            * Checks ReceivedTs of each message not sent by current user- if it is null set it to the time when listMessages was called
+            */
         for (Message message : messages) {
             if (message.getReceivedTs() == null && message.getSenderId() != userId) {
                 message.setReceivedTs(receivedTs);

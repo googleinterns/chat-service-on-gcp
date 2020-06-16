@@ -22,7 +22,6 @@ public final class ChatAccessor {
     private SpannerTemplate spannerTemplate;
 
     public void insertLastSentMessageId(Chat chat) {
-        //must insert PK even in partial update
         spannerTemplate.update(chat, "ChatID", "LastSentMessageID");
     }
 

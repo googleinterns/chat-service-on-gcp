@@ -56,19 +56,25 @@ public final class CreateChat {
 
         long userId = Long.parseLong(userIdString);
 
-        //check if request body is as required
+        /*
+            * Checks if request body is as required
+            */
         if (!requestBody.containsKey("username")) {
             throw new UsernameMissingFromRequestBodyException(path);
         }
 
         String username = requestBody.get("username");
 
-        //check if the passed userId is valid
+        /*
+            * Checks if the passed userId is valid
+            */
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
 
-        //check if username of second user exists - error if does not
+        /*
+            * Checks if username of second user exists
+            */
         if (!queryUser.checkIfUsernameExists(username)) {
             throw new UsernameDoesNotExistException(path);
         } 
@@ -77,13 +83,17 @@ public final class CreateChat {
         UserChat newUserChat1 = UserChat.newUserChatWithUserId(userId);
         UserChat newUserChat2 = UserChat.newUserChatWithUserId(queryUser.getUserIdFromUsername(username));
 
-        //check if chat between the users already exists
+        /*
+            * Checks if chat between the users already exists
+            */
         List<UserChat> resultSet = queryUserChat.getChatIdIfChatExistsBetweenUserIds(newUserChat1.getUserId(), newUserChat2.getUserId());
         if (!resultSet.isEmpty()) {
             return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", resultSet.get(0).getChatId());
         } 
         
-        //generate unique chatId
+        /*
+            * Generates unique chatId
+            */
         newChat.setChatId(uniqueIdGenerator.generateUniqueId("Chat"));
 
         newUserChat1.setChatId(newChat.getChatId());

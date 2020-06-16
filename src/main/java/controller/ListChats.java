@@ -89,7 +89,9 @@ public final class ListChats {
 
         long userId = Long.parseLong(userIdString);
         
-        //check if the passed userId is valid
+        /*
+            * Checks if the passed userId is valid
+            */
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
