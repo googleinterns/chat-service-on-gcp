@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.chat">
+    package="com.interns.chat">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.example.chat.ViewContactsActivity"
+            android:name="com.gpayinterns.chat.ViewContactsActivity"
             android:label="Contacts"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
@@ -24,37 +24,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.chat.LoginActivity">
+        <activity android:name="com.gpayinterns.chat.LoginActivity">
         </activity>
         <activity
-            android:name="com.example.chat.ViewMessageActivity"
-            android:parentActivityName="com.example.chat.ViewContactsActivity" />
-        <activity android:name="com.example.chat.RegistrationActivity" />
-        <activity android:name=".NewMessageActivity" android:label="New Message" android:parentActivityName=".ViewContactsActivity"/>
+            android:name="com.gpayinterns.chat.ViewMessageActivity"
+            android:parentActivityName="com.gpayinterns.chat.ViewContactsActivity" />
+        <activity android:name="com.gpayinterns.chat.RegistrationActivity" />
+        <activity android:name="com.gpayinterns.chat.NewMessageActivity" android:label="New Message" android:parentActivityName="com.gpayinterns.chat.ViewContactsActivity"/>
 
-
-        <activity
-            android:name="com.facebook.FacebookActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name" />
-
-        <activity
-            android:name="com.facebook.CustomTabActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="@string/fb_login_protocol_scheme" />
-            </intent-filter>
-        </activity>
-
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
         <provider
-            android:name="com.example.chat.ChatContentProvider"
-            android:authorities="com.example.chat.provider"
+            android:name="com.gpayinterns.chat.ChatContentProvider"
+            android:authorities="com.interns.chat.provider"
             android:enabled="true"
             android:exported="true" />
     </application>

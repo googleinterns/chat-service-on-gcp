@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.gpayinterns.chat;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -7,7 +7,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import util.User;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -33,8 +32,8 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.interns.chat.R;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -358,7 +357,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
     private void switchToViewMessages()
     {
-
+        finish();
     }
 
 

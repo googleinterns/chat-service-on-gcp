@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.interns.chat;
 
 import android.content.Context;
 

@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.gpayinterns.chat;
 
 import android.provider.BaseColumns;
 

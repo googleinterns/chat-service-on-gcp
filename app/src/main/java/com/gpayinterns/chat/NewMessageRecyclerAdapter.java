@@ -1,21 +1,17 @@
-package com.example.chat;
+package com.gpayinterns.chat;
 
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import com.interns.chat.R;
+
 import java.util.List;
-import java.util.ListIterator;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class NewMessageRecyclerAdapter extends RecyclerView.Adapter <NewMessageRecyclerAdapter.ViewHolder>
@@ -36,7 +32,7 @@ public class NewMessageRecyclerAdapter extends RecyclerView.Adapter <NewMessageR
     public NewMessageRecyclerAdapter(Context context, List<String> messages)
     {
         mContext = context;
-        mMessages=messages;
+        mMessages = messages;
         mLayoutInflater = LayoutInflater.from(mContext);
     }
 

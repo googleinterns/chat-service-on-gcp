@@ -1,15 +1,8 @@
-package com.example.chat;
+package com.gpayinterns.chat;
 
 
-import android.content.ContentValues;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.os.SystemClock;
-import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -25,8 +18,7 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.chat.DatabaseContract.chatEntry;
-import com.example.chat.DatabaseContract.userEntry;
+import com.interns.chat.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

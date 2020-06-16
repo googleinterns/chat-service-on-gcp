@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.gpayinterns.chat;
 
 
 import android.content.Intent;
@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.interns.chat.R;
 
 import java.util.Objects;
 import java.util.regex.Pattern;

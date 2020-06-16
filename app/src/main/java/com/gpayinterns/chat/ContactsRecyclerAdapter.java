@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.gpayinterns.chat;
 
 
 import android.content.Context;
@@ -13,6 +13,8 @@ import android.widget.Filterable;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+
+import com.interns.chat.R;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.gpayinterns.chat;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.interns.chat.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -137,6 +138,7 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
         currentUser = mPrefs.getString("currentUser","");
+        //TODO add this when login is done properly
 //        if(currentUser.equals(""))
 //        {
 //            startActivity(new Intent(this,LoginActivity.class));

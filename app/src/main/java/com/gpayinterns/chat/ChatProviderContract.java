@@ -1,4 +1,4 @@
-package com.example.chat;
+package com.gpayinterns.chat;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -7,7 +7,7 @@ public final class ChatProviderContract
 {
     private ChatProviderContract() {};
 
-    public static final String AUTHORITY = "com.example.chat.provider";
+    public static final String AUTHORITY = "com.gpayinterns.chat.provider";
     public static final Uri AUTHORITY_URI = Uri.parse("content://" + AUTHORITY);
 
 
