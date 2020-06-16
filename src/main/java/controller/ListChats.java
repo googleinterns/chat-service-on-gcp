@@ -47,6 +47,9 @@ public final class ListChats {
     @Autowired
     private UniqueIdGenerator uniqueIdGenerator;
 
+    /**
+     * Encapsulation for ChatId and Username of one of the Users engaged in that Chat 
+     */
     public static final class UsernameChatId {
 
         @Column(name = "Username")
