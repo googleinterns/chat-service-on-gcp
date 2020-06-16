@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Generator which generates a unique Id for a newly created object of User, Chat or Message.
+ */
 @Component
 public final class UniqueIdGenerator {
 
