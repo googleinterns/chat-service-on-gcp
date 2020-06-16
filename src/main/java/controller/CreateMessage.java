@@ -50,6 +50,10 @@ public final class CreateMessage {
     @Autowired
     private UniqueIdGenerator uniqueIdGenerator; 
 
+    /**
+     * Responds to requests with missing userId and chatId URL Path Variables.
+     * Throws an exception for missing userId URL Path Variable. 
+     */
     @PostMapping("/users/chats/messages")
     public void createMessageWithoutUserIdChatIdPathVariable(HttpServletRequest request) {
 
@@ -58,6 +62,10 @@ public final class CreateMessage {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing userId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @PostMapping("/users/chats/{chatId}/messages")
     public void createMessageWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -66,6 +74,10 @@ public final class CreateMessage {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @PostMapping("/users/{userId}/chats/messages")
     public void createMessageWithoutChatIdPathVariable(HttpServletRequest request) {
 
@@ -73,6 +85,11 @@ public final class CreateMessage {
         throw new ChatIdMissingFromRequestURLPathException(path);
     }
     
+    /**
+     * Responds to complete requests.
+     * Creates and sends a Message from current User in the given Chat.
+     * Returns MessageId of the sent Message.
+     */
     @PostMapping("/users/{userId}/chats/{chatId}/messages")
     public Map<String, Object> createMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         

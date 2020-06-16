@@ -36,6 +36,10 @@ public final class GetChat {
     @Autowired
     private UserChatAccessor queryUserChat;
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users/chats/{chatId}")
     public void getChatWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -44,6 +48,10 @@ public final class GetChat {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to complete requests.
+     * Returns details of the requested Chat.
+     */
     @GetMapping("/users/{userId}/chats/{chatId}")
     public Map<String, Object> getChat(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, HttpServletRequest request) {
 

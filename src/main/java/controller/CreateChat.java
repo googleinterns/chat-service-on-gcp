@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * Controller which responds to client requests to create a chat between two users.
- * Sends the ChatId of the newly created chat (or of the already existing chat between the two users) in response.
+ * Controller which responds to client requests to create a Chat between two Users.
+ * Sends the ChatId of the newly created Chat (or of the already existing Chat between the two Users) in response.
  */
 @RestController
 public final class CreateChat {
@@ -44,6 +44,10 @@ public final class CreateChat {
     @Autowired
     private UniqueIdGenerator uniqueIdGenerator;
 
+    /**
+     * Responds to requests with missing userId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @PostMapping("/users/chats")
     public void createChatWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -52,6 +56,11 @@ public final class CreateChat {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to complete requests.
+     * Creates a Chat between the two Users, if does not already exist.
+     * Returns ChatId of the Chat between the two Users.
+     */
     @PostMapping("/users/{userId}/chats")
     public Map<String, Object> createChat(@PathVariable("userId") String userIdString, 
     @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
@@ -88,7 +97,7 @@ public final class CreateChat {
         UserChat newUserChat2 = UserChat.newUserChatWithUserId(queryUser.getUserIdFromUsername(username));
 
         /*
-         * Checks if chat between the users already exists
+         * Checks if Chat between the users already exists
          */
         List<UserChat> resultSet = queryUserChat.getChatIdIfChatExistsBetweenUserIds(newUserChat1.getUserId(), newUserChat2.getUserId());
         if (!resultSet.isEmpty()) {
@@ -96,7 +105,7 @@ public final class CreateChat {
         } 
         
         /*
-         * Generates unique chatId
+         * Generates unique ChatId
          */
         newChat.setChatId(uniqueIdGenerator.generateUniqueId("Chat"));
 

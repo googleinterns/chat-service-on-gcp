@@ -60,6 +60,10 @@ public final class ListMessages {
     
     private static final int LOWER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN = 50;
 
+    /**
+     * Responds to requests with missing userId and chatId URL Path Variables.
+     * Throws an exception for missing userId URL Path Variable. 
+     */
     @GetMapping("/users/chats/messages")
     public void listMessagesWithoutUserIdChatIdPathVariable(HttpServletRequest request) {
 
@@ -68,6 +72,10 @@ public final class ListMessages {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users/chats/{chatId}/messages")
     public void listMessagesWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -76,6 +84,10 @@ public final class ListMessages {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users/{userId}/chats/messages")
     public void listMessagesWithoutChatIdPathVariable(HttpServletRequest request) {
 
@@ -84,6 +96,10 @@ public final class ListMessages {
         throw new ChatIdMissingFromRequestURLPathException(path);
     }
     
+    /**
+     * Responds to complete requests.
+     * Returns the list of message details of the given Chat.
+     */
     @GetMapping("/users/{userId}/chats/{chatId}/messages")
     public Map<String, List<Map<String, Object>>> listMessages(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestParam(value = "startMessageId", required = false) String startMessageIdString, @RequestParam(value = "endMessageId", required = false) String endMessageIdString, @RequestParam(value = "count", required = false) String countString, HttpServletRequest request) {
 

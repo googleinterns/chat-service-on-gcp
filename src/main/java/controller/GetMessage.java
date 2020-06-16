@@ -48,14 +48,10 @@ public final class GetMessage {
     @Autowired
     private UserChatAccessor queryUserChat;
 
-    @GetMapping("/users/{userId}/chats/messages/{messageId}")
-    public void getMessageWithoutChatIdPathVariable(HttpServletRequest request) {
-
-        String path = request.getRequestURI();
-
-        throw new ChatIdMissingFromRequestURLPathException(path);
-    }
-
+    /**
+     * Responds to requests with missing userId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users/chats/{chatId}/messages/{messageId}")
     public void getMessageWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -64,6 +60,22 @@ public final class GetMessage {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
+    @GetMapping("/users/{userId}/chats/messages/{messageId}")
+    public void getMessageWithoutChatIdPathVariable(HttpServletRequest request) {
+
+        String path = request.getRequestURI();
+
+        throw new ChatIdMissingFromRequestURLPathException(path);
+    }
+
+    /**
+     * Responds to complete requests.
+     * Returns details of the requested Message.
+     */
     @GetMapping("/users/{userId}/chats/{chatId}/messages/{messageId}")
     public Map<String, Object> getMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @PathVariable("messageId") String messageIdString, HttpServletRequest request) {
 

@@ -30,6 +30,10 @@ public final class CreateUser {
     @Autowired
     private UniqueIdGenerator uniqueIdGenerator;
     
+    /**
+     * Creates a new User with the given username.
+     * Returns UserId of the new User.
+     */
     @PostMapping("/users")
     public Map<String, Object> createUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
 

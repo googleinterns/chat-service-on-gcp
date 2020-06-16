@@ -26,6 +26,10 @@ public final class GetUser {
     @Autowired 
     private UserAccessor queryUser;
 
+    /**
+     * Responds to requests with missing userId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users")
     public void getUserWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -34,6 +38,10 @@ public final class GetUser {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to complete requests.
+     * Returns details of the requested User.
+     */
     @GetMapping("/users/{userId}")
     public Map<String, Object> getUser(@PathVariable("userId") String userIdString, HttpServletRequest request) {
 

@@ -71,6 +71,13 @@ public final class ListChats {
         }
     }
 
+    /**
+     * Returns details of given Chat in a Map.
+     * Details include:
+     * (1)  ChatId
+     * (2)  Username (of the other user)
+     * (3)  LastSentMessageId
+     */
     Map<String, Object> getChatInfoOfChatInMap(Chat chat, String usernameOfSecondUser) {
         
         Map<String, Object> chatInfoOfChatInMap = new LinkedHashMap<String, Object>();
@@ -81,6 +88,10 @@ public final class ListChats {
         return chatInfoOfChatInMap;
     }
 
+    /**
+     * Responds to requests with missing userId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users/chats")
     public void listChatsWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -89,6 +100,10 @@ public final class ListChats {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to complete requests.
+     * Returns the list of chats which the User id engaged in.
+     */
     @GetMapping("/users/{userId}/chats")
     public Map<String,List<Map<String, Object>>> listChats(@PathVariable("userId") String userIdString, HttpServletRequest request) {
         
