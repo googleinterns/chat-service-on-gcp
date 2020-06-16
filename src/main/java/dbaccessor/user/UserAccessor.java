@@ -10,6 +10,9 @@ import java.util.List;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
+/**
+ * Accessor which performs database accesses for the User entity.
+ */
 @Component
 public final class UserAccessor {
     

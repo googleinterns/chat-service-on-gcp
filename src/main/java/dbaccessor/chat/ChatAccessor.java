@@ -12,6 +12,9 @@ import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerOperations;
 
+/**
+ * Accessor which performs database accesses for the Chat entity.
+ */
 @Component
 public final class ChatAccessor {
     
