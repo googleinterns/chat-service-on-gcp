@@ -20,7 +20,9 @@ public final class UniqueIdGenerator {
     @Autowired
     private MessageAccessor queryMessage; 
     
-    //generates long type unique Id value for the given table and its corres Id attribute
+    /**
+     * Generates long type unique Id value for the given table and its corres Id attribute
+     */
     public long generateUniqueId(String tableName) {
 
         long id;

@@ -17,17 +17,23 @@ public final class MessageAccessor {
     @Autowired
     private SpannerTemplate spannerTemplate;
 
-    //called to insert all fields in message - its usage till now is to insert all fields (with ReceivedTs = null) when createChat is called
+    /**
+     * Inserts all fields of a message in Message
+     */
     public void insertAllForTextMessage(Message message) {
         spannerTemplate.insert(message);
     } 
 
-    //called to update the Received Ts of a message after ListChats is called by the Receiver
+    /**
+     * Updates the ReceivedTs of a message
+     */
     public void insertReceivedTs(Message message) {
         spannerTemplate.update(message, "MessageID", "ReceivedTS");
     }
 
-    //to check if message with passed messageId exists
+    /**
+     * Checks if message with passed messageId exists
+     */
     public boolean checkIfMessageIdExists(long messageId) {
 
         String SQLStatment = "SELECT MessageID FROM Message WHERE MessageID=@messageId";
@@ -37,7 +43,9 @@ public final class MessageAccessor {
         return (!resultSet.isEmpty());
     }
 
-    //to get the message whose Id = passed messageId 
+    /**
+     * Gets the message whose Id = passed messageId 
+     */
     public Message getMessage(long messageId) {
 
         String SQLStatment = "SELECT * FROM Message WHERE MessageID=@messageId";
@@ -47,7 +55,9 @@ public final class MessageAccessor {
         return resultSet.get(0);
     }
 
-    //to get only the CreationTs field of the message with the passed messageId
+    /**
+     * Gets only the CreationTs field of the message with the passed messageId
+     */
     public Timestamp getCreationTsForMessageId(long messageId) {
 
         String SQLStatment = "SELECT CreationTS FROM Message WHERE MessageID=@messageId";
@@ -57,7 +67,9 @@ public final class MessageAccessor {
         return resultSet.get(0).getCreationTs();
     }
 
-    //to check if given message belongs to given chat
+    /**
+     * Checks if given message belongs to given chat
+     */
     public boolean checkIfMessageIdBelongsToChatId(long messageId, long chatId) {
         
         String SQLStatment = "SELECT MessageID FROM Message WHERE MessageID=@messageId and ChatID=@chatId";
