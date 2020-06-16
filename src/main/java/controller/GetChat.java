@@ -61,16 +61,10 @@ public final class GetChat {
         long userId = Long.parseLong(userIdString);
         long chatId = Long.parseLong(chatIdString);
 
-        /*
-         * Checks if the passed userId is valid.
-        */
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
         
-        /*
-         * Checks if the passed chatId is valid.
-         */
         if (!queryChat.checkIfChatIdExists(chatId)) {
             throw new ChatIdDoesNotExistException(path);
         } 

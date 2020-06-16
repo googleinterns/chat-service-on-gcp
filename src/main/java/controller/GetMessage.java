@@ -86,16 +86,10 @@ public final class GetMessage {
         long chatId = Long.parseLong(chatIdString);
         long messageId = Long.parseLong(messageIdString);
 
-        /*
-         * Checks if the passed userId is valid.
-         */
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
         
-        /*
-         * Checks if the passed chatId is valid.
-         */
         if (!queryChat.checkIfChatIdExists(chatId)) {
             throw new ChatIdDoesNotExistException(path);
         }
@@ -107,16 +101,10 @@ public final class GetMessage {
             throw new UserChatIdDoesNotExistException(path);
         }
         
-        /*
-         * Checks if the passed messageId is valid.
-         */
         if (!queryMessage.checkIfMessageIdExists(messageId)) {
             throw new MessageIdDoesNotExistException(path);
         }
 
-        /*
-         * Checks if the passed message belongs to chat.
-         */
         if (!queryMessage.checkIfMessageIdBelongsToChatId(messageId, chatId)) {
             throw new MessageIdDoesNotBelongToChatIdException(path);
         }

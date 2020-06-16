@@ -98,34 +98,22 @@ public final class CreateMessage {
         long userId = Long.parseLong(userIdString);
         long chatId = Long.parseLong(chatIdString);
 
-        /*
-         * Checks if request body is as required.
-         */
         if (!requestBody.containsKey("contentType")) {
             throw new ContentTypeMissingFromRequestBodyException(path);
         }
 
         String contentType = requestBody.get("contentType");
 
-        /*
-         * Checks if request body is as required.
-         */
         if (!requestBody.containsKey("textContent")) {
             throw new TextContentMissingFromRequestBodyException(path);
         }
 
         String textContent = requestBody.get("textContent");
-        
-        /*
-         * Checks if the passed userId is valid.
-         */
+       
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
         
-        /*
-         * Checks if the passed chatId is valid.
-         */
         if (!queryChat.checkIfChatIdExists(chatId)) {
             throw new ChatIdDoesNotExistException(path);
         }
