@@ -25,6 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * Controller which responds to client requests to create (and send) a message in a chat.
+ * Sends the MessageId of the newly created message in response.
+ */
 @RestController
 public final class CreateMessage {
 

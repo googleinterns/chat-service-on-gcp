@@ -26,6 +26,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/**
+ * Controller which responds to client requests to get the list of messages of a chat.
+ * Each entry in the response contains:
+ * (1)  MessageId
+ * (2)  CreationTs
+ * (3)  ChatId
+ * (4)  SentByCurrentUser
+ * (5)  ContentType
+ * (6)  TextContent
+ * (7)  SentTs
+ * (8)  ReceivedTs
+ */
 @RestController
 public final class ListMessages {
 

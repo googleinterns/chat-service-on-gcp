@@ -22,6 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * Controller which responds to client requests to create a chat between two users.
+ * Sends the ChatId of the newly created chat (or of the already existing chat between the two users) in response.
+ */
 @RestController
 public final class CreateChat {
     

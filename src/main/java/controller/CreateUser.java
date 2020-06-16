@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * Controller which responds to client requests to create (and register) a new user.
+ * Sends the UserId of the newly created user in response.
+ */
 @RestController
 public final class CreateUser {
 

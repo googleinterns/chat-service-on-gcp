@@ -17,6 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 
+/**
+ * Controller which responds to client requests to get the details of a chat.
+ * The response contains:
+ * (1)  ChatId
+ * (2)  LastSentMessageId
+ * (3)  CreationTs
+ */
 @RestController
 public final class GetChat {
     

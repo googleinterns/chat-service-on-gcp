@@ -25,6 +25,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import com.google.cloud.Timestamp;
 
+/**
+ * Controller which responds to client requests to get the list of chats which the user is engaged in.
+ * Each entry in the response contains:
+ * (1)  ChatId
+ * (2)  Username of the other user
+ * (3)  LastSentMessageId
+ */
 @RestController
 public final class ListChats {
     

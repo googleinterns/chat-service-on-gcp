@@ -13,6 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 
+/**
+ * Controller which responds to client requests to get the details of the user itself.
+ * The response contains:
+ * (1)  UserId
+ * (2)  Username
+ * (3)  CreationTs
+ */
 @RestController
 public final class GetUser {
 
