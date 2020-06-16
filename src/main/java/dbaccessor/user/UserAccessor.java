@@ -2,7 +2,7 @@ package dbaccessor.user;
 
 import entity.User;
 
-import helper.UniqueIDGenerator;
+import helper.UniqueIdGenerator;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
@@ -19,7 +19,7 @@ public class UserAccessor {
     SpannerTemplate spannerTemplate;
 
     @Autowired
-    private UniqueIDGenerator uniqueIDGenerator;
+    private UniqueIdGenerator uniqueIDGenerator;
 
     /* Inserts new entry in User Table */
     public long insert(User user) {

@@ -1,22 +1,13 @@
 package helper;
 
-import exceptions.APIException;
-
 import dbaccessor.user.UserAccessor;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedHashMap;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
-public class UniqueIDGenerator {
+public class UniqueIdGenerator {
 
     @Autowired
     UserAccessor queryUser;
