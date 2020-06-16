@@ -1,26 +1,54 @@
 package helper;
 
 import dbaccessor.user.UserAccessor;
+import dbaccessor.chat.ChatAccessor;
+import dbaccessor.message.MessageAccessor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
-public class UniqueIdGenerator {
+public final class UniqueIdGenerator {
 
     @Autowired
-    UserAccessor queryUser;
+    private UserAccessor queryUser;
+
+    @Autowired
+    private ChatAccessor queryChat;
+
+    @Autowired
+    private MessageAccessor queryMessage; 
     
-    /* Generates long type unique ID value for the given table and its corres ID attribute */
-    public long generateUniqueID(String tableName) {
+    //generates long type unique Id value for the given table and its corres Id attribute
+    public long generateUniqueId(String tableName) {
+
         long id;
+
         while (true) {
-            // Generates ID in range [1, Long.MAX_VALUE)
             id = ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE);
+
             switch (tableName) {
                 case "User": 
-                    if (queryUser.checkIfUserIDExists(id)) {continue;} else {return id;}
+                    if (!queryUser.checkIfUserIdExists(id)) {
+                        return id;
+                    } 
+                    break;
+
+                case "Chat": 
+                    if (!queryChat.checkIfChatIdExists(id)) {
+                        return id;
+                    } 
+                    break;
+
+                case "Message": 
+                    if (!queryMessage.checkIfMessageIdExists(id)) {
+                        return id;
+                    }
+                    break;
+                
+                default: 
+                    throw new IllegalArgumentException("Invalid DB Relation Name passed to UniqueIdGenerator");
             }
         }
     }

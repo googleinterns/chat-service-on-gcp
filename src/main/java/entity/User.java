@@ -90,6 +90,10 @@ public class User {
   public String getPicture(){
     return this.Picture;
   }
+  
+  public Timestamp getCreationTs() {
+    return this.CreationTS;
+  }
 
   public void setUserID(long id){
     this.UserID = id;
@@ -114,5 +118,8 @@ public class User {
   public void setPicture(String picture){
     this.Picture = picture;
   }
-
+  
+  public void setCreationTs(Timestamp creationTs) {
+    this.CreationTS = creationTs;
+  }
 }

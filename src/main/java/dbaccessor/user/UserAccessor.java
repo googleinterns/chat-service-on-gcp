@@ -1,12 +1,12 @@
 package dbaccessor.user;
 
 import entity.User;
+import controller.ListChats;
 
 import helper.UniqueIdGenerator;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
-
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
@@ -97,5 +97,37 @@ public class UserAccessor {
             return null;
         }
         return resultSet.get(0);
+      
+    }
+    
+    public void insertAll(User user) {
+        spannerTemplate.insert(user);
+    } 
+
+    public boolean checkIfUsernameExists(String username) {
+
+        String SQLStatment = "SELECT Username FROM User WHERE Username=@username";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("username").to(username).build();
+        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
+ 
+        return (!resultSet.isEmpty());
+    }
+
+    public User getUser(long userId) {
+
+        String SQLStatment = "SELECT * FROM User WHERE UserID=@userId";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
+        List<User> resultSet = spannerTemplate.query(User.class, statement, null);
+ 
+        return resultSet.get(0);
+    }
+
+    public List<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
+
+        String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
+        List<ListChats.UsernameChatId> resultSet = spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+ 
+        return resultSet;
     }
 }

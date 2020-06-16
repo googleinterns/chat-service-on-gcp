@@ -3,13 +3,13 @@ package main;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
  
-//This annotation tells that this class is the starting point of our application
-//The argument passed are the packages which we would like Spring to scan for Spring components.
+//this annotation tells that this class is the starting point of our application 
+//the argument passed are the packages which we would like Spring to scan for Spring components. 
 //Refer: https://smarterco.de/java-spring-boot-mvc-ontroller-not-called/
-@SpringBootApplication(scanBasePackages = {"entity", "controller", "dbaccessor", "helper", "main"})
+@SpringBootApplication(scanBasePackages = {"entity", "controller", "dbaccessor", "exceptionhandler", "helper", "main"})
 public class MainClass {
     public static void main(String[] args) {
-        //To start running the application
+        //to start running the application
         SpringApplication.run(MainClass.class, args);
     }
 }
