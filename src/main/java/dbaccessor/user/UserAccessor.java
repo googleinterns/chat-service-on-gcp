@@ -23,8 +23,8 @@ public class UserAccessor {
 
     /* Inserts new entry in User Table */
     public long insert(User user) {
-        long id = uniqueIDGenerator.generateUniqueID("User");
-        user.setUserID(id);
+        long id = uniqueIDGenerator.generateUniqueId("User");
+        user.setUserId(id);
         spannerTemplate.insert(user);
         return id;
     }
@@ -44,7 +44,7 @@ public class UserAccessor {
     }
 
     /* Checks if there is a row in the User table having the given UserID */
-    public boolean checkIfUserIDExists(long id) {
+    public boolean checkIfUserIdExists(long id) {
         String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userID";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("UserID")
@@ -56,7 +56,7 @@ public class UserAccessor {
     }
 
     /* Retrieves UserID of user having the given username */
-    public long getUserIDFromUsername(String username) {
+    public long getUserIdFromUsername(String username) {
         String SQLStatment = "SELECT UserID FROM User WHERE Username=@Username";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
@@ -64,7 +64,7 @@ public class UserAccessor {
                                 .build();
         return spannerTemplate
                 .query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true))
-                .get(0).getUserID();
+                .get(0).getUserId();
     }
 
     /* Retrieves the UserID of the user having the given username and password
@@ -81,7 +81,7 @@ public class UserAccessor {
         if(resultSet.isEmpty()) {
             return -1;
         }
-        return resultSet.get(0).getUserID();
+        return resultSet.get(0).getUserId();
     }
 
     /* Retrieves UserID, Username, EmailID, MobileNo and Picture of the user having the given username

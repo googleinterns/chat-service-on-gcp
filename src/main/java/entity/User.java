@@ -67,7 +67,22 @@ public class User {
     this(-1, username, password, emailID, mobileNo, base64Image);
   }
 
-  public long getUserID(){
+  public User(long userId, String username) {
+    this.UserID = userId;
+    this.Username = username;
+  }
+
+  public User(long userId) {
+    this.UserID = userId;
+    this.Username = null;
+  }
+
+  public User(String username) {
+    this.UserID = 0;
+    this.Username = username;
+  }
+
+  public long getUserId(){
     return this.UserID;
   }
 
@@ -95,7 +110,7 @@ public class User {
     return this.CreationTS;
   }
 
-  public void setUserID(long id){
+  public void setUserId(long id){
     this.UserID = id;
   }
 

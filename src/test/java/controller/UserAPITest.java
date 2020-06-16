@@ -50,7 +50,7 @@ public class UserAPITest {
         assertEquals(200, response.getStatusCodeValue());
         Map<String, Object> body = response.getBody();
         assertTrue(body.containsKey("message"));
-        assertTrue(body.containsKey("UserID"));
+        assertTrue(body.containsKey("UserId"));
         assertTrue(body.get("message").equals("Success"));
     }
 
@@ -67,7 +67,7 @@ public class UserAPITest {
         assertEquals(200, response.getStatusCodeValue());
         Map<String, Object> body = response.getBody();
         assertTrue(body.containsKey("message"));
-        assertTrue(body.containsKey("UserID"));
+        assertTrue(body.containsKey("UserId"));
         assertTrue(body.get("message").equals("Success"));
     }
 

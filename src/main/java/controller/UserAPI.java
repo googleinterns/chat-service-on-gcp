@@ -101,7 +101,7 @@ public class UserAPI {
             throw new UserNotFoundException(path);
         }
         Map<String, Object> response = new HashMap<>();
-        response.put("UserID", user.getUserID());
+        response.put("UserID", user.getUserId());
         response.put("Username", username);
         response.put("EmailID", user.getEmailID());
         response.put("MobileNo", user.getMobileNumber());

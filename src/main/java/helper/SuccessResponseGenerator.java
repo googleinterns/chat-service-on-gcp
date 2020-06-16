@@ -26,7 +26,8 @@ public final class SuccessResponseGenerator {
     public static Map<String, Object> getSuccessResponseForLogin(long ID) {
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
         responseBody.put("message", "Success");
-        responseBody.put("UserID", ID);
+        responseBody.put("UserId", ID);
+        return responseBody;
     }
 
     public static Map<String, Object> getSuccessResponseForGetUser(User user) {
