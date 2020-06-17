@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +72,7 @@ public class UserAPI {
         }
 
         /* Checks if Username or email exists - throws exception if it does */
-        if (userAccessor.checkIfUserExists(username, emailID)) {
+        if (userAccessor.checkIfUserExists(username, emailID) != null) {
             throw new UserAlreadyExistsException(path);
         }
         User newUser = new User(username, password, emailID, mobileNo, base64Image);
@@ -109,5 +110,11 @@ public class UserAPI {
             response.put("Picture", user.getPicture());
         }
         return response;
+    }
+
+    @GetMapping("/googleSignIn")
+    public long googleSignIn(@RequestParam(value = "authCode", required = true) String authCode) throws IOException {
+        GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator(authCode);
+        return googleAuthenticator.getUser().getUserId();
     }
 }

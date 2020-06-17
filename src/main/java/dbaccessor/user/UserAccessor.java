@@ -30,7 +30,7 @@ public class UserAccessor {
     }
 
     /* Checks if a user with the given username or email-id already exists in User table */
-    public boolean checkIfUserExists(String username, String emailID) {
+    public User checkIfUserExists(String username, String emailID) {
         String SQLStatment = "SELECT Username FROM User WHERE Username=@Username OR EmailID=@EmailID";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
@@ -38,9 +38,11 @@ public class UserAccessor {
                                 .bind("EmailID")
                                 .to(emailID)
                                 .build();
-        return !spannerTemplate
-                .query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)) //setAllowPartialRead for reading specific columns
-                .isEmpty();
+        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
+        if(resultSet.isEmpty()) {
+            return null;
+        }
+        return resultSet.get(0);
     }
 
     /* Checks if there is a row in the User table having the given UserID */

@@ -50,7 +50,7 @@ public class User {
     this.Password = password;
     this.EmailID = emailID;
     this.MobileNo = mobileNo;
-    if(base64Image.length() != 0){
+    if(base64Image != null && base64Image.length() != 0){
       this.Picture = base64Image;
     } else {
       this.Picture = null;
@@ -65,6 +65,15 @@ public class User {
           String base64Image
   ) {
     this(-1, username, password, emailID, mobileNo, base64Image);
+  }
+
+  public User(
+          String username,
+          String emailID,
+          String mobileNo,
+          String base64Image
+  ) {
+    this(-1, username, null, emailID, mobileNo, base64Image);
   }
 
   public User(long userId, String username) {
