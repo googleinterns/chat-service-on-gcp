@@ -115,7 +115,6 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void sendMessageToServer(String messageText) throws JSONException
     {
-//        String SAMPLE_CURRENT_USER = "3441453482889885209";
         String URL = "https://gcp-chat-service.an.r.appspot.com/users/"
                 + currentUser + "/chats/"+chatID+"/messages";
 
@@ -227,7 +226,6 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void receivePreviousMessagesFromServer()
     {
-//        String SAMPLE_CURRENT_USER = "3441453482889885209";
         String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats/"+
                 chatID + "/messages?endMessageId="+messages.get(0).messageID;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -326,7 +324,6 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void firstReceiveMessageFromServer()
     {
-//        String SAMPLE_CURRENT_USER = "3441453482889885209";
         String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats/"+
                 chatID + "/messages?endMessageId="+lastMessageID;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -396,7 +393,6 @@ public class ViewMessageActivity extends AppCompatActivity
 
 
 
-//        String SAMPLE_CURRENT_USER = "3441453482889885209";
         String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats/"+
                 chatID + "/messages?startMessageId="+lastMessageID;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest

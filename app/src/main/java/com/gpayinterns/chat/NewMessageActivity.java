@@ -193,7 +193,6 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
     private void getChatID() throws JSONException
     {
-//        String SAMPLE_CURRENT_USER = "3441453482889885209";
         String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + currentUser+"/chats";
 
         String username = ((EditText)findViewById(R.id.new_message_username)).getText().toString();
@@ -271,7 +270,6 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
     private void sendFirstMessageToServer() throws JSONException
     {
-//        String SAMPLE_CURRENT_USER = "3441453482889885209";
         String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + currentUser
                 +"/chats/"+chatID+"/messages";
 
