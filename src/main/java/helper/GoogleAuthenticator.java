@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class GoogleAuthenticator {
 
@@ -72,14 +73,19 @@ public class GoogleAuthenticator {
         return phoneNumberList.get(0).getValue();
     }
 
-    public User getUser() throws IOException {
+    /** Retrieves the username and email-id of signed-in user
+     * Checks if an entry with the same username and email-id exists
+     * If it exists, then return the UserID of existing user
+     * Else create a new entry in the User table
+     * And return the UserID of the newly created user */
+    public long getOrCreateUser() throws IOException {
         GoogleIdToken idToken = tokenResponse.parseIdToken();
         GoogleIdToken.Payload payload = idToken.getPayload();
         String email = payload.getEmail();
         String username = googleUserMapper.getUsernameFromEmail(email);
-        User existingUser = userAccessor.checkIfUserExists(username, email);
-        if(existingUser != null) {
-            return existingUser;
+        Optional<Long> existingUser = userAccessor.getUserIdFromUsernameAndEmail(username, email);
+        if(existingUser.isPresent()) {
+            return existingUser.get();
         }
         String picture = null;
         Object pictureUrl = payload.get("picture");
@@ -88,6 +94,8 @@ public class GoogleAuthenticator {
         }
         String userId = payload.getSubject();
         String mobileNo = getPhoneNumber(userId);
-        return new User(username, email, mobileNo, picture);
+        User newUser = new User(username, email, mobileNo, picture);
+        long id = userAccessor.insert(newUser);
+        return id;
     }
 }

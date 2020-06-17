@@ -11,6 +11,7 @@ import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class UserAccessor {
@@ -29,9 +30,9 @@ public class UserAccessor {
         return id;
     }
 
-    /* Checks if a user with the given username or email-id already exists in User table */
-    public User checkIfUserExists(String username, String emailID) {
-        String SQLStatment = "SELECT Username FROM User WHERE Username=@Username OR EmailID=@EmailID";
+    /** Gets the UserID of the user having the given username and email-id */
+    public Optional<Long> getUserIdFromUsernameAndEmail(String username, String emailID) {
+        String SQLStatment = "SELECT Username FROM User WHERE Username=@Username AND EmailID=@EmailID";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
                                 .to(username)
@@ -40,9 +41,23 @@ public class UserAccessor {
                                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
         if(resultSet.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
-        return resultSet.get(0);
+        return Optional.of(resultSet.get(0).getUserId());
+    }
+
+    /** Checks if a user with the given username or email-id already exists in User table */
+    public boolean checkIfUserExists(String username, String emailID) {
+        String SQLStatment = "SELECT Username FROM User WHERE Username=@Username OR EmailID=@EmailID";
+        Statement statement = Statement.newBuilder(SQLStatment)
+                .bind("Username")
+                .to(username)
+                .bind("EmailID")
+                .to(emailID)
+                .build();
+        return !spannerTemplate
+                .query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true))
+                .isEmpty();
     }
 
     /* Checks if there is a row in the User table having the given UserID */

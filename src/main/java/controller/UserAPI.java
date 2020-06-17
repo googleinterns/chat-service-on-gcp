@@ -72,7 +72,7 @@ public class UserAPI {
         }
 
         /* Checks if Username or email exists - throws exception if it does */
-        if (userAccessor.checkIfUserExists(username, emailID) != null) {
+        if (userAccessor.checkIfUserExists(username, emailID)) {
             throw new UserAlreadyExistsException(path);
         }
         User newUser = new User(username, password, emailID, mobileNo, base64Image);
@@ -115,6 +115,6 @@ public class UserAPI {
     @GetMapping("/googleSignIn")
     public long googleSignIn(@RequestParam(value = "authCode", required = true) String authCode) throws IOException {
         GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator(authCode);
-        return googleAuthenticator.getUser().getUserId();
+        return googleAuthenticator.getOrCreateUser();
     }
 }
