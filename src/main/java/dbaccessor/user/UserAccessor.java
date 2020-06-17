@@ -33,6 +33,14 @@ public class UserAccessor {
         return id;
     }
 
+    /*
+     * Inserts all attributes of the given User in the DB.
+     * The userId of the User is present within the User object.
+     */ 
+    public void insertGivenUserId(User user) {
+        spannerTemplate.insert(user);
+    }
+
     /* Checks if a user with the given username or email-id already exists in User table */
     public boolean checkIfUserExists(String username, String emailID) {
         String SQLStatment = "SELECT Username FROM User WHERE Username=@Username OR EmailID=@EmailID";
