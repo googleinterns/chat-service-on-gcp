@@ -154,7 +154,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.login_button:
                 try
                 {
-                    signIn(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                    signIn();
                 }
                 catch (JSONException e)
                 {
@@ -179,7 +179,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginButton.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake));
     }
 
-    private void signIn(final String email, String password) throws JSONException
+    private void signIn() throws JSONException
     {
 
         if (!validateForm())

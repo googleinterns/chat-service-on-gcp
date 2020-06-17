@@ -53,6 +53,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
     private static final int CONTACT_PICKER_RESULT = 1;
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private String chatID;
+    private String messageText;
 
 
     @Override
@@ -109,7 +110,15 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         {
             try
             {
-                sendNewMessage();
+                messageText = messageEditText.getText().toString().trim();
+                if(messageText.equals(""))
+                    return;
+                getChatID();
+                messages.add(messageText);
+                messageRecyclerAdapter.notifyItemInserted(messages.size()-1);
+                recyclerMessages.smoothScrollToPosition(messages.size()-1);
+                messageEditText.setText("");
+                hideSoftKeyboard();
             }
             catch (JSONException e)
             {
@@ -181,21 +190,11 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void sendNewMessage() throws JSONException
-    {
-        String messageText = messageEditText.getText().toString().trim();
-        if(messageText.equals(""))
-        {
-            hideSoftKeyboard();
-            return;
-        }
-        getChatID();
-    }
 
     private void getChatID() throws JSONException
     {
-        String SAMPLE_CURRENT_USER = "3441453482889885209";
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + SAMPLE_CURRENT_USER+"/chats";
+//        String SAMPLE_CURRENT_USER = "3441453482889885209";
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + currentUser+"/chats";
 
         String username = ((EditText)findViewById(R.id.new_message_username)).getText().toString();
 
@@ -221,7 +220,6 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
                             {
                                 chatID = response.getString("ChatId");
                                 sendFirstMessageToServer();
-                                switchToViewMessages();
                             }
                         }
                         catch (JSONException e)
@@ -273,11 +271,10 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
     private void sendFirstMessageToServer() throws JSONException
     {
-        String SAMPLE_CURRENT_USER = "3441453482889885209";
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + SAMPLE_CURRENT_USER
+//        String SAMPLE_CURRENT_USER = "3441453482889885209";
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + currentUser
                 +"/chats/"+chatID+"/messages";
 
-        final String messageText  = messageEditText.getText().toString();
         Log.d("message sent to server: ",messageText);
 
         JSONObject jsonBody = new JSONObject();
@@ -299,12 +296,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
                             if(message.equals("Success"))
                             {
                                 String messageID = response.getString("MessageId");
-                                messages.add(messageText);
-                                messageRecyclerAdapter.notifyItemInserted(messages.size()-1);
-                                recyclerMessages.smoothScrollToPosition(messages.size()-1);
-                                messageEditText.setText("");
-                                hideSoftKeyboard();
-                                switchToViewMessages();
+                                switchToViewMessages(messageID);
                             }
                         }
                         catch (JSONException e)
@@ -355,8 +347,17 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
     }
 
-    private void switchToViewMessages()
+    private void switchToViewMessages(String lastMessageID)
     {
+        Intent intent = new Intent(this,ViewMessageActivity.class);
+
+        String username = ((EditText)findViewById(R.id.new_message_username)).getText().toString();
+
+        intent.putExtra(ViewMessageActivity.CHAT_ID,chatID);
+        intent.putExtra(ViewMessageActivity.CONTACT_USERNAME,username);
+        intent.putExtra(ViewMessageActivity.LAST_MESSAGE_ID,lastMessageID);
+
+        startActivity(intent);
         finish();
     }
 

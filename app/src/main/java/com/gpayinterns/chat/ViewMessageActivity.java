@@ -102,6 +102,8 @@ public class ViewMessageActivity extends AppCompatActivity
                 try
                 {
                     sendMessageToServer(messageText);
+                    messageEditText.setText("");
+                    hideSoftKeyboard();
                 }
                 catch (JSONException e)
                 {
@@ -113,9 +115,9 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void sendMessageToServer(String messageText) throws JSONException
     {
-        String SAMPLE_CURRENT_USER = "3441453482889885209";
+//        String SAMPLE_CURRENT_USER = "3441453482889885209";
         String URL = "https://gcp-chat-service.an.r.appspot.com/users/"
-                + SAMPLE_CURRENT_USER + "/chats/"+chatID+"/messages";
+                + currentUser + "/chats/"+chatID+"/messages";
 
 
         JSONObject jsonBody = new JSONObject();
@@ -140,7 +142,7 @@ public class ViewMessageActivity extends AppCompatActivity
                             if(message.equals("Success"))
                             {
                                 String lastMessageID = response.getString("MessageId");
-                                addMessageToScreen(lastMessageID);
+//                                addMessageToScreen(lastMessageID);
                             }
                         }
                         catch (JSONException e)
@@ -216,7 +218,8 @@ public class ViewMessageActivity extends AppCompatActivity
                 if (!recyclerView.canScrollVertically(-1))//-1 implies up
                 {
                     //User has hit top of view
-                    receivePreviousMessagesFromServer();
+                    if(!messages.isEmpty())
+                        receivePreviousMessagesFromServer();
                 }
             }
         });
@@ -224,8 +227,8 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void receivePreviousMessagesFromServer()
     {
-        String SAMPLE_CURRENT_USER = "3441453482889885209";
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ SAMPLE_CURRENT_USER +"/chats/"+
+//        String SAMPLE_CURRENT_USER = "3441453482889885209";
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats/"+
                 chatID + "/messages?endMessageId="+messages.get(0).messageID;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
@@ -323,8 +326,8 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void firstReceiveMessageFromServer()
     {
-        String SAMPLE_CURRENT_USER = "3441453482889885209";
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ SAMPLE_CURRENT_USER +"/chats/"+
+//        String SAMPLE_CURRENT_USER = "3441453482889885209";
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats/"+
                 chatID + "/messages?endMessageId="+lastMessageID;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
@@ -381,7 +384,7 @@ public class ViewMessageActivity extends AppCompatActivity
             }
         };
 
-        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
+        VolleyController.getInstance(this).addToRequestQueueWithRetry(jsonObjectRequest);
 
     }
 
@@ -393,8 +396,8 @@ public class ViewMessageActivity extends AppCompatActivity
 
 
 
-        String SAMPLE_CURRENT_USER = "3441453482889885209";
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ SAMPLE_CURRENT_USER +"/chats/"+
+//        String SAMPLE_CURRENT_USER = "3441453482889885209";
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats/"+
                 chatID + "/messages?startMessageId="+lastMessageID;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
@@ -475,8 +478,7 @@ public class ViewMessageActivity extends AppCompatActivity
         Log.d("here",Integer.toString(newMessage.size()));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
-        messageEditText.setText("");
-        hideSoftKeyboard();
+
     }
 
 

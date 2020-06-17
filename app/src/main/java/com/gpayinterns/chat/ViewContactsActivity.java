@@ -81,8 +81,8 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         Log.d("currentUser sent to server:",currentUser);
 
-        String SAMPLE_CURRENT_USER = "3441453482889885209";
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ SAMPLE_CURRENT_USER +"/chats";
+//        String SAMPLE_CURRENT_USER = "3441453482889885209";
+        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {
@@ -138,11 +138,10 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
         currentUser = mPrefs.getString("currentUser","");
-        //TODO add this when login is done properly
-//        if(currentUser.equals(""))
-//        {
-//            startActivity(new Intent(this,LoginActivity.class));
-//        }
+        if(currentUser.equals(""))
+        {
+            startActivity(new Intent(this,LoginActivity.class));
+        }
     }
 
     private void initializeDisplayContent()
