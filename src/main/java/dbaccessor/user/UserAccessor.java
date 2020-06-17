@@ -114,7 +114,6 @@ public class UserAccessor {
             return null;
         }
         return resultSet.get(0);
-      
     }
     
     public void insertAll(User user) {

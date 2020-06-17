@@ -32,6 +32,9 @@ public class UserAPI {
     private RequestValidator requestValidator;
 
     @Autowired
+    private GoogleAuthenticator googleAuthenticator;
+
+    @Autowired
     private ErrorResponseBody errorResponseBody;
 
     @ExceptionHandler(UserAlreadyExistsException.class)
@@ -114,7 +117,7 @@ public class UserAPI {
 
     @GetMapping("/googleSignIn")
     public long googleSignIn(@RequestParam(value = "authCode", required = true) String authCode) throws IOException {
-        GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator(authCode);
-        return googleAuthenticator.getOrCreateUser();
+        GoogleUser googleUser = googleAuthenticator.getGoogleUser(authCode);
+        return googleUser.getOrCreateUser();
     }
 }

@@ -76,6 +76,10 @@ public class User {
     this(-1, username, null, emailID, mobileNo, base64Image);
   }
 
+  public User(String username, String email, String picture) {
+    this(-1, username, null, email, null, picture);
+  }
+
   public User(long userId, String username) {
     this.UserID = userId;
     this.Username = username;
