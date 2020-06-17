@@ -127,9 +127,7 @@ public final class CreateMessage {
 
         newMessage.setMessageId(uniqueIdGenerator.generateUniqueId("Message"));
 
-        insertMessage.insertAllForTextMessage(newMessage);
-
-        insertChat.updateLastSentMessageId(new Chat(chatId, newMessage.getMessageId()));
+        insertMessage.insertForCreateMessageTransaction(newMessage, new Chat(chatId, newMessage.getMessageId()));
         
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Message", newMessage.getMessageId());
     }

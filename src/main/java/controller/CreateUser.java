@@ -53,7 +53,7 @@ public final class CreateUser {
 
         newUser.setUserId(uniqueIdGenerator.generateUniqueId("User"));
         
-        insertUser.insertAll(newUser);
+        insertUser.insertGivenUserId(newUser);
 
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", newUser.getUserId());
     }

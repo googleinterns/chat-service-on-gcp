@@ -1,5 +1,6 @@
 package dbaccessor.message;
 
+import entity.Chat;
 import entity.Message;
 
 import com.google.cloud.Timestamp;
@@ -10,6 +11,7 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
 import java.util.List;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
+import org.springframework.cloud.gcp.data.spanner.core.SpannerOperations;
 
 /**
  * Accessor which performs database accesses for the Message entity.
@@ -17,6 +19,9 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 @Component
 public final class MessageAccessor {
     
+    @Autowired
+    SpannerOperations spannerOperations;
+
     @Autowired
     private SpannerTemplate spannerTemplate;
 
@@ -32,6 +37,20 @@ public final class MessageAccessor {
      */
     public void updateReceivedTs(Message message) {
         spannerTemplate.update(message, "MessageID", "ReceivedTS");
+    }
+
+    /**
+     * Completes all DB insertions for the CreateMessage API in a single transaction.
+     */
+    public boolean insertForCreateMessageTransaction(Message message, Chat chat) {
+        return spannerOperations.performReadWriteTransaction(
+            transactionSpannerOperations -> {
+                transactionSpannerOperations.insert(message);
+                transactionSpannerOperations.update(chat, "ChatID", "LastSentMessageID");
+
+                return true;
+            }
+        );
     }
 
     /**
