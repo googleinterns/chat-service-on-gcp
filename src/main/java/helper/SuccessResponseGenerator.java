@@ -66,12 +66,18 @@ public final class SuccessResponseGenerator {
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetMessage API.
      */
-    public static Map<String, Object> getSuccessResponseForGetMessage(Message message) {
+    public static Map<String, Object> getSuccessResponseForGetMessage(Message message, long userId) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
         responseBody.put("MessageId", message.getMessageId());
         responseBody.put("ChatId", message.getChatId());
-        responseBody.put("SenderId", message.getSenderId());
+        
+        if (message.getSenderId() == userId) {
+            responseBody.put("SentByCurrentUser", true);
+        } else {
+            responseBody.put("SentByCurrentUser", false);
+        }
+
         responseBody.put("ContentType", message.getContentType());
         responseBody.put("TextContent", message.getTextContent());
         responseBody.put("SentTs", message.getSentTs());

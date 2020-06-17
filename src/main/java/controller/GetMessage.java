@@ -109,6 +109,6 @@ public final class GetMessage {
 
         Message message = queryMessage.getMessage(messageId);
     
-        return SuccessResponseGenerator.getSuccessResponseForGetMessage(message);
+        return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, userId);
     }
 }
