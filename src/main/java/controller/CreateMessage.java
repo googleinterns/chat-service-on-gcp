@@ -25,6 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * Controller which responds to client requests to create (and send) a message in a chat.
+ * Sends the MessageId of the newly created message in response.
+ */
 @RestController
 public final class CreateMessage {
 
@@ -46,6 +50,10 @@ public final class CreateMessage {
     @Autowired
     private UniqueIdGenerator uniqueIdGenerator; 
 
+    /**
+     * Responds to requests with missing userId and chatId URL Path Variables.
+     * Throws an exception for missing userId URL Path Variable. 
+     */
     @PostMapping("/users/chats/messages")
     public void createMessageWithoutUserIdChatIdPathVariable(HttpServletRequest request) {
 
@@ -54,6 +62,10 @@ public final class CreateMessage {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing userId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @PostMapping("/users/chats/{chatId}/messages")
     public void createMessageWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -62,6 +74,10 @@ public final class CreateMessage {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @PostMapping("/users/{userId}/chats/messages")
     public void createMessageWithoutChatIdPathVariable(HttpServletRequest request) {
 
@@ -69,6 +85,11 @@ public final class CreateMessage {
         throw new ChatIdMissingFromRequestURLPathException(path);
     }
     
+    /**
+     * Responds to complete requests.
+     * Creates and sends a Message from current User in the given Chat.
+     * Returns MessageId of the sent Message.
+     */
     @PostMapping("/users/{userId}/chats/{chatId}/messages")
     public Map<String, Object> createMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         
@@ -77,31 +98,27 @@ public final class CreateMessage {
         long userId = Long.parseLong(userIdString);
         long chatId = Long.parseLong(chatIdString);
 
-        //check if request body is as required
         if (!requestBody.containsKey("contentType")) {
             throw new ContentTypeMissingFromRequestBodyException(path);
         }
 
         String contentType = requestBody.get("contentType");
 
-        //check if request body is as required
         if (!requestBody.containsKey("textContent")) {
             throw new TextContentMissingFromRequestBodyException(path);
         }
 
         String textContent = requestBody.get("textContent");
-        
-        //check if the passed userId is valid
+       
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
         
-        //check if the passed chatId is valid
         if (!queryChat.checkIfChatIdExists(chatId)) {
             throw new ChatIdDoesNotExistException(path);
         }
 
-        //check if user is part of chat
+        //Checks if user is part of chat.
         if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
             throw new UserChatIdDoesNotExistException(path);
         }
@@ -112,7 +129,7 @@ public final class CreateMessage {
 
         insertMessage.insertAllForTextMessage(newMessage);
 
-        insertChat.insertLastSentMessageId(new Chat(chatId, newMessage.getMessageId()));
+        insertChat.updateLastSentMessageId(new Chat(chatId, newMessage.getMessageId()));
         
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Message", newMessage.getMessageId());
     }

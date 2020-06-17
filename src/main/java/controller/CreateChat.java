@@ -22,6 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * Controller which responds to client requests to create a Chat between two Users.
+ * Sends the ChatId of the newly created Chat (or of the already existing Chat between the two Users) in response.
+ */
 @RestController
 public final class CreateChat {
     
@@ -40,6 +44,10 @@ public final class CreateChat {
     @Autowired
     private UniqueIdGenerator uniqueIdGenerator;
 
+    /**
+     * Responds to requests with missing userId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @PostMapping("/users/chats")
     public void createChatWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -48,6 +56,11 @@ public final class CreateChat {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to complete requests.
+     * Creates a Chat between the two Users, if does not already exist.
+     * Returns ChatId of the Chat between the two Users.
+     */
     @PostMapping("/users/{userId}/chats")
     public Map<String, Object> createChat(@PathVariable("userId") String userIdString, 
     @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
@@ -56,19 +69,16 @@ public final class CreateChat {
 
         long userId = Long.parseLong(userIdString);
 
-        //check if request body is as required
         if (!requestBody.containsKey("username")) {
             throw new UsernameMissingFromRequestBodyException(path);
         }
 
         String username = requestBody.get("username");
 
-        //check if the passed userId is valid
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
 
-        //check if username of second user exists - error if does not
         if (!queryUser.checkIfUsernameExists(username)) {
             throw new UsernameDoesNotExistException(path);
         } 
@@ -77,13 +87,11 @@ public final class CreateChat {
         UserChat newUserChat1 = UserChat.newUserChatWithUserId(userId);
         UserChat newUserChat2 = UserChat.newUserChatWithUserId(queryUser.getUserIdFromUsername(username));
 
-        //check if chat between the users already exists
         List<UserChat> resultSet = queryUserChat.getChatIdIfChatExistsBetweenUserIds(newUserChat1.getUserId(), newUserChat2.getUserId());
         if (!resultSet.isEmpty()) {
             return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", resultSet.get(0).getChatId());
         } 
         
-        //generate unique chatId
         newChat.setChatId(uniqueIdGenerator.generateUniqueId("Chat"));
 
         newUserChat1.setChatId(newChat.getChatId());

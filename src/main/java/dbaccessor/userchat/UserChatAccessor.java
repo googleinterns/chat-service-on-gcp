@@ -9,16 +9,26 @@ import java.util.List;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
+/**
+ * Accessor which performs database accesses for the UserChat entity.
+ */
 @Component
 public final class UserChatAccessor {
     
     @Autowired
     private SpannerTemplate spannerTemplate;
 
+    /**
+     * Inserts all attributes of the given UserChat in the DB.
+     */
     public void insertAll(UserChat userChat) {
         spannerTemplate.insert(userChat);
     }
     
+    /**
+     * Returns ChatId of the Chat between the given Users.
+     * Returns an empty List if Chat does not exist between the given Users. 
+     */
     public List<UserChat> getChatIdIfChatExistsBetweenUserIds(long userId1, long userId2) {
 
         String SQLStatment = "SELECT ChatID FROM UserChat WHERE UserID=@userId2 AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userId1)";
@@ -28,6 +38,9 @@ public final class UserChatAccessor {
         return resultSet;
     }
 
+    /**
+     * Checks if a UserChat entry for the given userId and chatId exists.
+     */
     public boolean checkIfUserChatIdExists(long userId, long chatId) {
 
         String SQLStatment = "SELECT * FROM UserChat WHERE UserID=@userId AND ChatID=@chatId";

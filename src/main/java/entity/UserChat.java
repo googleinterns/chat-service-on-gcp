@@ -7,7 +7,7 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 @Table(name = "UserChat")
 public final class UserChat {
     
-    @PrimaryKey(keyOrder = 1) //in the case of composite pk - key order must show how the pk is defined in the DDL of the table
+    @PrimaryKey(keyOrder = 1)
     @Column(name = "UserID")
     private long userId;
 

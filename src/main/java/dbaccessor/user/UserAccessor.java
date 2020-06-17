@@ -2,16 +2,18 @@ package dbaccessor.user;
 
 import entity.User;
 import controller.ListChats;
-
 import helper.UniqueIdGenerator;
+
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
-import java.util.List;
-
+/**
+ * Accessor which performs database accesses for the User entity.
+ */
 @Component
 public class UserAccessor {
     
@@ -21,7 +23,9 @@ public class UserAccessor {
     @Autowired
     private UniqueIdGenerator uniqueIDGenerator;
 
-    /* Inserts new entry in User Table */
+    /*
+     * Inserts all attributes of the given User in the DB.
+     */ 
     public long insert(User user) {
         long id = uniqueIDGenerator.generateUniqueId("User");
         user.setUserId(id);
@@ -43,7 +47,9 @@ public class UserAccessor {
                 .isEmpty();
     }
 
-    /* Checks if there is a row in the User table having the given UserID */
+    /**
+     * Checks if a User with the given userId already exists.
+     */
     public boolean checkIfUserIdExists(long id) {
         String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userID";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -55,7 +61,9 @@ public class UserAccessor {
                 .isEmpty();
     }
 
-    /* Retrieves UserID of user having the given username */
+    /**
+     * Returns the UserId of the User with the given username.
+     */
     public long getUserIdFromUsername(String username) {
         String SQLStatment = "SELECT UserID FROM User WHERE Username=@Username";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -99,11 +107,10 @@ public class UserAccessor {
         return resultSet.get(0);
       
     }
-    
-    public void insertAll(User user) {
-        spannerTemplate.insert(user);
-    } 
 
+    /**
+     * Checks if a User with the given username already exists.
+     */
     public boolean checkIfUsernameExists(String username) {
 
         String SQLStatment = "SELECT Username FROM User WHERE Username=@username";
@@ -113,6 +120,13 @@ public class UserAccessor {
         return (!resultSet.isEmpty());
     }
 
+    /**
+     * Returns details of the User with the given UserId.
+     * Details include:
+     * (1)  UserId
+     * (2)  Username
+     * (3)  Creation Timestamp 
+     */
     public User getUser(long userId) {
 
         String SQLStatment = "SELECT * FROM User WHERE UserID=@userId";
@@ -122,6 +136,12 @@ public class UserAccessor {
         return resultSet.get(0);
     }
 
+    /**
+     * Returns details of Users with whome the given User is engaged in a Chat with.
+     * Details include:
+     * (1) Username
+     * (2) ChatId
+     */
     public List<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
 
         String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";

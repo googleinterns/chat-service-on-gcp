@@ -11,8 +11,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Generator which generates the successful HTTP response for all client requests to APIs.
+ */
 public final class SuccessResponseGenerator {
 
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the CreateUser, CreateChat and CreateMessage APIs.
+     */
     public static Map<String, Object> getSuccessResponseForCreateEntity(String className, long Id) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
@@ -30,6 +36,9 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetUser API.
+     */
     public static Map<String, Object> getSuccessResponseForGetUser(User user) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
@@ -41,6 +50,9 @@ public final class SuccessResponseGenerator {
         
     }
 
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetChat API.
+     */
     public static Map<String, Object> getSuccessResponseForGetChat(Chat chat) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
@@ -51,6 +63,9 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetMessage API.
+     */
     public static Map<String, Object> getSuccessResponseForGetMessage(Message message) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
@@ -66,6 +81,9 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the ListChats API.
+     */
     public static Map<String,List<Map<String, Object>>> getSuccessResponseForListChats(List<Map<String, Object>> chatInfoOfChatsOfUser) {
 
         Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
@@ -97,11 +115,14 @@ public final class SuccessResponseGenerator {
         return messageForResponseBody;
     }
 
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the ListMessages API.
+     */
     public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userId, List<Message> messages) {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
-
-        //sort the messages in  ascending order of CreationTs
+        
+        //Sorts the messages in  ascending order of Creation Timestamp
         Collections.sort(messages, Comparator.comparing(Message::getCreationTs));
         
         for (int i = 0; i < messages.size(); ++i) {

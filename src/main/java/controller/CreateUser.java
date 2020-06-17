@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 
-//this annotation tells that this class can contain methods which map to URL requests
+/**
+ * Controller which responds to client requests to create (and register) a new user.
+ * Sends the UserId of the newly created user in response.
+ */
 @RestController
 public final class CreateUser {
 
@@ -27,27 +30,29 @@ public final class CreateUser {
     @Autowired
     private UniqueIdGenerator uniqueIdGenerator;
     
+    /**
+     * Creates a new User with the given username.
+     * Returns UserId of the new User.
+     */
     @PostMapping("/users")
     public Map<String, Object> createUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
-        //check if request body is as required
         if (!requestBody.containsKey("username")) {
             throw new UsernameMissingFromRequestBodyException(path);
         }
 
         String username  = requestBody.get("username");
 
-        //check if username exists - return error if it does
         if (queryUser.checkIfUsernameExists(username)) {
             throw new UsernameAlreadyExistsException(path);
         } 
 
         User newUser = new User(username);
-        //generate unique userId
+
         newUser.setUserId(uniqueIdGenerator.generateUniqueId("User"));
-        //insert new entry into User
+        
         insertUser.insertAll(newUser);
 
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", newUser.getUserId());
