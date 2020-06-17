@@ -19,6 +19,7 @@ import java.util.Map;
 
 import com.google.cloud.Timestamp;
 import java.util.List;
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -196,13 +197,17 @@ public final class ListMessages {
          * Checks Received Timestamp of each message not sent by current user.
          * If it is null, sets it to the time when listMessages was called.
          */
+        List<Message> messageListForReceivedTsUpdate = new ArrayList<Message>();
+
         for (Message message : messages) {
             if (message.getReceivedTs() == null && message.getSenderId() != userId) {
                 message.setReceivedTs(receivedTs);
-                insertMessage.updateReceivedTs(message);
+                messageListForReceivedTsUpdate.add(message);
             }
         }
         
+        insertMessage.updateReceivedTsForListMessagesTransaction(messageListForReceivedTsUpdate);
+                
         return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messages);
     }
 }

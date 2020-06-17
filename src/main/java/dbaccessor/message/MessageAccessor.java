@@ -54,6 +54,22 @@ public final class MessageAccessor {
     }
 
     /**
+     * Completes all DB insertions for the ListMessages API in a single transaction.
+     */
+    public boolean updateReceivedTsForListMessagesTransaction(List<Message> messageList) {
+        return spannerOperations.performReadWriteTransaction(
+            transactionSpannerOperations -> {
+
+                for (Message message : messageList) {
+                    transactionSpannerOperations.update(message, "MessageID", "ReceivedTS");
+                }
+
+                return true;
+            }
+        );
+    }
+
+    /**
      * Checks if a Message with the given messageId exists.
      */
     public boolean checkIfMessageIdExists(long messageId) {
