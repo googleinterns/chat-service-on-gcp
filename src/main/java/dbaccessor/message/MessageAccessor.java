@@ -42,7 +42,7 @@ public final class MessageAccessor {
     /**
      * Completes all DB insertions for the CreateMessage API in a single transaction.
      */
-    public boolean insertForCreateMessageTransaction(Message message, Chat chat) {
+    public boolean createMessageInTransaction(Message message, Chat chat) {
         return spannerOperations.performReadWriteTransaction(
             transactionSpannerOperations -> {
                 transactionSpannerOperations.insert(message);
