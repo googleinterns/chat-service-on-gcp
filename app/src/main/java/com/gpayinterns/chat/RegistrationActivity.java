@@ -94,21 +94,16 @@ public class RegistrationActivity extends AppCompatActivity
     protected void onPause()
     {
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        active=false;
         super.onPause();
     }
 
-    @Override
-    protected void onStop()
-    {
-        active=false;
-        super.onStop();
-    }
 
     @Override
-    protected void onStart()
+    protected void onResume()
     {
         active=true;
-        super.onStart();
+        super.onResume();
     }
 
     private void addUserServer() throws JSONException

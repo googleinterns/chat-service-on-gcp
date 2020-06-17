@@ -43,6 +43,8 @@ public class ViewContactsActivity extends AppCompatActivity
     public static final String CHAT_LOGGED_IN_USER = "CHAT_LOGGED_IN_USER";
     public static final String CURRENT_USER = "currentUser";
 
+    private static boolean active = false;
+
 
     ContactsRecyclerAdapter contactsRecyclerAdapter;
     LinearLayoutManager contactLayoutManager;
@@ -81,7 +83,6 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         Log.d("currentUser sent to server:",currentUser);
 
-//        String SAMPLE_CURRENT_USER = "3441453482889885209";
         String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
@@ -159,6 +160,7 @@ public class ViewContactsActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
+        active=true;
         getCurrentUser();
         Log.d("currentUser",currentUser);
         loadChatsFromServer();
@@ -174,6 +176,7 @@ public class ViewContactsActivity extends AppCompatActivity
     protected void onPause()
     {
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        active=false;
         super.onPause();
     }
 

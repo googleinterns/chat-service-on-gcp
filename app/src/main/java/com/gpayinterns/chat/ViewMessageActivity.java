@@ -46,6 +46,9 @@ public class ViewMessageActivity extends AppCompatActivity
     public static final String CHAT_ID = "CHAT_ID";
     public static final String CONTACT_USERNAME = "CONTACT_USERNAME";
     public static final String LAST_MESSAGE_ID = "LAST_MESSAGE_ID";
+    private static final String POLL = "SHORT_POLLING";
+
+    private static boolean active=false;
 
     private List<Message> messages = new ArrayList<Message>();
     Set<String> messageIDSet = new HashSet<String>();//This helps to prevent duplicate messages.
@@ -68,6 +71,8 @@ public class ViewMessageActivity extends AppCompatActivity
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         if(mTimer != null)
             mTimer.cancel();
+        VolleyController.getInstance(this).getRequestQueue().cancelAll(POLL);
+        active=false;
         super.onPause();
     }
 
@@ -287,6 +292,8 @@ public class ViewMessageActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
+        active=true;
+
         findViewById(R.id.view_message_constraint_layout).requestFocus();
         chatID = getIntent().getStringExtra(CHAT_ID);
         lastMessageID = getIntent().getStringExtra(LAST_MESSAGE_ID);
@@ -352,7 +359,7 @@ public class ViewMessageActivity extends AppCompatActivity
                                     messageIDSet.add(messageID);
                                 }
                             }
-                            if(newMessages.size()>0)
+                            if(newMessages.size()>0 && active)
                             {
                                 lastMessageID = newMessages.get(newMessages.size()-1).messageID;
                                 messageRecyclerAdapter.addMessages(newMessages);
@@ -426,7 +433,7 @@ public class ViewMessageActivity extends AppCompatActivity
                                     lastMessageID = messageID;
                                 }
                             }
-                            if(newMessages.size()>0)
+                            if(newMessages.size()>0 && active)
                             {
                                 lastMessageID = newMessages.get(newMessages.size()-1).messageID;
                                 messageRecyclerAdapter.addMessages(newMessages);
@@ -453,7 +460,7 @@ public class ViewMessageActivity extends AppCompatActivity
                 return Priority.LOW;
             }
         };
-
+        jsonObjectRequest.setTag(POLL);
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 

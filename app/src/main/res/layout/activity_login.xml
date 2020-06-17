@@ -78,7 +78,7 @@
 
 
 
-                android:hint="@string/email"
+                android:hint="Username"
 
                 android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>

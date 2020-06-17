@@ -54,12 +54,20 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private String chatID;
     private String messageText;
+    private static boolean active = false;
 
+    @Override
+    protected void onResume()
+    {
+        active=true;
+        super.onResume();
+    }
 
     @Override
     protected void onPause()
     {
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        active=false;
         super.onPause();
     }
 
@@ -253,8 +261,10 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
                             }
 
                             assert data != null;
-                            String message = data.optString("Message");
+                            String message = data.optString("message");
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                            messages.clear();
+                            messageRecyclerAdapter.notifyDataSetChanged();
                         }
                     }
                 }) {
@@ -347,15 +357,18 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
     private void switchToViewMessages(String lastMessageID)
     {
-        Intent intent = new Intent(this,ViewMessageActivity.class);
+        if(active)
+        {
+            Intent intent = new Intent(this, ViewMessageActivity.class);
 
-        String username = ((EditText)findViewById(R.id.new_message_username)).getText().toString();
+            String username = ((EditText) findViewById(R.id.new_message_username)).getText().toString();
 
-        intent.putExtra(ViewMessageActivity.CHAT_ID,chatID);
-        intent.putExtra(ViewMessageActivity.CONTACT_USERNAME,username);
-        intent.putExtra(ViewMessageActivity.LAST_MESSAGE_ID,lastMessageID);
+            intent.putExtra(ViewMessageActivity.CHAT_ID, chatID);
+            intent.putExtra(ViewMessageActivity.CONTACT_USERNAME, username);
+            intent.putExtra(ViewMessageActivity.LAST_MESSAGE_ID, lastMessageID);
 
-        startActivity(intent);
+            startActivity(intent);
+        }
         finish();
     }
 
