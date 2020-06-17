@@ -35,6 +35,7 @@ public class UserAccessor {
 
     /*
      * Inserts all attributes of the given User in the DB.
+     * The userId of the User is present within the User object.
      */ 
     public void insertGivenUserId(User user) {
         spannerTemplate.insert(user);
