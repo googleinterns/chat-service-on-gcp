@@ -1,6 +1,7 @@
 package com.gpayinterns.chat;
 
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -18,13 +19,13 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.interns.chat.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -33,7 +34,8 @@ public class RegistrationActivity extends AppCompatActivity
 {
 
     //Edittexts
-    private EditText nameEditText;
+    private EditText usernameEditText;
+    private EditText phoneNumEditText;
     private EditText emailEditText;
     private EditText passwordEditText;
     private EditText confirmPasswordEditText;
@@ -50,7 +52,8 @@ public class RegistrationActivity extends AppCompatActivity
         setContentView(R.layout.activity_registration);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        nameEditText=findViewById(R.id.name_input);
+        usernameEditText=findViewById(R.id.name_input);
+        phoneNumEditText=findViewById(R.id.phone_num_input_register);
         emailEditText=findViewById(R.id.email_input_register);
         passwordEditText =findViewById(R.id.password_input_register);
         confirmPasswordEditText =findViewById(R.id.confirm_password_input);
@@ -77,7 +80,7 @@ public class RegistrationActivity extends AppCompatActivity
                     }
                     mLastClickTime = System.currentTimeMillis();
 
-                    addUserServer(emailEditText.getText().toString());
+                    addUserServer();
                 }
                 catch (JSONException e)
                 {
@@ -108,16 +111,26 @@ public class RegistrationActivity extends AppCompatActivity
         super.onStart();
     }
 
-    private void addUserServer(String userName) throws JSONException
+    private void addUserServer() throws JSONException
     {
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users";
+        String userName = usernameEditText.getText().toString();
+        String emailID = emailEditText.getText().toString();
+        String phoneNum = phoneNumEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
+
+        String URL = "https://gcp-chat-service.an.r.appspot.com/signup";
 
 
         JSONObject jsonBody = new JSONObject();
 
-        Log.d("username sent to server: ",userName);
 
-        jsonBody.put("username", userName);
+        jsonBody.put("Username", userName);
+        jsonBody.put("EmailID", emailID);
+        jsonBody.put("MobileNo",phoneNum);
+        jsonBody.put("Password",password);
+
+
+
 
 
         final Long mRequestStartTime = System.currentTimeMillis();
@@ -135,13 +148,16 @@ public class RegistrationActivity extends AppCompatActivity
                         Log.d("successLatencyTime: ",Long.toString(totalRequestTime));
                         try
                         {
-                            String message = response.getString("Message");
+                            String message = response.getString("message");
                             if(message.equals("Success"))
                             {
                                 String userID = response.getString("UserId");
                                 storeInSharedPreferences(userID);
                                 Toast.makeText(getApplicationContext(), "Successfully registered", Toast.LENGTH_LONG).show();
-
+                                if(active)
+                                {
+                                    startActivity(new Intent(RegistrationActivity.this,ViewContactsActivity.class));
+                                }
                             }
                         }
                         catch (JSONException e)
@@ -180,10 +196,11 @@ public class RegistrationActivity extends AppCompatActivity
                             }
 
                             assert data != null;
-                            String message = data.optString("Message");
+                            String message = data.optString("message");
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                             if(active)
                             {
+                                usernameEditText.setText("");
                                 emailEditText.setText("");
                                 passwordEditText.setText("");
                                 confirmPasswordEditText.setText("");
@@ -212,8 +229,9 @@ public class RegistrationActivity extends AppCompatActivity
     {
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
-        String confirm_password= confirmPasswordEditText.getText().toString();
-
+        String confirm_password = confirmPasswordEditText.getText().toString();
+        String username = usernameEditText.getText().toString();
+        String phoneNum = phoneNumEditText.getText().toString();
 
         if (TextUtils.isEmpty(email))
         {
@@ -223,7 +241,7 @@ public class RegistrationActivity extends AppCompatActivity
             emailEditText.setText("");
             return false;
         }
-        else if(LoginActivity.inValidEmailId(email))
+        else if(inValidEmailId(email))
         {
             emailEditText.setFocusable(true);
             Toast.makeText(getApplicationContext(), "Invalid Email ID", Toast.LENGTH_SHORT).show();
@@ -240,11 +258,11 @@ public class RegistrationActivity extends AppCompatActivity
             passwordEditText.requestFocus();
             return false;
         }
-        if(TextUtils.isEmpty(nameEditText.getText().toString()))
+        if(TextUtils.isEmpty(username))
         {
-            nameEditText.setFocusable(true);
-            nameEditText.requestFocus();
-            Toast.makeText(getApplicationContext(), "Name should not be empty", Toast.LENGTH_SHORT).show();
+            usernameEditText.setFocusable(true);
+            usernameEditText.requestFocus();
+            Toast.makeText(getApplicationContext(), "Enter a Username", Toast.LENGTH_SHORT).show();
             return false;
         }
         if(!password.equals(confirm_password))
@@ -254,6 +272,14 @@ public class RegistrationActivity extends AppCompatActivity
             passwordEditText.setText("");
             confirmPasswordEditText.setText("");
             passwordEditText.requestFocus();
+            return false;
+        }
+
+        if(TextUtils.isEmpty(phoneNum))
+        {
+            phoneNumEditText.setFocusable(true);
+            phoneNumEditText.requestFocus();
+            Toast.makeText(getApplicationContext(), "Enter a phone number", Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -278,5 +304,14 @@ public class RegistrationActivity extends AppCompatActivity
         super.onDestroy();
     }
 
+    public static boolean inValidEmailId(String email)
+    {
+        return !Pattern.compile("^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
+                + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
+                + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$").matcher(email).matches();
+    }
 
 }

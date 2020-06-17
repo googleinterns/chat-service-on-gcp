@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.interns.chat.R;
+import com.gpayinterns.chat.R;
 
 import java.util.List;
 

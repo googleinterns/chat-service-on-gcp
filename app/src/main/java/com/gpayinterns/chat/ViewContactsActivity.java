@@ -19,7 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.interns.chat.R;
+import com.gpayinterns.chat.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -130,7 +130,7 @@ public class ViewContactsActivity extends AppCompatActivity
             }
         };
 
-        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
+        VolleyController.getInstance(this).addToRequestQueueWithRetry(jsonObjectRequest);
     }
 
 

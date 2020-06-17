@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
-import com.interns.chat.R;
+import com.gpayinterns.chat.R;
 
 import java.util.ArrayList;
 import java.util.List;

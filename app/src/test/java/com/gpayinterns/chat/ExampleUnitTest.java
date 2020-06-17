@@ -1,4 +1,4 @@
-package com.interns.chat;
+package com.gpayinterns.chat;
 
 import org.junit.Test;
 

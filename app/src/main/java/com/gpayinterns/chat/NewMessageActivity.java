@@ -32,7 +32,7 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.interns.chat.R;
+import com.gpayinterns.chat.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

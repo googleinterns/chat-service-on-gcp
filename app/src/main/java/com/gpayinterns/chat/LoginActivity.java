@@ -12,6 +12,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.ClientError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -19,18 +26,21 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.interns.chat.R;
+import com.gpayinterns.chat.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
 {
-    private EditText mEmailField;
-    private EditText mPasswordField;
+    private EditText usernameEditText;
+    private EditText passwordEditText;
     private String currentUser;
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_GOOGLE_SIGN_IN = 9001;
@@ -54,8 +64,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
         //Views
-        mEmailField = findViewById(R.id.input_email_id);
-        mPasswordField = findViewById(R.id.input_password);
+        usernameEditText = findViewById(R.id.input_email_id);
+        passwordEditText = findViewById(R.id.input_password);
         //Buttons
         findViewById(R.id.login_button).setOnClickListener(this);
         findViewById(R.id.google_sign_in_button).setOnClickListener(this);
@@ -102,46 +112,32 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-    public static boolean inValidEmailId(String email)
-    {
-        return !Pattern.compile("^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
-                + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-                + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
-                + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-                + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
-                + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$").matcher(email).matches();
-    }
 
 
     public boolean validateForm()
     {
         boolean valid = true;
 
-        String email = mEmailField.getText().toString();
-        if (TextUtils.isEmpty(email))
+        String username = usernameEditText.getText().toString();
+        if (TextUtils.isEmpty(username))
         {
-            mEmailField.setError("Required.");
-            valid = false;
-        }
-        else if (inValidEmailId(email))
-        {
-            mEmailField.setError("Invalid Email.");
+            usernameEditText.setError("Required.");
             valid = false;
         }
         else
         {
-            mEmailField.setError(null);
+            usernameEditText.setError(null);
         }
 
-        String password = mPasswordField.getText().toString();
+        String password = passwordEditText.getText().toString();
         if (TextUtils.isEmpty(password))
         {
-            mPasswordField.setError("Required.");
+            passwordEditText.setError("Required.");
             valid = false;
         }
         else
         {
-            mPasswordField.setError(null);
+            passwordEditText.setError(null);
         }
 
         return valid;
@@ -156,7 +152,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
                 break;
             case R.id.login_button:
-                signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
+                try
+                {
+                    signIn(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.google_sign_in_button:
                 signInWithGoogle();
@@ -176,7 +179,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginButton.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake));
     }
 
-    private void signIn(final String email, String password)
+    private void signIn(final String email, String password) throws JSONException
     {
 
         if (!validateForm())
@@ -185,19 +188,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
-        if (authenticate(email, password))
-        {
-            setCurrentUser();//correct
-            startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));
-        }
-        else
-        {
-            shakeLoginButton();
-            Toast.makeText(getBaseContext(), "Invalid Credentials", Toast.LENGTH_SHORT).show();
-        }
-
-        mEmailField.getText().clear();
-        mPasswordField.getText().clear();
+        authenticateFromServer();
     }
 
     private void setCurrentUser()
@@ -207,11 +198,88 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mEditor.putString("currentUser", currentUser).apply();
     }
 
-    private boolean authenticate(String email, String password)
+
+    private void authenticateFromServer() throws JSONException
     {
-        //TODO authenticate from backend server
-        //currentUser = userID received from the server
-        return true;
+        String userName = usernameEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
+
+        String URL = "https://gcp-chat-service.an.r.appspot.com/login";
+
+
+        JSONObject jsonBody = new JSONObject();
+
+
+        jsonBody.put("Username", userName);
+        jsonBody.put("Password",password);
+
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
+                {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        Log.d("ResponseMessage: " , response.toString());
+                        try
+                        {
+                            String message = response.getString("message");
+                            if(message.equals("Success"))
+                            {
+                                currentUser = response.getString("UserId");
+                                setCurrentUser();
+                                Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(LoginActivity.this,ViewContactsActivity.class));
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            Toast.makeText(getApplicationContext(), "Parse Error", Toast.LENGTH_SHORT).show();
+                            Log.d("JsonError: ",e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        Log.d("errorMessage",error.toString());
+                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
+                        {
+                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
+                        }
+                        else if(error instanceof ClientError)
+                        {
+                            String responseBody = null;
+                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = null;
+                            try
+                            {
+                                data = new JSONObject(responseBody);
+                            }
+                            catch (JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            assert data != null;
+                            String message = data.optString("message");
+
+                            shakeLoginButton();
+                            Toast.makeText(getBaseContext(), "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                            usernameEditText.setText("");
+                            passwordEditText.setText("");
+                        }
+                    }
+                }) {
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
+            }
+        };
+        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
 

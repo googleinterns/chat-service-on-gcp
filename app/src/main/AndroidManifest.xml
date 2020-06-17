@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.interns.chat">
+    package="com.gpayinterns.chat">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -19,12 +19,12 @@
             android:name="com.gpayinterns.chat.ViewContactsActivity"
             android:label="Contacts"
             android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity android:name="com.gpayinterns.chat.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name="com.gpayinterns.chat.LoginActivity">
         </activity>
         <activity
             android:name="com.gpayinterns.chat.ViewMessageActivity"
@@ -34,7 +34,7 @@
 
         <provider
             android:name="com.gpayinterns.chat.ChatContentProvider"
-            android:authorities="com.interns.chat.provider"
+            android:authorities="com.gpayinterns.chat.provider"
             android:enabled="true"
             android:exported="true" />
     </application>
