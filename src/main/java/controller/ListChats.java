@@ -122,17 +122,13 @@ public final class ListChats {
         List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
         List<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getCreationTsOfLastSentMessageIdForChatsOfUser(userId);
 
-        /*
-         * Stores time of the last Message sent in each ChatId of the User against ChatId.
-         */
+        //Stores time of the last Message sent in each ChatId of the User against ChatId.
         Map<Long, Timestamp> chatIdCreationTsOflastSentMessageIdMap = new LinkedHashMap<Long, Timestamp>();
         for (Message chatIdCreationTsOfLastSentMessageId : listOfChatIdCreationTsOfLastSentMessageId) {
             chatIdCreationTsOflastSentMessageIdMap.put(chatIdCreationTsOfLastSentMessageId.getChatId(), chatIdCreationTsOfLastSentMessageId.getCreationTs());
         }
         
-        /*
-         * Sets time of the last Message sent for each Chat of the User.
-         */
+        //Sets time of the last Message sent for each Chat of the User.
         for (Chat chat : chatsOfUser) {
             if (chat.getLastSentMessageId() == 0) { 
                 chat.setLastSentTime(chat.getCreationTs());
@@ -151,18 +147,14 @@ public final class ListChats {
 
         List<UsernameChatId> usernameChatIdForSecondUsers = queryUser.getUsernameChatIdForSecondUsers(userId);
 
-        /*
-         * Stores username of the other User against ChatId for each Chat of the User.
-         */
+        //Stores username of the other User against ChatId for each Chat of the User.
         Map<Long, String> chatIdSecondUsernameMap = new LinkedHashMap<Long, String>();
 
         for (UsernameChatId usernameChatId : usernameChatIdForSecondUsers) {
             chatIdSecondUsernameMap.put(usernameChatId.getChatId(), usernameChatId.getUsername());
         }
 
-        /*
-         * Stores list of all details of each Chat of the User.
-         */
+        //Stores list of all details of each Chat of the User.
         List<Map<String, Object>> chatInfoOfChatsOfUser = new ArrayList<Map<String, Object>>();
 
         for (Chat chat : chatsOfUser) {

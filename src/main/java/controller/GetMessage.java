@@ -94,9 +94,7 @@ public final class GetMessage {
             throw new ChatIdDoesNotExistException(path);
         }
 
-        /*
-         * Checks if the user is part of chat.
-         */
+        //Checks if the user is part of chat.
         if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
             throw new UserChatIdDoesNotExistException(path);
         }

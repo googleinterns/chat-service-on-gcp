@@ -176,9 +176,7 @@ public final class ListMessages {
         }
 
         if (startCreationTs != null && endCreationTs != null) {
-            /*
-             * Checks if startCreation Timestamp is after endCreation Timestamp.
-             */
+            //Checks if startCreation Timestamp is after endCreation Timestamp.
             if (startCreationTs.compareTo(endCreationTs) > 0) {
                 Timestamp temp = startCreationTs;
                 startCreationTs = endCreationTs;
@@ -195,7 +193,8 @@ public final class ListMessages {
         }
 
         /*
-         * Checks Received Timestamp of each message not sent by current user- if it is null set it to the time when listMessages was called.
+         * Checks Received Timestamp of each message not sent by current user.
+         * If it is null, sets it to the time when listMessages was called.
          */
         for (Message message : messages) {
             if (message.getReceivedTs() == null && message.getSenderId() != userId) {

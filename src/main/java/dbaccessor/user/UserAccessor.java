@@ -19,16 +19,12 @@ public final class UserAccessor {
     @Autowired
     private SpannerTemplate spannerTemplate;
 
-    /**
-     * Inserts all attributes of the given User in the DB.
-     */
+    //Inserts all attributes of the given User in the DB.
     public void insertAll(User user) {
         spannerTemplate.insert(user);
     } 
 
-    /**
-     * Checks if a User with the given username already exists.
-     */
+    //Checks if a User with the given username already exists.
     public boolean checkIfUsernameExists(String username) {
 
         String SQLStatment = "SELECT Username FROM User WHERE Username=@username";
