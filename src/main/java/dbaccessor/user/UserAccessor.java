@@ -43,7 +43,7 @@ public final class UserAccessor {
      * Details include:
      * (1)  UserId
      * (2)  Username
-     * (3)  CreationTs 
+     * (3)  Creation Timestamp 
      */
     public User getUser(long userId) {
 

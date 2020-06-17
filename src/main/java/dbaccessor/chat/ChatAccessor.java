@@ -63,7 +63,7 @@ public final class ChatAccessor {
      * Details include:
      * (1)  ChatId
      * (2)  LastSentMessageId
-     * (3)  CreationTs
+     * (3)  Creation Timestamp
      */
     public Chat getChat(long chatId) {
 
@@ -79,7 +79,7 @@ public final class ChatAccessor {
      * Details include:
      * (1)  ChatId
      * (2)  LastSentMessageId
-     * (3)  CreationTs
+     * (3)  Creation Timestamp
      */
     public List<Chat> getChatsForUser(User user) {
 

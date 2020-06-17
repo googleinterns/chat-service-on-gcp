@@ -30,13 +30,13 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Controller which responds to client requests to get the list of messages of a chat.
  * Each entry in the response contains:
  * (1)  MessageId
- * (2)  CreationTs
+ * (2)  Creation Timestamp
  * (3)  ChatId
  * (4)  SentByCurrentUser
  * (5)  ContentType
  * (6)  TextContent
- * (7)  SentTs
- * (8)  ReceivedTs
+ * (7)  Sent Timestamp
+ * (8)  Received Timestamp
  */
 @RestController
 public final class ListMessages {
@@ -177,7 +177,7 @@ public final class ListMessages {
 
         if (startCreationTs != null && endCreationTs != null) {
             /*
-             * Checks if startCreationTs is after endCreationTs.
+             * Checks if startCreation Timestamp is after endCreation Timestamp.
              */
             if (startCreationTs.compareTo(endCreationTs) > 0) {
                 Timestamp temp = startCreationTs;
@@ -195,7 +195,7 @@ public final class ListMessages {
         }
 
         /*
-         * Checks ReceivedTs of each message not sent by current user- if it is null set it to the time when listMessages was called.
+         * Checks Received Timestamp of each message not sent by current user- if it is null set it to the time when listMessages was called.
          */
         for (Message message : messages) {
             if (message.getReceivedTs() == null && message.getSenderId() != userId) {

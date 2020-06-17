@@ -115,7 +115,7 @@ public final class SuccessResponseGenerator {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
         /*
-         * Sorts the messages in  ascending order of CreationTs
+         * Sorts the messages in  ascending order of Creation Timestamp
          */
         Collections.sort(messages, Comparator.comparing(Message::getCreationTs));
         

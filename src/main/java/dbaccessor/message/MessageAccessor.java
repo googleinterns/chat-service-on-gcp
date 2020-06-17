@@ -28,7 +28,7 @@ public final class MessageAccessor {
     } 
 
     /**
-     * Updates the ReceivedTs of a Message.
+     * Updates the Received Timestamp of a Message.
      */
     public void updateReceivedTs(Message message) {
         spannerTemplate.update(message, "MessageID", "ReceivedTS");
@@ -54,9 +54,9 @@ public final class MessageAccessor {
      * (3)  SenderId
      * (4)  ContentType
      * (5)  TextContent
-     * (6)  SentTs
-     * (7)  ReceivedTs
-     * (8)  CreationTs
+     * (6)  Sent Timestamp
+     * (7)  Received Timestamp
+     * (8)  Creation Timestamp
      */
     public Message getMessage(long messageId) {
 
@@ -68,7 +68,7 @@ public final class MessageAccessor {
     }
 
     /**
-     * Returns the CreationTs field of the Message with the given messageId.
+     * Returns the Creation Timestamp field of the Message with the given messageId.
      */
     public Timestamp getCreationTsForMessageId(long messageId) {
 
@@ -158,7 +158,7 @@ public final class MessageAccessor {
      * Returns details of Messages which were sent last in the Chats which the given User is engaged in.
      * Details include:
      * (1)  ChatId
-     * (2)  CreationTs (of the Message)
+     * (2)  Creation Timestamp (of the Message)
      */
     public List<Message> getCreationTsOfLastSentMessageIdForChatsOfUser(long userId) {
 

@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.PathVariable;
  * (3)  SentByCurrentUser
  * (4)  ContentType
  * (5)  TextContent
- * (6)  SentTs
- * (7)  ReceivedTs
- * (8)  CreationTs
+ * (6)  Sent Timestamp
+ * (7)  Received Timestamp
+ * (8)  Creation Timestamp
  */
 @RestController
 public final class GetMessage {
