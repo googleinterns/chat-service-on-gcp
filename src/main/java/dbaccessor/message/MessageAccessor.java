@@ -56,7 +56,7 @@ public final class MessageAccessor {
     /**
      * Completes all DB insertions for the ListMessages API in a single transaction.
      */
-    public boolean updateReceivedTsForListMessagesTransaction(List<Message> messageList) {
+    public boolean updateReceivedTsForMessages(List<Message> messageList) {
         return spannerOperations.performReadWriteTransaction(
             transactionSpannerOperations -> {
 
