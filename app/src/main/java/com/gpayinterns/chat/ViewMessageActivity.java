@@ -154,7 +154,6 @@ public class ViewMessageActivity extends AppCompatActivity
                             if(message.equals("Success"))
                             {
                                 String lastMessageID = response.getString("MessageId");
-//                                addMessageToScreen(lastMessageID);
                             }
                         }
                         catch (JSONException e)
