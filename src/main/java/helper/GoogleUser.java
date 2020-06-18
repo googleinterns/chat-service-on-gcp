@@ -56,11 +56,13 @@ public class GoogleUser {
         return Optional.of(phoneNumberList.get(0).getValue());
     }
 
-    /** Retrieves the username and email-id of signed-in user
+    /**
+     * Retrieves the username and email-id of signed-in user
      * Checks if an entry with the same username and email-id exists
      * If it exists, then return the UserID of existing user
      * Else create a new entry in the User table
-     * And return the UserID of the newly created user */
+     * And return the UserID of the newly created user
+     */
     public long getOrCreateUser() throws IOException {
         GoogleIdToken idToken = tokenResponse.parseIdToken();
         GoogleIdToken.Payload payload = idToken.getPayload();

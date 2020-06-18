@@ -62,19 +62,19 @@ public class UserAPI {
 
         String path = request.getRequestURI();
         requestValidator.signupRequestValidator(data, path);
-        /* necessary fields */
+        /** necessary fields */
         String username = data.get("Username").toString();
         String emailID = data.get("EmailID").toString();
         String password = data.get("Password").toString();
         String mobileNo = data.get("MobileNo").toString();
 
-        /* optional field */
+        /** optional field */
         String base64Image = "";
         if(data.get("Picture") != null){
             base64Image = data.get("Picture").toString();
         }
 
-        /* Checks if Username or email exists - throws exception if it does */
+        /** Checks if Username or email exists - throws exception if it does */
         if (userAccessor.checkIfUserExists(username, emailID)) {
             throw new UserAlreadyExistsException(path);
         }
