@@ -2,6 +2,8 @@ package controller;
 
 import entity.User;
 import dbaccessor.user.UserAccessor;
+import googlesignin.GoogleAuthenticator;
+import googlesignin.GoogleUser;
 import helper.*;
 import exceptions.UserRequiredFieldMissingException;
 import exceptions.UserAlreadyExistsException;
