@@ -206,8 +206,8 @@ public final class ListMessages {
             }
         }
         
-        insertMessage.updateReceivedTsForListMessagesTransaction(messageListForReceivedTsUpdate);
-                
+        insertMessage.updateReceivedTsForMessages(messageListForReceivedTsUpdate);
+                 
         return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messages);
     }
 }
