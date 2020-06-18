@@ -1,17 +1,16 @@
 package dbaccessor.user;
 
-import entity.User;
-import controller.ListChats;
-
-import helper.UniqueIdGenerator;
-import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
 import com.google.cloud.spanner.Statement;
+import controller.ListChats;
+import entity.User;
+import helper.UniqueIdGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
+import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.OptionalLong;
 
 @Component
 public class UserAccessor {
@@ -24,7 +23,7 @@ public class UserAccessor {
 
     /**
      * Generates a unique id for user and
-     * Inserts user in User Table
+     * Inserts user in User table
      */
     public long insert(User user) {
         long id = uniqueIDGenerator.generateUniqueId("User");
@@ -34,7 +33,7 @@ public class UserAccessor {
     }
 
     /** Gets the UserID of the user having the given username and email-id */
-    public Optional<Long> getUserIdFromUsernameAndEmail(String username, String emailID) {
+    public OptionalLong getUserIdFromUsernameAndEmail(String username, String emailID) {
         String SQLStatment = "SELECT UserID FROM User WHERE Username=@Username AND EmailID=@EmailID";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
@@ -44,9 +43,9 @@ public class UserAccessor {
                                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
         if(resultSet.isEmpty()) {
-            return Optional.empty();
+            return OptionalLong.empty();
         }
-        return Optional.of(resultSet.get(0).getUserId());
+        return OptionalLong.of(resultSet.get(0).getUserId());
     }
 
     /** Checks if a user with the given username or email-id already exists in User table */

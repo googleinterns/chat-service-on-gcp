@@ -8,11 +8,8 @@ import java.net.URLConnection;
 import java.util.Base64;
 
 public final class GoogleUserMapper {
-    private static Base64.Encoder encoder;
 
-    private GoogleUserMapper() {
-        encoder = Base64.getEncoder();
-    }
+    private GoogleUserMapper() { }
 
     public static String getUsernameFromEmail(String email) {
         int usernameEndsAt = email.indexOf('@');
@@ -33,6 +30,7 @@ public final class GoogleUserMapper {
             baos.write(buffer, 0, read);
         }
         baos.flush();
+        Base64.Encoder encoder = Base64.getEncoder();
         return encoder.encodeToString(baos.toByteArray());
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 public final class GoogleUser {
 
@@ -65,9 +66,9 @@ public final class GoogleUser {
         GoogleIdToken.Payload payload = idToken.getPayload();
         String email = payload.getEmail();
         String username = GoogleUserMapper.getUsernameFromEmail(email);
-        Optional<Long> existingUser = userAccessor.getUserIdFromUsernameAndEmail(username, email);
+        OptionalLong existingUser = userAccessor.getUserIdFromUsernameAndEmail(username, email);
         if(existingUser.isPresent()) {
-            return existingUser.get();
+            return existingUser.getAsLong();
         }
         String picture = null;
         Object pictureUrl = payload.get("picture");
@@ -82,7 +83,6 @@ public final class GoogleUser {
         } else {
             newUser = new User(username, email, picture);
         }
-        long id = userAccessor.insert(newUser);
-        return id;
+        return userAccessor.insert(newUser);
     }
 }
