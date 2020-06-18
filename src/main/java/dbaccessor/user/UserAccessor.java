@@ -32,12 +32,10 @@ public class UserAccessor {
         return id;
     }
 
-    /** Gets the UserID of the user having the given username and email-id */
-    public OptionalLong getUserIdFromUsernameAndEmail(String username, String emailID) {
-        String SQLStatment = "SELECT UserID FROM User WHERE Username=@Username AND EmailID=@EmailID";
+    /** Gets the UserID of the user having the given email-id */
+    public OptionalLong getUserIdFromEmail(String emailID) {
+        String SQLStatment = "SELECT UserID FROM User WHERE EmailID=@EmailID";
         Statement statement = Statement.newBuilder(SQLStatment)
-                                .bind("Username")
-                                .to(username)
                                 .bind("EmailID")
                                 .to(emailID)
                                 .build();

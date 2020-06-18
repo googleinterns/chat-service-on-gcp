@@ -65,11 +65,11 @@ public final class GoogleUser {
         GoogleIdToken idToken = tokenResponse.parseIdToken();
         GoogleIdToken.Payload payload = idToken.getPayload();
         String email = payload.getEmail();
-        String username = GoogleUserMapper.getUsernameFromEmail(email);
-        OptionalLong existingUser = userAccessor.getUserIdFromUsernameAndEmail(username, email);
+        OptionalLong existingUser = userAccessor.getUserIdFromEmail(email);
         if(existingUser.isPresent()) {
             return existingUser.getAsLong();
         }
+        String username = GoogleUserMapper.getUsernameFromEmail(email);
         String picture = null;
         Object pictureUrl = payload.get("picture");
         if(pictureUrl != null) {

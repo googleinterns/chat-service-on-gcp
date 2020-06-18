@@ -1,5 +1,9 @@
 package googlesignin;
 
+import dbaccessor.user.UserAccessor;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +13,9 @@ import java.util.Base64;
 
 public final class GoogleUserMapper {
 
+    @Autowired
+    private static UserAccessor userAccessor;
+
     private GoogleUserMapper() { }
 
     public static String getUsernameFromEmail(String email) {
@@ -16,7 +23,12 @@ public final class GoogleUserMapper {
         if(usernameEndsAt == -1) {
             throw new IllegalArgumentException();
         }
-        return email.substring(0, usernameEndsAt);
+        String baseUsername = email.substring(0, usernameEndsAt);
+        String username = baseUsername;
+        while(userAccessor.checkIfUsernameExists(username)) {
+            username = baseUsername + RandomStringUtils.randomAlphanumeric(3);
+        }
+        return username;
     }
 
     public static String getPictureFromUrl(String pictureUrl) throws IOException {
