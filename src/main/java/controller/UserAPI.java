@@ -71,8 +71,9 @@ public class UserAPI {
         }
 
         /* Checks if Username or email exists - throws exception if it does */
-        if (userAccessor.checkIfUserExists(username, emailID)) {
-            throw new UserAlreadyExistsException(path);
+        int bitMask = userAccessor.checkIfUsernameOrEmailIdExists(username, emailID);
+        if (bitMask != 0) {
+            throw new UserAlreadyExistsException(path, bitMask);
         }
         User newUser = new User(username, password, emailID, mobileNo, base64Image);
         /* Inserts new entry into User table */

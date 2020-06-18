@@ -4,6 +4,7 @@ import entity.User;
 import controller.ListChats;
 import helper.UniqueIdGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,18 +42,34 @@ public class UserAccessor {
         spannerTemplate.insert(user);
     }
 
-    /* Checks if a user with the given username or email-id already exists in User table */
-    public boolean checkIfUserExists(String username, String emailID) {
-        String SQLStatment = "SELECT Username FROM User WHERE Username=@Username OR EmailID=@EmailID";
+    /**
+     * Checks if there exists users having given username or email-id
+     * If no such user exists, return 0
+     * If a user having only the given username exists return 1
+     * If a user having only the given email-id exists return 2
+     * If a user having both given username and email-id exists return 3
+     */
+    public int checkIfUsernameOrEmailIdExists(String username, String emailID) {
+        String SQLStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username OR EmailID=@EmailID";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
                                 .to(username)
                                 .bind("EmailID")
                                 .to(emailID)
                                 .build();
-        return !spannerTemplate
-                .query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)) //setAllowPartialRead for reading specific columns
-                .isEmpty();
+        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
+        int usernameBit = 0;
+        int emailIdBit = 1;
+        int setBits = 0;
+        for(User user: resultSet) {
+            if(user.getUsername().equals(username)) {
+                setBits |= (1 << usernameBit);
+            }
+            if(user.getEmailID().equals(emailID)) {
+                setBits |= (1 << emailIdBit);
+            }
+        }
+        return setBits;
     }
 
     /**
