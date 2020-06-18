@@ -55,8 +55,8 @@ public final class GoogleUser {
     }
 
     /**
-     * Retrieves the username and email-id of signed-in user
-     * Checks if an entry with the same username and email-id exists
+     * Retrieves the email-id of signed-in user
+     * Checks if an entry with the same email-id exists
      * If it exists, then return the UserID of existing user
      * Else create a new entry in the User table
      * And return the UserID of the newly created user
