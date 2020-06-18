@@ -202,8 +202,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPreferences.Editor mEditor = mPrefs.edit();
         mEditor.putString("currentUser", currentUser).apply();
     }
-
-
+    
     private void authenticateFromServer() throws JSONException
     {
         String userName = usernameEditText.getText().toString();
