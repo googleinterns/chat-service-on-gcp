@@ -11,7 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 @Component
-public class GoogleAuthenticator {
+public final class GoogleAuthenticator {
 
     private static final String CLIENT_SECRET_FILE =
         "src/main/resources/client_secret_731468299245-enaig2iil558lcjp15jmejvpphn5vpg5.apps.googleusercontent.com.json";

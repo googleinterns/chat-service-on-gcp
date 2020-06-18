@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public class GoogleUser {
-
-    @Autowired
-    private GoogleUserMapper googleUserMapper;
+public final class GoogleUser {
 
     @Autowired
     private UserAccessor userAccessor;
@@ -67,7 +64,7 @@ public class GoogleUser {
         GoogleIdToken idToken = tokenResponse.parseIdToken();
         GoogleIdToken.Payload payload = idToken.getPayload();
         String email = payload.getEmail();
-        String username = googleUserMapper.getUsernameFromEmail(email);
+        String username = GoogleUserMapper.getUsernameFromEmail(email);
         Optional<Long> existingUser = userAccessor.getUserIdFromUsernameAndEmail(username, email);
         if(existingUser.isPresent()) {
             return existingUser.get();
@@ -75,7 +72,7 @@ public class GoogleUser {
         String picture = null;
         Object pictureUrl = payload.get("picture");
         if(pictureUrl != null) {
-            picture = googleUserMapper.getPictureFromUrl(pictureUrl.toString());
+            picture = GoogleUserMapper.getPictureFromUrl(pictureUrl.toString());
         }
         String userId = payload.getSubject();
         Optional<String> mobileNo = getPhoneNumber(userId);

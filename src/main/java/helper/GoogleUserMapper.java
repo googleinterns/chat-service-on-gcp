@@ -7,16 +7,22 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Base64;
 
-public class GoogleUserMapper {
-    public String getUsernameFromEmail(String email) {
+public final class GoogleUserMapper {
+    private static Base64.Encoder encoder;
+
+    private GoogleUserMapper() {
+        encoder = Base64.getEncoder();
+    }
+
+    public static String getUsernameFromEmail(String email) {
         int usernameEndsAt = email.indexOf('@');
         if(usernameEndsAt == -1) {
-            return null;
+            throw new IllegalArgumentException();
         }
         return email.substring(0, usernameEndsAt);
     }
 
-    public String getPictureFromUrl(String pictureUrl) throws IOException {
+    public static String getPictureFromUrl(String pictureUrl) throws IOException {
         URL imageUrl = new URL(pictureUrl);
         URLConnection connection = imageUrl.openConnection();
         InputStream inputStream = connection.getInputStream();
@@ -27,7 +33,6 @@ public class GoogleUserMapper {
             baos.write(buffer, 0, read);
         }
         baos.flush();
-        Base64.Encoder encoder = Base64.getEncoder();
         return encoder.encodeToString(baos.toByteArray());
     }
 }
