@@ -207,7 +207,7 @@ public final class ListMessages {
         }
         
         insertMessage.updateReceivedTsForMessages(messageListForReceivedTsUpdate);
-                 
+         
         return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messages);
     }
 }
