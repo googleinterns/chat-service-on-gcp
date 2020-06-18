@@ -49,7 +49,7 @@ public final class CreateUser {
             throw new UsernameAlreadyExistsException(path);
         } 
 
-        User newUser = new User(username);
+        User newUser = new User.Builder().username(username).build();
 
         newUser.setUserId(uniqueIdGenerator.generateUniqueId("User"));
         
