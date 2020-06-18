@@ -29,6 +29,13 @@ import java.util.regex.Pattern;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import static com.gpayinterns.chat.ServerHelper.BASE_URL;
+import static com.gpayinterns.chat.ServerHelper.SIGNUP;
+import static com.gpayinterns.chat.ServerHelper.USER_EMAIL;
+import static com.gpayinterns.chat.ServerHelper.USER_MOBILE;
+import static com.gpayinterns.chat.ServerHelper.USER_PASSWORD;
+import static com.gpayinterns.chat.ServerHelper.USER_USERNAME;
+
 
 public class RegistrationActivity extends AppCompatActivity
 {
@@ -112,17 +119,16 @@ public class RegistrationActivity extends AppCompatActivity
         String emailID = emailEditText.getText().toString();
         String phoneNum = phoneNumEditText.getText().toString();
         String password = passwordEditText.getText().toString();
-
-        String URL = "https://gcp-chat-service.an.r.appspot.com/signup";
+        String URL = BASE_URL + SIGNUP;
 
 
         JSONObject jsonBody = new JSONObject();
 
 
-        jsonBody.put("Username", userName);
-        jsonBody.put("EmailID", emailID);
-        jsonBody.put("MobileNo",phoneNum);
-        jsonBody.put("Password",password);
+        jsonBody.put(USER_USERNAME, userName);
+        jsonBody.put(USER_EMAIL, emailID);
+        jsonBody.put(USER_MOBILE,phoneNum);
+        jsonBody.put(USER_PASSWORD,password);
 
 
 
@@ -152,6 +158,7 @@ public class RegistrationActivity extends AppCompatActivity
                                 if(active)
                                 {
                                     startActivity(new Intent(RegistrationActivity.this,ViewContactsActivity.class));
+                                    finish();
                                 }
                             }
                         }

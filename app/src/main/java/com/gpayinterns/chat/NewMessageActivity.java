@@ -42,6 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.gpayinterns.chat.ServerHelper.BASE_URL;
+import static com.gpayinterns.chat.ServerHelper.CHATS;
+import static com.gpayinterns.chat.ServerHelper.MESSAGES;
+import static com.gpayinterns.chat.ServerHelper.USERS;
+
 public class NewMessageActivity extends AppCompatActivity implements View.OnClickListener
 {
     EditText messageEditText;
@@ -201,7 +206,8 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
     private void getChatID() throws JSONException
     {
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + currentUser+"/chats";
+        String URL = BASE_URL + USERS + "/"
+                + currentUser + "/" + CHATS;
 
         String username = ((EditText)findViewById(R.id.new_message_username)).getText().toString();
 
@@ -280,8 +286,9 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
     private void sendFirstMessageToServer() throws JSONException
     {
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/" + currentUser
-                +"/chats/"+chatID+"/messages";
+        String URL = BASE_URL + USERS + "/" +
+                currentUser + "/" + CHATS +
+                "/" + chatID + "/" + MESSAGES;
 
         Log.d("message sent to server: ",messageText);
 

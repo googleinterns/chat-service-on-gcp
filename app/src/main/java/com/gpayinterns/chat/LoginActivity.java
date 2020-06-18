@@ -36,6 +36,11 @@ import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import static com.gpayinterns.chat.ServerHelper.BASE_URL;
+import static com.gpayinterns.chat.ServerHelper.LOGIN;
+import static com.gpayinterns.chat.ServerHelper.USER_PASSWORD;
+import static com.gpayinterns.chat.ServerHelper.USER_USERNAME;
+
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
 {
@@ -204,14 +209,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String userName = usernameEditText.getText().toString();
         String password = passwordEditText.getText().toString();
 
-        String URL = "https://gcp-chat-service.an.r.appspot.com/login";
+        String URL = BASE_URL + LOGIN;
 
 
         JSONObject jsonBody = new JSONObject();
 
 
-        jsonBody.put("Username", userName);
-        jsonBody.put("Password",password);
+        jsonBody.put(USER_USERNAME, userName);
+        jsonBody.put(USER_PASSWORD,password);
 
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest

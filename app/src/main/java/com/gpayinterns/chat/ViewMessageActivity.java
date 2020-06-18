@@ -40,6 +40,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import util.Message;
 
+import static com.gpayinterns.chat.ServerHelper.BASE_URL;
+import static com.gpayinterns.chat.ServerHelper.CHATS;
+import static com.gpayinterns.chat.ServerHelper.END_MESSAGE;
+import static com.gpayinterns.chat.ServerHelper.MESSAGES;
+import static com.gpayinterns.chat.ServerHelper.START_MESSAGE;
+import static com.gpayinterns.chat.ServerHelper.USERS;
+
 public class ViewMessageActivity extends AppCompatActivity
 {
 
@@ -120,8 +127,9 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void sendMessageToServer(String messageText) throws JSONException
     {
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"
-                + currentUser + "/chats/"+chatID+"/messages";
+        String URL = BASE_URL + USERS
+                + "/" + currentUser + "/" + CHATS
+                + "/" + chatID + "/" + MESSAGES;
 
 
         JSONObject jsonBody = new JSONObject();
@@ -231,8 +239,12 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void receivePreviousMessagesFromServer()
     {
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats/"+
-                chatID + "/messages?endMessageId="+messages.get(0).messageID;
+        String firstMessageID = messages.get(0).messageID;
+        String URL = BASE_URL + USERS +
+                "/" + currentUser + "/" + CHATS +
+                "/" + chatID + "/" + MESSAGES +
+                "?" + END_MESSAGE + "=" + firstMessageID;
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {
@@ -331,8 +343,11 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void firstReceiveMessageFromServer()
     {
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats/"+
-                chatID + "/messages?endMessageId="+lastMessageID;
+        String URL = BASE_URL + USERS +
+                "/" + currentUser + "/" +
+                CHATS + "/" + chatID + "/" +
+                MESSAGES + "?" + END_MESSAGE + "=" + lastMessageID;
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {
@@ -399,9 +414,11 @@ public class ViewMessageActivity extends AppCompatActivity
         Log.d("lastMessageID:",lastMessageID);
 
 
+        String URL = BASE_URL + USERS +
+                "/" + currentUser + "/" + CHATS +
+                "/" + chatID + "/" + MESSAGES + "?" +
+                START_MESSAGE + "=" + lastMessageID;
 
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats/"+
-                chatID + "/messages?startMessageId="+lastMessageID;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {

@@ -38,6 +38,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import util.User;
 
+import static com.gpayinterns.chat.ServerHelper.USERS;
+import static com.gpayinterns.chat.ServerHelper.BASE_URL;
+import static com.gpayinterns.chat.ServerHelper.CHATS;
+
 public class ViewContactsActivity extends AppCompatActivity
 {
     public static final String CHAT_LOGGED_IN_USER = "CHAT_LOGGED_IN_USER";
@@ -83,7 +87,7 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         Log.d("currentUser sent to server:",currentUser);
 
-        String URL = "https://gcp-chat-service.an.r.appspot.com/users/"+ currentUser +"/chats";
+        String URL = BASE_URL + USERS + "/" + currentUser + "/" + CHATS;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {
