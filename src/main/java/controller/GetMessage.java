@@ -21,6 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 
+/**
+ * Controller which responds to client requests to get the details of a message.
+ * The response contains:
+ * (1)  MessageId
+ * (2)  ChatId
+ * (3)  SentByCurrentUser
+ * (4)  ContentType
+ * (5)  TextContent
+ * (6)  Sent Timestamp
+ * (7)  Received Timestamp
+ * (8)  Creation Timestamp
+ */
 @RestController
 public final class GetMessage {
 
@@ -36,14 +48,10 @@ public final class GetMessage {
     @Autowired
     private UserChatAccessor queryUserChat;
 
-    @GetMapping("/users/{userId}/chats/messages/{messageId}")
-    public void getMessageWithoutChatIdPathVariable(HttpServletRequest request) {
-
-        String path = request.getRequestURI();
-
-        throw new ChatIdMissingFromRequestURLPathException(path);
-    }
-
+    /**
+     * Responds to requests with missing userId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users/chats/{chatId}/messages/{messageId}")
     public void getMessageWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -52,6 +60,22 @@ public final class GetMessage {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
+    @GetMapping("/users/{userId}/chats/messages/{messageId}")
+    public void getMessageWithoutChatIdPathVariable(HttpServletRequest request) {
+
+        String path = request.getRequestURI();
+
+        throw new ChatIdMissingFromRequestURLPathException(path);
+    }
+
+    /**
+     * Responds to complete requests.
+     * Returns details of the requested Message.
+     */
     @GetMapping("/users/{userId}/chats/{chatId}/messages/{messageId}")
     public Map<String, Object> getMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @PathVariable("messageId") String messageIdString, HttpServletRequest request) {
 
@@ -62,33 +86,29 @@ public final class GetMessage {
         long chatId = Long.parseLong(chatIdString);
         long messageId = Long.parseLong(messageIdString);
 
-        //check if the passed userId is valid
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
         
-        //check if the passed chatId is valid
         if (!queryChat.checkIfChatIdExists(chatId)) {
             throw new ChatIdDoesNotExistException(path);
         }
 
-        //check if user is part of chat
+        //Checks if the user is part of chat.
         if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
             throw new UserChatIdDoesNotExistException(path);
         }
         
-        //check if the passed messageId is valid
         if (!queryMessage.checkIfMessageIdExists(messageId)) {
             throw new MessageIdDoesNotExistException(path);
         }
 
-        //check if passed message belongs to chat 
         if (!queryMessage.checkIfMessageIdBelongsToChatId(messageId, chatId)) {
             throw new MessageIdDoesNotBelongToChatIdException(path);
         }
 
         Message message = queryMessage.getMessage(messageId);
     
-        return SuccessResponseGenerator.getSuccessResponseForGetMessage(message);
+        return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, userId);
     }
 }

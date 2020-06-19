@@ -19,6 +19,7 @@ import java.util.Map;
 
 import com.google.cloud.Timestamp;
 import java.util.List;
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/**
+ * Controller which responds to client requests to get the list of messages of a chat.
+ * Each entry in the response contains:
+ * (1)  MessageId
+ * (2)  Creation Timestamp
+ * (3)  ChatId
+ * (4)  SentByCurrentUser
+ * (5)  ContentType
+ * (6)  TextContent
+ * (7)  Sent Timestamp
+ * (8)  Received Timestamp
+ */
 @RestController
 public final class ListMessages {
 
@@ -48,6 +61,10 @@ public final class ListMessages {
     
     private static final int LOWER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN = 50;
 
+    /**
+     * Responds to requests with missing userId and chatId URL Path Variables.
+     * Throws an exception for missing userId URL Path Variable. 
+     */
     @GetMapping("/users/chats/messages")
     public void listMessagesWithoutUserIdChatIdPathVariable(HttpServletRequest request) {
 
@@ -56,6 +73,10 @@ public final class ListMessages {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users/chats/{chatId}/messages")
     public void listMessagesWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -64,6 +85,10 @@ public final class ListMessages {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users/{userId}/chats/messages")
     public void listMessagesWithoutChatIdPathVariable(HttpServletRequest request) {
 
@@ -72,6 +97,10 @@ public final class ListMessages {
         throw new ChatIdMissingFromRequestURLPathException(path);
     }
     
+    /**
+     * Responds to complete requests.
+     * Returns the list of message details of the given Chat.
+     */
     @GetMapping("/users/{userId}/chats/{chatId}/messages")
     public Map<String, List<Map<String, Object>>> listMessages(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestParam(value = "startMessageId", required = false) String startMessageIdString, @RequestParam(value = "endMessageId", required = false) String endMessageIdString, @RequestParam(value = "count", required = false) String countString, HttpServletRequest request) {
 
@@ -91,22 +120,18 @@ public final class ListMessages {
 
         List<Message> messages;
         
-        //check if the passed userId is valid
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
         
-        //check if the passed chatId is valid
         if (!queryChat.checkIfChatIdExists(chatId)) {
             throw new ChatIdDoesNotExistException(path);
         }
 
-        //check if user is part of chat
         if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
             throw new UserChatIdDoesNotExistException(path);
         }
 
-        //configure the value of count
         if (countString == null) {
             count = LOWER_LIMIT_OF_MESSAGE_COUNT_TO_RETURN;
         } else {
@@ -121,17 +146,15 @@ public final class ListMessages {
 
         if (startMessageIdString != null) {
             startMessageId = Long.parseLong(startMessageIdString);
-            //check if startMessageId is valid
+            
             if (!queryMessage.checkIfMessageIdExists(startMessageId)) {
                 throw new MessageIdDoesNotExistException(path);
             } 
-
-            //check if startMessageId is part of this chat
+            
             if (!queryMessage.checkIfMessageIdBelongsToChatId(startMessageId, chatId)) {
                 throw new MessageIdDoesNotBelongToChatIdException(path);
             } 
-
-            //get CreationTs of startMessageId 
+            
             startCreationTs = queryMessage.getCreationTsForMessageId(startMessageId);
         } else {
             startCreationTs = null;
@@ -139,50 +162,52 @@ public final class ListMessages {
 
         if (endMessageIdString != null) {
             endMessageId = Long.parseLong(endMessageIdString);
-            //check if endMessageId is valid
+            
             if (!queryMessage.checkIfMessageIdExists(endMessageId)) {
                 throw new MessageIdDoesNotExistException(path);
             } 
-
-            //check if endMessageId is part of this chat
+            
             if (!queryMessage.checkIfMessageIdBelongsToChatId(endMessageId, chatId)) {
                 throw new MessageIdDoesNotBelongToChatIdException(path);
             }
-
-            //get CreationTs of endCreationTs 
+            
             endCreationTs = queryMessage.getCreationTsForMessageId(endMessageId);
         } else {
             endCreationTs = null;
         }
 
         if (startCreationTs != null && endCreationTs != null) {
-            //check if startMessageId is after endMessageId
+            //Checks if startCreation Timestamp is after endCreation Timestamp.
             if (startCreationTs.compareTo(endCreationTs) > 0) {
                 Timestamp temp = startCreationTs;
                 startCreationTs = endCreationTs;
                 endCreationTs = temp;
             }
-            //get messages within the required time frame
+            
             messages = queryMessage.listCountMessagesOfChatIdWithinGivenTime(startCreationTs, endCreationTs, count, chatId);
         } else if (startCreationTs != null) {
-            //get messages beginning at the start time
             messages = queryMessage.listCountMessagesOfChatIdFromStartTime(startCreationTs, count, chatId);
         } else if (endCreationTs != null) {
-            //get messages before the end time
             messages = queryMessage.listCountMessagesOfChatIdBeforeEndTime(endCreationTs, count, chatId);
         } else {
-            //get latest messages 
             messages = queryMessage.listLatestCountMessagesOfChatId(count, chatId);
         }
 
-        //check ReceivedTs of each message not sent by current user- if it is null set it to the time when listMessages was called
+        /*
+         * Checks Received Timestamp of each message not sent by current user.
+         * If it is null, sets it to the time when listMessages was called.
+         */
+        List<Message> messageListForReceivedTsUpdate = new ArrayList<Message>();
+
         for (Message message : messages) {
             if (message.getReceivedTs() == null && message.getSenderId() != userId) {
                 message.setReceivedTs(receivedTs);
-                insertMessage.insertReceivedTs(message);
+                messageListForReceivedTsUpdate.add(message);
             }
         }
         
+        insertMessage.updateReceivedTsForMessages(messageListForReceivedTsUpdate);
+         
         return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messages);
     }
 }

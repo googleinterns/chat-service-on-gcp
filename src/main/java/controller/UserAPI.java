@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,10 +78,17 @@ public class UserAPI {
         }
 
         // Checks if Username or email exists - throws exception if it does
-        if (userAccessor.checkIfUserExists(username, emailID)) {
-            throw new UserAlreadyExistsException(path);
+        EnumSet<User.UniqueFields> usedFields = userAccessor.checkIfUsernameOrEmailIdExists(username, emailID);
+        if (!usedFields.isEmpty()) {
+            throw new UserAlreadyExistsException(path, usedFields);
         }
-        User newUser = new User(username, password, emailID, mobileNo, base64Image);
+        User newUser = User.newBuilder()
+                .username(username)
+                .password(password)
+                .emailId(emailID)
+                .mobileNo(mobileNo)
+                .picture(base64Image)
+                .build();
         // Inserts new entry into User table
         long id = userAccessor.insert(newUser);
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", id);

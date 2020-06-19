@@ -5,14 +5,21 @@ import com.google.common.collect.ImmutableList;
 import controller.ListChats;
 import entity.User;
 import helper.UniqueIdGenerator;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.OptionalLong;
 
+/**
+ * Accessor which performs database accesses for the User entity.
+ */
 @Component
 public class UserAccessor {
     
@@ -22,10 +29,9 @@ public class UserAccessor {
     @Autowired
     private UniqueIdGenerator uniqueIDGenerator;
 
-    /**
-     * Generates a unique id for user and
-     * Inserts user in User table
-     */
+    /*
+     * Inserts all attributes of the given User in the DB.
+     */ 
     public long insert(User user) {
         long id = uniqueIDGenerator.generateUniqueId("User");
         user.setUserId(id);
@@ -33,35 +39,52 @@ public class UserAccessor {
         return id;
     }
 
-    /** Gets the UserID of the user having the given email-id */
+    /*
+     * Inserts all attributes of the given User in the DB.
+     * The userId of the User is present within the User object.
+     */ 
+    public void insertGivenUserId(User user) {
+        spannerTemplate.insert(user);
+    }
+  
+  /** Gets the UserID of the user having the given email-id */
     public OptionalLong getUserIdFromEmail(String emailID) {
         String SQLStatment = "SELECT UserID FROM User WHERE EmailID=@EmailID";
-        Statement statement = Statement.newBuilder(SQLStatment)
-                                .bind("EmailID")
-                                .to(emailID)
-                                .build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
         if(resultSet.isEmpty()) {
             return OptionalLong.empty();
         }
         return OptionalLong.of(resultSet.get(0).getUserId());
     }
 
-    /** Checks if a user with the given username or email-id already exists in User table */
-    public boolean checkIfUserExists(String username, String emailID) {
-        String SQLStatment = "SELECT Username FROM User WHERE Username=@Username OR EmailID=@EmailID";
+    /**
+     * Checks if there exists users having given username or email-id
+     * If no such user exists, returns empty set
+     * Otherwise returns EnumSet of matching fields
+     */
+    public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username, String emailID) {
+        String SQLStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username OR EmailID=@EmailID";
         Statement statement = Statement.newBuilder(SQLStatment)
-                .bind("Username")
-                .to(username)
-                .bind("EmailID")
-                .to(emailID)
-                .build();
-        return !spannerTemplate
-                .query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true))
-                .isEmpty();
+                                .bind("Username")
+                                .to(username)
+                                .bind("EmailID")
+                                .to(emailID)
+                                .build();
+        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
+        EnumSet<User.UniqueFields> matchingFields = EnumSet.noneOf(User.UniqueFields.class);
+        for(User user: resultSet) {
+            if(user.getUsername().equals(username)) {
+                matchingFields.add(User.UniqueFields.USERNAME);
+            }
+            if(user.getEmailID().equals(emailID)) {
+                matchingFields.add(User.UniqueFields.EMAIL);
+            }
+        }
+        return matchingFields;
     }
-
-    /** Checks if there is a row in the User table having the given UserID */
+        
+    /**
+     * Checks if a User with the given userId already exists.
+     */
     public boolean checkIfUserIdExists(long id) {
         String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userID";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -73,7 +96,9 @@ public class UserAccessor {
                 .isEmpty();
     }
 
-    /** Retrieves UserID of user having the given username */
+    /**
+     * Returns the UserId of the User with the given username.
+     */
     public long getUserIdFromUsername(String username) {
         String SQLStatment = "SELECT UserID FROM User WHERE Username=@Username";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -120,11 +145,10 @@ public class UserAccessor {
         }
         return resultSet.get(0);
     }
-    
-    public void insertAll(User user) {
-        spannerTemplate.insert(user);
-    } 
 
+    /**
+     * Checks if a User with the given username already exists.
+     */
     public boolean checkIfUsernameExists(String username) {
 
         String SQLStatment = "SELECT Username FROM User WHERE Username=@username";
@@ -132,6 +156,13 @@ public class UserAccessor {
         return !spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)).isEmpty();
     }
 
+    /**
+     * Returns details of the User with the given UserId.
+     * Details include:
+     * (1)  UserId
+     * (2)  Username
+     * (3)  Creation Timestamp 
+     */
     public User getUser(long userId) {
 
         String SQLStatment = "SELECT * FROM User WHERE UserID=@userId";
@@ -139,6 +170,12 @@ public class UserAccessor {
         return spannerTemplate.query(User.class, statement, null).get(0);
     }
 
+    /**
+     * Returns details of Users with whome the given User is engaged in a Chat with.
+     * Details include:
+     * (1) Username
+     * (2) ChatId
+     */
     public ImmutableList<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
 
         String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";

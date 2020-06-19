@@ -17,6 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 
+/**
+ * Controller which responds to client requests to get the details of a chat.
+ * The response contains:
+ * (1)  ChatId
+ * (2)  LastSentMessageId
+ * (3)  Creation Timestamp
+ */
 @RestController
 public final class GetChat {
     
@@ -29,6 +36,10 @@ public final class GetChat {
     @Autowired
     private UserChatAccessor queryUserChat;
 
+    /**
+     * Responds to requests with missing chatId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users/chats/{chatId}")
     public void getChatWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -37,6 +48,10 @@ public final class GetChat {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to complete requests.
+     * Returns details of the requested Chat.
+     */
     @GetMapping("/users/{userId}/chats/{chatId}")
     public Map<String, Object> getChat(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, HttpServletRequest request) {
 
@@ -46,12 +61,10 @@ public final class GetChat {
         long userId = Long.parseLong(userIdString);
         long chatId = Long.parseLong(chatIdString);
 
-        //check if the passed userId is valid
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         }
         
-        //check if the passed chatId is valid
         if (!queryChat.checkIfChatIdExists(chatId)) {
             throw new ChatIdDoesNotExistException(path);
         } 

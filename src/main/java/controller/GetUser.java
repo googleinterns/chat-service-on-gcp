@@ -13,13 +13,23 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 
-//this annotation tells that this class can contain methods which map to URL requests
+/**
+ * Controller which responds to client requests to get the details of the user itself.
+ * The response contains:
+ * (1)  UserId
+ * (2)  Username
+ * (3)  Creation Timestamp
+ */
 @RestController
 public final class GetUser {
 
     @Autowired 
     private UserAccessor queryUser;
 
+    /**
+     * Responds to requests with missing userId URL Path Variable.
+     * Throws an exception for the same. 
+     */
     @GetMapping("/users")
     public void getUserWithoutUserIdPathVariable(HttpServletRequest request) {
 
@@ -28,6 +38,10 @@ public final class GetUser {
         throw new UserIdMissingFromRequestURLPathException(path);
     }
 
+    /**
+     * Responds to complete requests.
+     * Returns details of the requested User.
+     */
     @GetMapping("/users/{userId}")
     public Map<String, Object> getUser(@PathVariable("userId") String userIdString, HttpServletRequest request) {
 
@@ -36,7 +50,6 @@ public final class GetUser {
 
         long userId = Long.parseLong(userIdString);
 
-        //check if UserId is valid
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
         } 
