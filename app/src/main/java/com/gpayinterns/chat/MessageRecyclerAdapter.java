@@ -2,6 +2,7 @@ package com.gpayinterns.chat;
 
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 
 import com.gpayinterns.chat.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -68,9 +71,8 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
-        Log.d("position",Integer.toString(position));
-        Log.d("text",mMessages.get(position).text);
         holder.mMessage.setText(mMessages.get(position).text);
+        holder.mTime.setText(convertDate(mMessages.get(position).sendTime));
     }
 
 
@@ -83,13 +85,20 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     public class ViewHolder extends RecyclerView.ViewHolder
     {
         public final TextView mMessage;
+        public final TextView mTime;
         public ViewHolder(@NonNull View itemView)
         {
             super(itemView);
             if(mViewType==0)
+            {
                 mMessage = (TextView) itemView.findViewById(R.id.receive_message_text);
+                mTime = (TextView) itemView.findViewById(R.id.time_receive_message_text);
+            }
             else
+            {
                 mMessage = (TextView) itemView.findViewById(R.id.send_message_text);
+                mTime = (TextView) itemView.findViewById(R.id.time_send_message_text);
+            }
         }
     }
 
@@ -123,5 +132,10 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
             mMessages.add(0,newMessages.get(0));
             notifyItemInserted(0);
         }
+    }
+
+    public static String convertDate(String dateInMilliseconds)
+    {
+        return "      "+DateFormat.format("hh:mm", Long.parseLong(dateInMilliseconds)).toString();
     }
 }

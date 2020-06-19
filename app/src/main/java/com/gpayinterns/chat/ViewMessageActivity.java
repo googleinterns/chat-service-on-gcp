@@ -258,15 +258,11 @@ public class ViewMessageActivity extends AppCompatActivity
                             for(int i=0;i<messageList.length();i++)
                             {
                                 JSONObject message = (JSONObject) messageList.get(i);
-
-                                String messageID = message.getString("MessageId");
-                                String chatID = message.getString("ChatId");
-                                boolean received = !message.getBoolean("SentByCurrentUser");
-                                String text = message.getString("TextContent");
-                                if(!messageIDSet.contains(messageID))
+                                Message newMessage = jsonToMessage(message);
+                                if(!messageIDSet.contains(newMessage.messageID))
                                 {
-                                    newMessages.add(new Message(messageID,chatID,received,text,(long)0));
-                                    messageIDSet.add(messageID);
+                                    newMessages.add(newMessage);
+                                    messageIDSet.add(newMessage.messageID);
                                 }
                             }
                             if(newMessages.size()>0)
@@ -362,15 +358,12 @@ public class ViewMessageActivity extends AppCompatActivity
                             for(int i=0;i<messageList.length();i++)
                             {
                                 JSONObject message = (JSONObject) messageList.get(i);
+                                Message newMessage = jsonToMessage(message);
 
-                                String messageID = message.getString("MessageId");
-                                String chatID = message.getString("ChatId");
-                                boolean received = !message.getBoolean("SentByCurrentUser");
-                                String text = message.getString("TextContent");
-                                if(!messageIDSet.contains(messageID))
+                                if(!messageIDSet.contains(newMessage.messageID))
                                 {
-                                    newMessages.add(new Message(messageID,chatID,received,text,(long)0));
-                                    messageIDSet.add(messageID);
+                                    newMessages.add(newMessage);
+                                    messageIDSet.add(newMessage.messageID);
                                 }
                             }
                             if(newMessages.size()>0 && active)
@@ -433,20 +426,16 @@ public class ViewMessageActivity extends AppCompatActivity
                             for(int i=0;i<messageList.length();i++)
                             {
                                 JSONObject message = (JSONObject) messageList.get(i);
-
-                                String messageID = message.getString("MessageId");
-                                String chatID = message.getString("ChatId");
-                                boolean received = !message.getBoolean("SentByCurrentUser");
-                                String text = message.getString("TextContent");
-                                if(!messageIDSet.contains(messageID))
+                                Message newMessage = jsonToMessage(message);
+                                if(!messageIDSet.contains(newMessage.messageID))
                                 {
-                                    newMessages.add(new Message(messageID,chatID,received,text,(long)0));
-                                    messageIDSet.add(messageID);
+                                    newMessages.add(newMessage);
+                                    messageIDSet.add(newMessage.messageID);
                                 }
 
                                 if(i==messageList.length()-1)
                                 {
-                                    lastMessageID = messageID;
+                                    lastMessageID = newMessage.messageID;
                                 }
                             }
                             if(newMessages.size()>0 && active)
@@ -493,7 +482,7 @@ public class ViewMessageActivity extends AppCompatActivity
         lastMessageID = messageID;
         findViewById(R.id.view_message_constraint_layout).requestFocus();
         List <Message> newMessage = new ArrayList<Message>();
-        newMessage.add(new Message(messageID,chatID,false,messageEditText.getText().toString(),(long)0));
+        newMessage.add(new Message(messageID,chatID,false,messageEditText.getText().toString(),"0"));
         Log.d("here",Integer.toString(newMessage.size()));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
@@ -510,5 +499,17 @@ public class ViewMessageActivity extends AppCompatActivity
             assert imm != null;
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    private Message jsonToMessage(JSONObject message) throws JSONException
+    {
+        String messageID = message.getString("MessageId");
+        String chatID = message.getString("ChatId");
+        boolean received = !message.getBoolean("SentByCurrentUser");
+        String text = message.getString("TextContent");
+        JSONObject sendTime = message.getJSONObject("CreationTs");
+        String seconds = sendTime.getString("seconds");
+
+        return new Message(messageID,chatID,received,text,seconds+"000");
     }
 }
