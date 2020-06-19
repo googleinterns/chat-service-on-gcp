@@ -32,7 +32,7 @@ public class User {
   @Column(name = "Picture")
   private String Picture;
 
-  public enum  UniqueFields {
+  public enum UniqueFields {
     USERNAME, EMAIL
   }
 
