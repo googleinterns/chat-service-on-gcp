@@ -5,10 +5,69 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 
-import java.util.Base64;
 
 @Table(name = "User")
 public class User {
+
+  public static class Builder {
+
+    private Timestamp creationTs;
+    private long userId;
+    private String username;
+    private String password;
+    private String emailId;
+    private String mobileNo;
+    private String picture;
+
+    private Builder() {}
+
+    public Builder creationTs(Timestamp creationTs) {
+      this.creationTs = creationTs;
+      return this;
+    }
+
+    public Builder userId(long userId) {
+      this.userId = userId;
+      return this;
+    }
+
+    public Builder username(String username) {
+      this.username = username;
+      return this;
+    }
+
+    public Builder password(String password) {
+      this.password = password;
+      return this;
+    }
+
+    public Builder emailId(String emailId) {
+      this.emailId = emailId;
+      return this;
+    }
+
+    public Builder mobileNo(String mobileNo) {
+      this.mobileNo = mobileNo;
+      return this;
+    }
+
+    public Builder picture(String picture) {
+      this.picture = picture;
+      return this;
+    }
+
+    public User build() {
+      User user = new User();
+      user.CreationTS = this.creationTs;
+      user.UserID = this.userId;
+      user.Username = this.username;
+      user.Password = this.password;
+      user.EmailID = this.emailId;
+      user.MobileNo = this.mobileNo;
+      user.Picture = this.picture;
+      return user;
+    }
+  }
 
   @Column(name = "CreationTS", spannerCommitTimestamp = true) 
   private Timestamp CreationTS;
@@ -35,55 +94,13 @@ public class User {
   public enum UniqueFields {
     USERNAME, EMAIL
   }
-
-  public User() {
+  
+  private User() {
 
   }
 
-  public User(
-              long id, 
-              String username, 
-              String password, 
-              String emailID, 
-              String mobileNo, 
-              String base64Image
-            ) {
-    
-    this.UserID = id;
-    this.Username = username;
-    this.Password = password;
-    this.EmailID = emailID;
-    this.MobileNo = mobileNo;
-    if(base64Image.length() != 0){
-      this.Picture = base64Image;
-    } else {
-      this.Picture = null;
-    }
-  }
-
-  public User(
-          String username,
-          String password,
-          String emailID,
-          String mobileNo,
-          String base64Image
-  ) {
-    this(-1, username, password, emailID, mobileNo, base64Image);
-  }
-
-  public User(long userId, String username) {
-    this.UserID = userId;
-    this.Username = username;
-  }
-
-  public User(long userId) {
-    this.UserID = userId;
-    this.Username = null;
-  }
-
-  public User(String username) {
-    this.UserID = 0;
-    this.Username = username;
+  public static Builder newBuilder() {
+    return new Builder();
   }
 
   public long getUserId(){
