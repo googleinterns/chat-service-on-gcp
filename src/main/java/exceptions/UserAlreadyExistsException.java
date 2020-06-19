@@ -1,6 +1,9 @@
 package exceptions;
 
 import java.lang.RuntimeException;
+import java.util.EnumSet;
+
+import entity.User;
 import org.springframework.http.HttpStatus;
 
 public class UserAlreadyExistsException extends RuntimeException implements APIException {
@@ -9,14 +12,14 @@ public class UserAlreadyExistsException extends RuntimeException implements APIE
     private String message;
     private final String path;
 
-    public UserAlreadyExistsException(String path, int bitMask) {
+    public UserAlreadyExistsException(String path, EnumSet<User.UniqueFields> usedFields) {
         super();
         this.path = path;
         message = "";
-        if((bitMask & 1) > 0) {
+        if(usedFields.contains(User.UniqueFields.USERNAME)) {
             message += "Username ";
         }
-        if((bitMask & 2) > 0) {
+        if(usedFields.contains(User.UniqueFields.EMAIL)) {
             message += "EmailId ";
         }
         message += "already exists.";

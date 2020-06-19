@@ -5,6 +5,7 @@ import controller.ListChats;
 import helper.UniqueIdGenerator;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +45,10 @@ public class UserAccessor {
 
     /**
      * Checks if there exists users having given username or email-id
-     * If no such user exists, return 0
-     * If a user having only the given username exists return 1
-     * If a user having only the given email-id exists return 2
-     * If a user having both given username and email-id exists return 3
+     * If no such user exists, returns empty set
+     * Otherwise returns EnumSet of matching fields
      */
-    public int checkIfUsernameOrEmailIdExists(String username, String emailID) {
+    public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username, String emailID) {
         String SQLStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username OR EmailID=@EmailID";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
@@ -58,18 +57,16 @@ public class UserAccessor {
                                 .to(emailID)
                                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
-        int usernameBit = 0;
-        int emailIdBit = 1;
-        int setBits = 0;
+        EnumSet<User.UniqueFields> matchingFields = EnumSet.noneOf(User.UniqueFields.class);
         for(User user: resultSet) {
             if(user.getUsername().equals(username)) {
-                setBits |= (1 << usernameBit);
+                matchingFields.add(User.UniqueFields.USERNAME);
             }
             if(user.getEmailID().equals(emailID)) {
-                setBits |= (1 << emailIdBit);
+                matchingFields.add(User.UniqueFields.EMAIL);
             }
         }
-        return setBits;
+        return matchingFields;
     }
 
     /**
