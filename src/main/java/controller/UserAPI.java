@@ -74,7 +74,13 @@ public class UserAPI {
         if (userAccessor.checkIfUserExists(username, emailID)) {
             throw new UserAlreadyExistsException(path);
         }
-        User newUser = new User(username, password, emailID, mobileNo, base64Image);
+        User newUser = User.newBuilder()
+                .username(username)
+                .password(password)
+                .emailId(emailID)
+                .mobileNo(mobileNo)
+                .picture(base64Image)
+                .build();
         /* Inserts new entry into User table */
         long id = userAccessor.insert(newUser);
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", id);
