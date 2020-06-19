@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,8 +72,9 @@ public class UserAPI {
         }
 
         /* Checks if Username or email exists - throws exception if it does */
-        if (userAccessor.checkIfUserExists(username, emailID)) {
-            throw new UserAlreadyExistsException(path);
+        EnumSet<User.UniqueFields> usedFields = userAccessor.checkIfUsernameOrEmailIdExists(username, emailID);
+        if (!usedFields.isEmpty()) {
+            throw new UserAlreadyExistsException(path, usedFields);
         }
         User newUser = User.newBuilder()
                 .username(username)
