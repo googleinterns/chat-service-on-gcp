@@ -19,7 +19,7 @@ public class User {
     private String mobileNo;
     private String picture;
 
-    public Builder() {}
+    private Builder() {}
 
     public Builder creationTs(Timestamp creationTs) {
       this.creationTs = creationTs;
@@ -93,6 +93,10 @@ public class User {
 
   private User() {
 
+  }
+
+  public static Builder newBuilder() {
+    return new Builder();
   }
 
   public long getUserId(){

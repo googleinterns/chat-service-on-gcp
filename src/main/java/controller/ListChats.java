@@ -118,7 +118,7 @@ public final class ListChats {
             throw new UserIdDoesNotExistException(path);
         }
 
-        User user = new User.Builder().userId(userId).build();
+        User user = User.newBuilder().userId(userId).build();
         List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
         List<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getCreationTsOfLastSentMessageIdForChatsOfUser(userId);
 

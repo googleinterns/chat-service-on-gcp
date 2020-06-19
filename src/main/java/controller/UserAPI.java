@@ -74,7 +74,7 @@ public class UserAPI {
         if (userAccessor.checkIfUserExists(username, emailID)) {
             throw new UserAlreadyExistsException(path);
         }
-        User newUser = new User.Builder()
+        User newUser = User.newBuilder()
                 .username(username)
                 .password(password)
                 .emailId(emailID)
