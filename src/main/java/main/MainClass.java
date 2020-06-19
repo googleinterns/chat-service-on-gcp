@@ -3,7 +3,7 @@ package main;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
  
-@SpringBootApplication(scanBasePackages = {"entity", "controller", "dbaccessor", "exceptionhandler", "helper", "main"})
+@SpringBootApplication(scanBasePackages = {"entity", "controller", "dbaccessor", "exceptionhandler", "helper", "main", "googlesignin"})
 public class MainClass {
     public static void main(String[] args) {
 

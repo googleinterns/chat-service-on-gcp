@@ -2,6 +2,8 @@ package controller;
 
 import entity.User;
 import dbaccessor.user.UserAccessor;
+import googlesignin.GoogleAuthenticator;
+import googlesignin.GoogleUser;
 import helper.*;
 import exceptions.UserRequiredFieldMissingException;
 import exceptions.UserAlreadyExistsException;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +33,9 @@ public class UserAPI {
 
     @Autowired
     private RequestValidator requestValidator;
+
+    @Autowired
+    private GoogleAuthenticator googleAuthenticator;
 
     @Autowired
     private ErrorResponseBody errorResponseBody;
@@ -58,20 +64,20 @@ public class UserAPI {
     public Map<String, Object> signup(@RequestBody Map<String, Object> data, HttpServletRequest request) {
 
         String path = request.getRequestURI();
-        requestValidator.signupRequestValidator(data, path);
-        /* necessary fields */
+        requestValidator.signupRequestValidator(data.keySet(), path);
+        // necessary fields
         String username = data.get("Username").toString();
         String emailID = data.get("EmailID").toString();
         String password = data.get("Password").toString();
         String mobileNo = data.get("MobileNo").toString();
 
-        /* optional field */
+        // optional field
         String base64Image = "";
         if(data.get("Picture") != null){
             base64Image = data.get("Picture").toString();
         }
 
-        /* Checks if Username or email exists - throws exception if it does */
+        // Checks if Username or email exists - throws exception if it does
         EnumSet<User.UniqueFields> usedFields = userAccessor.checkIfUsernameOrEmailIdExists(username, emailID);
         if (!usedFields.isEmpty()) {
             throw new UserAlreadyExistsException(path, usedFields);
@@ -83,7 +89,7 @@ public class UserAPI {
                 .mobileNo(mobileNo)
                 .picture(base64Image)
                 .build();
-        /* Inserts new entry into User table */
+        // Inserts new entry into User table
         long id = userAccessor.insert(newUser);
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("User", id);
     }
@@ -91,7 +97,7 @@ public class UserAPI {
     @PostMapping(value = "/login", consumes={"application/json"})
     public Map<String, Object> login(@RequestBody Map<String, Object> data, HttpServletRequest request) {
         String path = request.getRequestURI();
-        requestValidator.loginRequestValidator(data, path);
+        requestValidator.loginRequestValidator(data.keySet(), path);
         String username = data.get("Username").toString();
         String password = data.get("Password").toString();
         long id = userAccessor.login(username, password);
@@ -117,5 +123,11 @@ public class UserAPI {
             response.put("Picture", user.getPicture());
         }
         return response;
+    }
+
+    @GetMapping("/googleSignIn")
+    public long googleSignIn(@RequestParam(value = "authCode", required = true) String authCode) throws IOException {
+        GoogleUser googleUser = googleAuthenticator.getGoogleUser(authCode);
+        return googleUser.getOrCreateUser();
     }
 }

@@ -1,7 +1,9 @@
 package dbaccessor.user;
 
-import entity.User;
+import com.google.cloud.spanner.Statement;
+import com.google.common.collect.ImmutableList;
 import controller.ListChats;
+import entity.User;
 import helper.UniqueIdGenerator;
 
 import java.util.ArrayList;
@@ -9,9 +11,11 @@ import java.util.EnumSet;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
-import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
+import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
+import org.springframework.stereotype.Component;
+
+import java.util.OptionalLong;
 
 /**
  * Accessor which performs database accesses for the User entity.
@@ -42,6 +46,20 @@ public class UserAccessor {
     public void insertGivenUserId(User user) {
         spannerTemplate.insert(user);
     }
+  
+  /** Gets the UserID of the user having the given email-id */
+    public OptionalLong getUserIdFromEmail(String emailID) {
+        String SQLStatment = "SELECT UserID FROM User WHERE EmailID=@EmailID";
+        Statement statement = Statement.newBuilder(SQLStatment)
+                .bind("EmailID")
+                .to(emailID)
+                .build();
+        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
+        if(resultSet.isEmpty()) {
+            return OptionalLong.empty();
+        }
+        return OptionalLong.of(resultSet.get(0).getUserId());
+    }
 
     /**
      * Checks if there exists users having given username or email-id
@@ -68,7 +86,7 @@ public class UserAccessor {
         }
         return matchingFields;
     }
-
+        
     /**
      * Checks if a User with the given userId already exists.
      */
@@ -97,8 +115,10 @@ public class UserAccessor {
                 .get(0).getUserId();
     }
 
-    /* Retrieves the UserID of the user having the given username and password
-        If no such user exists, returns -1 */
+    /**
+     * Retrieves the UserID of the user having the given username and password
+     * If no such user exists, returns -1
+     */
     public long login(String username, String password) {
         String SQLStatment = "SELECT UserID from User WHERE Username=@username AND Password=@password";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -114,8 +134,10 @@ public class UserAccessor {
         return resultSet.get(0).getUserId();
     }
 
-    /* Retrieves UserID, Username, EmailID, MobileNo and Picture of the user having the given username
-        If no such user exists, returns just the UserID as -1 */
+    /**
+     * Retrieves the user having the given username
+     * If no such user exists, returns null
+     */
     public User getUser(String username) {
         String SQLStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User WHERE Username=@Username";
         Statement statement = Statement.newBuilder(SQLStatment)
@@ -127,7 +149,6 @@ public class UserAccessor {
             return null;
         }
         return resultSet.get(0);
-      
     }
 
     /**
@@ -137,9 +158,7 @@ public class UserAccessor {
 
         String SQLStatment = "SELECT Username FROM User WHERE Username=@username";
         Statement statement = Statement.newBuilder(SQLStatment).bind("username").to(username).build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
- 
-        return (!resultSet.isEmpty());
+        return !spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)).isEmpty();
     }
 
     /**
@@ -153,9 +172,7 @@ public class UserAccessor {
 
         String SQLStatment = "SELECT * FROM User WHERE UserID=@userId";
         Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement, null);
- 
-        return resultSet.get(0);
+        return spannerTemplate.query(User.class, statement, null).get(0);
     }
 
     /**
@@ -164,12 +181,10 @@ public class UserAccessor {
      * (1) Username
      * (2) ChatId
      */
-    public List<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
+    public ImmutableList<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
 
         String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";
         Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
-        List<ListChats.UsernameChatId> resultSet = spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
- 
-        return resultSet;
+        return ImmutableList.copyOf(spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true)));
     }
 }
