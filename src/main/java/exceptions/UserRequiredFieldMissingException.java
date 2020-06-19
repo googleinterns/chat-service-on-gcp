@@ -1,6 +1,8 @@
 package exceptions;
 
 import java.lang.RuntimeException;
+
+import com.google.common.collect.ImmutableList;
 import org.springframework.http.HttpStatus;
 import java.util.List;
 
@@ -10,7 +12,7 @@ public class UserRequiredFieldMissingException extends RuntimeException implemen
     private String message;
     private final String path;
 
-    public UserRequiredFieldMissingException(String path, List<String> missing) {
+    public UserRequiredFieldMissingException(String path, ImmutableList<String> missing) {
         super();
         this.path = path;
         this.message = String.join(", ", missing) + " fields missing.";

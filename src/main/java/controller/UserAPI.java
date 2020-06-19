@@ -63,7 +63,7 @@ public class UserAPI {
     public Map<String, Object> signup(@RequestBody Map<String, Object> data, HttpServletRequest request) {
 
         String path = request.getRequestURI();
-        requestValidator.signupRequestValidator(data, path);
+        requestValidator.signupRequestValidator(data.keySet(), path);
         // necessary fields
         String username = data.get("Username").toString();
         String emailID = data.get("EmailID").toString();
@@ -89,7 +89,7 @@ public class UserAPI {
     @PostMapping(value = "/login", consumes={"application/json"})
     public Map<String, Object> login(@RequestBody Map<String, Object> data, HttpServletRequest request) {
         String path = request.getRequestURI();
-        requestValidator.loginRequestValidator(data, path);
+        requestValidator.loginRequestValidator(data.keySet(), path);
         String username = data.get("Username").toString();
         String password = data.get("Password").toString();
         long id = userAccessor.login(username, password);

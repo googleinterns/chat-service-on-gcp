@@ -1,5 +1,6 @@
 package controller;
 
+import com.google.common.collect.ImmutableList;
 import entity.User;
 import entity.Chat;
 import entity.Message;
@@ -119,7 +120,7 @@ public final class ListChats {
             listOfChatIdDesc.add(chat.getChatId());
         }
 
-        List<UsernameChatId> usernameChatIdForSecondUsers = queryUser.getUsernameChatIdForSecondUsers(userId);
+        ImmutableList<UsernameChatId> usernameChatIdForSecondUsers = queryUser.getUsernameChatIdForSecondUsers(userId);
         Map<Long, String> chatIdSecondUsernameMap = new LinkedHashMap<Long, String>();
 
         for (UsernameChatId usernameChatId : usernameChatIdForSecondUsers) {

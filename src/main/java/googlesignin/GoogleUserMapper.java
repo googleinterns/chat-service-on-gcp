@@ -18,6 +18,16 @@ public final class GoogleUserMapper {
 
     private GoogleUserMapper() { }
 
+    /**
+     * Extracts username from email.
+     * Ex: let email be xyz@gmail.com
+     * then, extract "xyz".
+     * If this username is not already present in User table,
+     * returns this username.
+     * Else appends it with some random string of length 3
+     * and repeats this until an unused username is found
+     * returns that username.
+     */
     public static String getUsernameFromEmail(String email) {
         int usernameEndsAt = email.indexOf('@');
         if(usernameEndsAt == -1) {
