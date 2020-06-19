@@ -7,13 +7,13 @@ public class Message
     public String chatID;
     public boolean received;
     public String text;
-    public Long sendTime;
+    public String sendTime;
 
     public Message()
     {
 
     }
-    public Message(String mMessageID,String mChatID, boolean mReceived, String mText, Long mSendTime)
+    public Message(String mMessageID,String mChatID, boolean mReceived, String mText, String mSendTime)
     {
         messageID = mMessageID;
         chatID = mChatID;
