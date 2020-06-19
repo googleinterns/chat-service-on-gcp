@@ -12,6 +12,7 @@ import com.google.api.services.people.v1.model.PhoneNumber;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.common.collect.ImmutableList;
 import dbaccessor.user.UserAccessor;
 import entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public final class GoogleUser {
         Person profile = peopleService.people().get("people/" + userId)
                 .setPersonFields("phoneNumbers")
                 .execute();
-        List<PhoneNumber> phoneNumberList = profile.getPhoneNumbers();
+        ImmutableList<PhoneNumber> phoneNumberList = ImmutableList.copyOf(profile.getPhoneNumbers());
         if(phoneNumberList.isEmpty()) {
             return Optional.empty();
         }

@@ -1,6 +1,7 @@
 package dbaccessor.user;
 
 import com.google.cloud.spanner.Statement;
+import com.google.common.collect.ImmutableList;
 import controller.ListChats;
 import entity.User;
 import helper.UniqueIdGenerator;
@@ -39,7 +40,7 @@ public class UserAccessor {
                                 .bind("EmailID")
                                 .to(emailID)
                                 .build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
+        ImmutableList<User> resultSet = ImmutableList.copyOf(spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)));
         if(resultSet.isEmpty()) {
             return OptionalLong.empty();
         }
@@ -96,7 +97,7 @@ public class UserAccessor {
                                 .bind("password")
                                 .to(password)
                                 .build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+        ImmutableList<User> resultSet = ImmutableList.copyOf(spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true)));
         if(resultSet.isEmpty()) {
             return -1;
         }
@@ -113,7 +114,7 @@ public class UserAccessor {
                                 .bind("Username")
                                 .to(username)
                                 .build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+        ImmutableList<User> resultSet = ImmutableList.copyOf(spannerTemplate.query(User.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true)));
         if(resultSet.isEmpty()) {
             return null;
         }
@@ -128,26 +129,20 @@ public class UserAccessor {
 
         String SQLStatment = "SELECT Username FROM User WHERE Username=@username";
         Statement statement = Statement.newBuilder(SQLStatment).bind("username").to(username).build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
- 
-        return (!resultSet.isEmpty());
+        return !spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)).isEmpty();
     }
 
     public User getUser(long userId) {
 
         String SQLStatment = "SELECT * FROM User WHERE UserID=@userId";
         Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
-        List<User> resultSet = spannerTemplate.query(User.class, statement, null);
- 
-        return resultSet.get(0);
+        return spannerTemplate.query(User.class, statement, null).get(0);
     }
 
     public List<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
 
         String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";
         Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
-        List<ListChats.UsernameChatId> resultSet = spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
- 
-        return resultSet;
+        return spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
     }
 }
