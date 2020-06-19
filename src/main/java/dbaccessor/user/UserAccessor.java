@@ -50,6 +50,11 @@ public class UserAccessor {
   /** Gets the UserID of the user having the given email-id */
     public OptionalLong getUserIdFromEmail(String emailID) {
         String SQLStatment = "SELECT UserID FROM User WHERE EmailID=@EmailID";
+        Statement statement = Statement.newBuilder(SQLStatment)
+                .bind("EmailID")
+                .to(emailID)
+                .build();
+        List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
         if(resultSet.isEmpty()) {
             return OptionalLong.empty();
         }

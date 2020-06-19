@@ -78,7 +78,20 @@ public final class GoogleUser {
         }
         String userId = payload.getSubject();
         Optional<String> mobileNo = getPhoneNumber(userId);
-        User newUser = mobileNo.isPresent()? new User(username, email, mobileNo.get(), picture) : new User(username, email, picture);
+        User newUser = mobileNo.isPresent()
+                                ?
+                        User.newBuilder()
+                            .username(username)
+                            .emailId(email)
+                            .mobileNo(mobileNo.get())
+                            .picture(picture)
+                            .build()
+                                :
+                        User.newBuilder()
+                            .username(username)
+                            .emailId(email)
+                            .picture(picture)
+                            .build();
         return userAccessor.insert(newUser);
     }
 }
