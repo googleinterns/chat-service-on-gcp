@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -59,6 +60,8 @@ public class ViewContactsActivity extends AppCompatActivity
     private String currentUser;
     RecyclerView recyclerContacts;
 
+    ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -70,6 +73,7 @@ public class ViewContactsActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.view_contacts_toolbar);
         setSupportActionBar(toolbar);
 
+        progressBar = (ProgressBar) findViewById(R.id.view_contacts_indeterminateBar);
         initializeDisplayContent();
 
         fab = findViewById(R.id.fab);
@@ -111,7 +115,7 @@ public class ViewContactsActivity extends AppCompatActivity
                                 Log.d("here",username);
                                 contacts.add(new User(username,chatID,lastMessageID));
                             }
-
+                            progressBar.setVisibility(View.GONE);
                             contactsRecyclerAdapter.updateContactsList(contacts);
                         }
                         catch (JSONException e)

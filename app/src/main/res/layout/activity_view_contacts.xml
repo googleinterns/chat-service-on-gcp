@@ -59,6 +59,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/item_contact" />
+        <ProgressBar
+            android:id="@+id/view_contacts_indeterminateBar"
+            style="@android:style/Widget.Material.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:foregroundGravity="center_vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:indeterminateOnly="true"
+            android:indeterminateTint="@color/purple"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

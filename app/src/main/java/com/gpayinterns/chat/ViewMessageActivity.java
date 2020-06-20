@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
@@ -38,6 +39,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import util.Message;
 
 import static com.gpayinterns.chat.ServerHelper.BASE_URL;
@@ -64,6 +66,7 @@ public class ViewMessageActivity extends AppCompatActivity
     MessageRecyclerAdapter messageRecyclerAdapter;
     private RecyclerView recyclerMessages;
     LinearLayoutManager messageLayoutManager;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     private String currentUser;
     private String chatID;
@@ -71,6 +74,7 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private Timer mTimer;
 
+    private ProgressBar progressBar;
 
     @Override
     protected void onPause()
@@ -93,6 +97,7 @@ public class ViewMessageActivity extends AppCompatActivity
 
         getCurrentUser();
         messageEditText=(EditText)findViewById(R.id.send_message_text);
+        progressBar = (ProgressBar) findViewById(R.id.view_message_indeterminateBar);
 
         Objects.requireNonNull(getSupportActionBar()).setTitle(getIntent().getStringExtra(CONTACT_USERNAME));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -229,15 +234,29 @@ public class ViewMessageActivity extends AppCompatActivity
                 if (!recyclerView.canScrollVertically(-1))//-1 implies up
                 {
                     //User has hit top of view
-                    if(!messages.isEmpty())
-                        receivePreviousMessagesFromServer();
+                    receivePreviousMessagesFromServer();
                 }
             }
         });
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.view_message_swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener()
+                {
+                    @Override
+                    public void onRefresh()
+                    {
+                        receivePreviousMessagesFromServer();
+                    }
+                }
+        );
     }
 
     private void receivePreviousMessagesFromServer()
     {
+        if(messages.isEmpty())
+        {
+            return;
+        }
         String firstMessageID = messages.get(0).messageID;
         String URL = BASE_URL + USERS +
                 "/" + currentUser + "/" + CHATS +
@@ -253,6 +272,10 @@ public class ViewMessageActivity extends AppCompatActivity
                         Log.d("ResponseMessage: " , response.toString());
                         try
                         {
+                            if(swipeRefreshLayout.isRefreshing())
+                            {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
                             JSONArray messageList = response.getJSONArray("payload");
                             List <Message> newMessages = new ArrayList<Message>();
                             for(int i=0;i<messageList.length();i++)
@@ -371,6 +394,7 @@ public class ViewMessageActivity extends AppCompatActivity
                                 lastMessageID = newMessages.get(newMessages.size()-1).messageID;
                                 messageRecyclerAdapter.addMessages(newMessages);
                                 recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
+                                progressBar.setVisibility(View.GONE);
                             }
                             ReceiveMessagePeriodically();
                         }

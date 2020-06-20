@@ -136,6 +136,6 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
 
     public static String convertDate(String dateInMilliseconds)
     {
-        return "      "+DateFormat.format("hh:mm", Long.parseLong(dateInMilliseconds)).toString();
+        return "      "+DateFormat.format("hh:mm a", Long.parseLong(dateInMilliseconds)).toString();
     }
 }
