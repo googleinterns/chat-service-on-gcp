@@ -1,6 +1,8 @@
 package entity;
 
 import com.google.cloud.Timestamp;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
@@ -37,7 +39,7 @@ public class User {
     }
 
     public Builder password(String password) {
-      this.password = password;
+      this.password = hashPassword(password);
       return this;
     }
 
@@ -103,6 +105,11 @@ public class User {
     return new Builder();
   }
 
+  public static String hashPassword(String password) {
+    HashFunction hashFunction = Hashing.farmHashFingerprint64();
+    return hashFunction.hashUnencodedChars(password).toString();
+  }
+
   public long getUserId(){
     return this.UserID;
   }
@@ -144,7 +151,7 @@ public class User {
   }
 
   public void setPassword(String password){
-    this.Password = password;
+    this.Password = hashPassword(password);
   }
 
   public void setMobileNumber(String mobileNo){

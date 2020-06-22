@@ -100,7 +100,8 @@ public class UserAPI {
         requestValidator.loginRequestValidator(data.keySet(), path);
         String username = data.get("Username").toString();
         String password = data.get("Password").toString();
-        long id = userAccessor.login(username, password);
+        String passwordHash = User.hashPassword(password);
+        long id = userAccessor.login(username, passwordHash);
         if(id == -1) {
             throw new InvalidLoginException(path);
         }
