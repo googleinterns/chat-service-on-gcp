@@ -61,10 +61,10 @@ public class User {
     public User build() {
       User user = new User();
       user.CreationTS = this.creationTs;
-      user.UserID = this.userId;
+      user.UserId = this.userId;
       user.Username = this.username;
       user.Password = this.password;
-      user.EmailID = this.emailId;
+      user.EmailId = this.emailId;
       user.MobileNo = this.mobileNo;
       user.Picture = this.picture;
       return user;
@@ -76,7 +76,7 @@ public class User {
   
   @PrimaryKey
   @Column(name = "UserID")
-  private long UserID;
+  private long UserId;
 
   @Column(name = "Username")
   private String Username;
@@ -85,7 +85,7 @@ public class User {
   private String Password;
 
   @Column(name = "EmailID")
-  private String EmailID;
+  private String EmailId;
 
   @Column(name = "MobileNo")
   private String MobileNo;
@@ -111,15 +111,15 @@ public class User {
   }
 
   public long getUserId(){
-    return this.UserID;
+    return this.UserId;
   }
 
   public String getUsername(){
     return this.Username;
   }
 
-  public String getEmailID(){
-    return this.EmailID;
+  public String getEmailId(){
+    return this.EmailId;
   }
 
   public String getPassword(){
@@ -139,15 +139,15 @@ public class User {
   }
 
   public void setUserId(long id){
-    this.UserID = id;
+    this.UserId = id;
   }
 
   public void setUsername(String username){
     this.Username = username;
   }
 
-  public void setEmailID(String emailID){
-    this.EmailID = emailID;
+  public void setEmailId(String emailId){
+    this.EmailId = emailId;
   }
 
   public void setPassword(String password){
