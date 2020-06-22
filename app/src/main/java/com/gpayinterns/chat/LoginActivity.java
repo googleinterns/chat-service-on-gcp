@@ -26,8 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
 import com.gpayinterns.chat.R;
 
 import org.json.JSONException;
@@ -210,17 +208,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String userName = usernameEditText.getText().toString();
         String password = passwordEditText.getText().toString();
 
-        HashCode hashCode = Hashing.farmHashFingerprint64().hashBytes(password.getBytes());
         String URL = BASE_URL + LOGIN;
-
 
         JSONObject jsonBody = new JSONObject();
 
 
         jsonBody.put(USER_USERNAME, userName);
         jsonBody.put(USER_PASSWORD,password);
-//        jsonBody.put("hashed_password",hashCode);
-
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()

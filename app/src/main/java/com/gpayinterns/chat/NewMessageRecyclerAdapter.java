@@ -9,7 +9,10 @@ import android.widget.TextView;
 
 import com.gpayinterns.chat.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,6 +52,8 @@ public class NewMessageRecyclerAdapter extends RecyclerView.Adapter <NewMessageR
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
         holder.mMessage.setText(mMessages.get(position));
+        String currentTime = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Calendar.getInstance().getTime());
+        holder.mTime.setText("     "+currentTime);
     }
 
     @Override
@@ -60,10 +65,12 @@ public class NewMessageRecyclerAdapter extends RecyclerView.Adapter <NewMessageR
     public class ViewHolder extends RecyclerView.ViewHolder
     {
         public final TextView mMessage;
+        public final TextView mTime;
         public ViewHolder(@NonNull View itemView)
         {
             super(itemView);
             mMessage = (TextView) itemView.findViewById(R.id.send_message_text);
+            mTime = (TextView) itemView.findViewById(R.id.time_send_message_text);
         }
     }
 

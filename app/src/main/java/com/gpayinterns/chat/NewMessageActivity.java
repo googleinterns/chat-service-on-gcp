@@ -375,8 +375,8 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
             intent.putExtra(ViewMessageActivity.LAST_MESSAGE_ID, lastMessageID);
 
             startActivity(intent);
+            finish();
         }
-        finish();
     }
 
 

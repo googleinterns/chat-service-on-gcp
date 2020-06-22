@@ -1,14 +1,23 @@
 package com.gpayinterns.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
+import android.text.InputType;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -21,11 +30,14 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.gpayinterns.chat.R;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,6 +48,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,6 +69,7 @@ public class ViewMessageActivity extends AppCompatActivity
     public static final String CONTACT_USERNAME = "CONTACT_USERNAME";
     public static final String LAST_MESSAGE_ID = "LAST_MESSAGE_ID";
     private static final String POLL = "SHORT_POLLING";
+    private static final int SELECT_PICTURE = 0;
 
     private static boolean active=false;
 
@@ -113,6 +127,7 @@ public class ViewMessageActivity extends AppCompatActivity
                 String messageText = messageEditText.getText().toString().trim();
                 if(messageText.equals(""))
                 {
+                    pickImage();
                     hideSoftKeyboard();
                     return;
                 }
@@ -214,12 +229,26 @@ public class ViewMessageActivity extends AppCompatActivity
         currentUser = mPrefs.getString("currentUser","");
     }
 
+    public class LinearLayoutManagerWrapper extends LinearLayoutManager
+    {
 
+        public LinearLayoutManagerWrapper(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        public boolean supportsPredictiveItemAnimations()
+        {
+            return false;
+        }
+    }
 
     private void initializeDisplayContent()
     {
+
         recyclerMessages = (RecyclerView) findViewById(R.id.message_recyclerView);
-        messageLayoutManager = new LinearLayoutManager(this);
+        messageLayoutManager = new LinearLayoutManagerWrapper(this);
         messageRecyclerAdapter = new MessageRecyclerAdapter(this,messages);
         messageLayoutManager.setStackFromEnd(true);
         recyclerMessages.setLayoutManager(messageLayoutManager);
@@ -249,6 +278,19 @@ public class ViewMessageActivity extends AppCompatActivity
                     }
                 }
         );
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data!=null)
+        {
+            Uri selectedImage = data.getData();
+            ImageView sendImage = (ImageView) findViewById(R.id.send_image);
+            sendImage.setImageURI(selectedImage);
+            messageEditText.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void receivePreviousMessagesFromServer()
@@ -535,5 +577,13 @@ public class ViewMessageActivity extends AppCompatActivity
         String seconds = sendTime.getString("seconds");
 
         return new Message(messageID,chatID,received,text,seconds+"000");
+    }
+
+    private void pickImage()
+    {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
     }
 }
