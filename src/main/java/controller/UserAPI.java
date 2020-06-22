@@ -67,7 +67,7 @@ public class UserAPI {
         requestValidator.signupRequestValidator(data.keySet(), path);
         // necessary fields
         String username = data.get("Username").toString();
-        String emailID = data.get("EmailID").toString();
+        String emailId = data.get("EmailID").toString();
         String password = data.get("Password").toString();
         String mobileNo = data.get("MobileNo").toString();
 
@@ -78,14 +78,14 @@ public class UserAPI {
         }
 
         // Checks if Username or email exists - throws exception if it does
-        EnumSet<User.UniqueFields> usedFields = userAccessor.checkIfUsernameOrEmailIdExists(username, emailID);
+        EnumSet<User.UniqueFields> usedFields = userAccessor.checkIfUsernameOrEmailIdExists(username, emailId);
         if (!usedFields.isEmpty()) {
             throw new UserAlreadyExistsException(path, usedFields);
         }
         User newUser = User.newBuilder()
                 .username(username)
                 .password(password)
-                .emailId(emailID)
+                .emailId(emailId)
                 .mobileNo(mobileNo)
                 .picture(base64Image)
                 .build();
@@ -100,7 +100,7 @@ public class UserAPI {
         requestValidator.loginRequestValidator(data.keySet(), path);
         String username = data.get("Username").toString();
         String password = data.get("Password").toString();
-        long id = userAccessor.login(username, password);
+        long id = userAccessor.login(username, User.hashPassword(password));
         if(id == -1) {
             throw new InvalidLoginException(path);
         }
@@ -117,7 +117,7 @@ public class UserAPI {
         Map<String, Object> response = new HashMap<>();
         response.put("UserID", user.getUserId());
         response.put("Username", username);
-        response.put("EmailID", user.getEmailID());
+        response.put("EmailID", user.getEmailId());
         response.put("MobileNo", user.getMobileNumber());
         if(user.getPicture() != null) {
             response.put("Picture", user.getPicture());

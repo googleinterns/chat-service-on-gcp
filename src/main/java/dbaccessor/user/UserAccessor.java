@@ -6,14 +6,12 @@ import controller.ListChats;
 import entity.User;
 import helper.UniqueIdGenerator;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
-import org.springframework.stereotype.Component;
 
 import java.util.OptionalLong;
 
@@ -48,11 +46,11 @@ public class UserAccessor {
     }
   
   /** Gets the UserID of the user having the given email-id */
-    public OptionalLong getUserIdFromEmail(String emailID) {
-        String SQLStatment = "SELECT UserID FROM User WHERE EmailID=@EmailID";
+    public OptionalLong getUserIdFromEmail(String emailId) {
+        String SQLStatment = "SELECT UserID FROM User WHERE EmailID=@emailId";
         Statement statement = Statement.newBuilder(SQLStatment)
-                .bind("EmailID")
-                .to(emailID)
+                .bind("emailId")
+                .to(emailId)
                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
         if(resultSet.isEmpty()) {
@@ -66,13 +64,13 @@ public class UserAccessor {
      * If no such user exists, returns empty set
      * Otherwise returns EnumSet of matching fields
      */
-    public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username, String emailID) {
-        String SQLStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username OR EmailID=@EmailID";
+    public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username, String emailId) {
+        String SQLStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username OR EmailID=@emailId";
         Statement statement = Statement.newBuilder(SQLStatment)
                                 .bind("Username")
                                 .to(username)
-                                .bind("EmailID")
-                                .to(emailID)
+                                .bind("emailId")
+                                .to(emailId)
                                 .build();
         List<User> resultSet = spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
         EnumSet<User.UniqueFields> matchingFields = EnumSet.noneOf(User.UniqueFields.class);
@@ -80,7 +78,7 @@ public class UserAccessor {
             if(user.getUsername().equals(username)) {
                 matchingFields.add(User.UniqueFields.USERNAME);
             }
-            if(user.getEmailID().equals(emailID)) {
+            if(user.getEmailId().equals(emailId)) {
                 matchingFields.add(User.UniqueFields.EMAIL);
             }
         }
@@ -91,9 +89,9 @@ public class UserAccessor {
      * Checks if a User with the given userId already exists.
      */
     public boolean checkIfUserIdExists(long id) {
-        String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userID";
+        String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userId";
         Statement statement = Statement.newBuilder(SQLStatment)
-                                .bind("UserID")
+                                .bind("userId")
                                 .to(id)
                                 .build();
         return !spannerTemplate
