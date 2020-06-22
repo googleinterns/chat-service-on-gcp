@@ -41,7 +41,12 @@ import static com.gpayinterns.chat.ServerHelper.LOGIN;
 import static com.gpayinterns.chat.ServerHelper.USER_PASSWORD;
 import static com.gpayinterns.chat.ServerHelper.USER_USERNAME;
 
-
+/**
+ * LoginActivity gets launched when the user starts the application.
+ * Major functions performed by it are:
+ * 1. Check if the last user was already signed in, if yes then move to ViewContacts.
+ * 2. Let the user signIn by verifying the credentials provided.
+ */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
 {
     private EditText usernameEditText;
@@ -63,6 +68,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         catch (NullPointerException ignored)
         {
+            /*
+            A NullPointerException will occur
+            when there won't be any SupportActionBar present hence no need to hide it
+            */
         }
 
         setContentView(R.layout.activity_login);
@@ -99,14 +108,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         currentUser = mPrefs.getString("currentUser","");
         if (!currentUser.equals(""))
         {
+            //autoLogin
             startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));
         }
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
     }
 
     @Override
@@ -115,9 +119,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         getCurrentUser();
         super.onResume();
     }
-
-
-
 
     public boolean validateForm()
     {
@@ -294,6 +295,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     {
         if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis())
         {
+            //exit the application
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

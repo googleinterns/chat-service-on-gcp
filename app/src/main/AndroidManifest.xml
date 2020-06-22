@@ -18,9 +18,9 @@
         <activity
             android:name="com.gpayinterns.chat.ViewContactsActivity"
             android:label="Contacts"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
-        <activity android:name="com.gpayinterns.chat.LoginActivity">
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.gpayinterns.chat.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -29,14 +29,13 @@
         <activity
             android:name="com.gpayinterns.chat.ViewMessageActivity"
             android:parentActivityName="com.gpayinterns.chat.ViewContactsActivity" />
-        <activity android:name="com.gpayinterns.chat.RegistrationActivity" />
-        <activity android:name="com.gpayinterns.chat.NewMessageActivity" android:label="New Message" android:parentActivityName="com.gpayinterns.chat.ViewContactsActivity"/>
+        <activity
+            android:name="com.gpayinterns.chat.RegistrationActivity" />
+        <activity
+            android:name="com.gpayinterns.chat.NewMessageActivity"
+            android:label="New Message"
+            android:parentActivityName="com.gpayinterns.chat.ViewContactsActivity"/>
 
-        <provider
-            android:name="com.gpayinterns.chat.ChatContentProvider"
-            android:authorities="com.gpayinterns.chat.provider"
-            android:enabled="true"
-            android:exported="true" />
     </application>
 
 </manifest>

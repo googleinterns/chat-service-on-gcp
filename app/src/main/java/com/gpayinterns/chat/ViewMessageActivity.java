@@ -62,6 +62,13 @@ import static com.gpayinterns.chat.ServerHelper.MESSAGES;
 import static com.gpayinterns.chat.ServerHelper.START_MESSAGE;
 import static com.gpayinterns.chat.ServerHelper.USERS;
 
+/**
+ * ViewMessageActivity gets launched when the user clicks on a contact to view the messages.
+ * It performs it's operation in the following manner:
+ * 1. Call "firstReceiveMessageFromServer()" method to receive messages previous to lastMessageID
+ * 2. Call "receiveMessageFromServer()" method periodically to receive messages after lastMessageID
+ * 3. Call "receivePreviousMessagesFromServer()" method to receive messages after user has hit top of the screen.
+ */
 public class ViewMessageActivity extends AppCompatActivity
 {
 

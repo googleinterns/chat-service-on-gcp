@@ -44,7 +44,7 @@ public class VolleyController
         req.setRetryPolicy(new DefaultRetryPolicy(
                 5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));//in case of failure retry every 5 seconds with an exponential backoff
 
         getRequestQueue().add(req);
     }
