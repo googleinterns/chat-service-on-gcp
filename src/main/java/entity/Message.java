@@ -21,18 +21,12 @@ public final class Message {
     @Column(name = "SenderID")
     private long senderId;
 
-    @Column(name = "ContentType")
-    private String contentType;
-
     @Column(name = "TextContent")
     private String textContent;
+
+    @Column(name = "AttachmentID")
+    private Long attachmentId;
     
-    @Column(name = "ContentID")
-    private long contentId;
-
-    @Column(name = "LinkToBlob")
-    private String linkToBlob;
-
     @Column(name = "SentTS", spannerCommitTimestamp = true) 
     private Timestamp sentTs;
 
@@ -41,49 +35,35 @@ public final class Message {
 
     public Message() {}
 
-    public Message(long messageId, long chatId, long senderId, String contentType) {
+    public Message(long messageId, long chatId, long senderId) {
         this.messageId = messageId;
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
     }
 
-    public Message(long chatId, long senderId, String contentType) {
+    public Message(long chatId, long senderId) {
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
     }
 
-    public Message(long messageId, long chatId, long senderId, String contentType, String textContent) {
+    public Message(long messageId, long chatId, long senderId, String textContent) {
         this.messageId = messageId;
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
         this.textContent = textContent;
     }
 
-    public Message(long chatId, long senderId, String contentType, String textContent) {
+    public Message(long chatId, long senderId, String textContent) {
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
         this.textContent = textContent;
     }
 
-    public Message(long messageId, long chatId, long senderId, String contentType, long contentId, String linkToBlob) {
+    public Message(long messageId, long chatId, long senderId, Long attachmentId) {
         this.messageId = messageId;
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
-        this.contentId = contentId;
-        this.linkToBlob = linkToBlob;
-    }
-
-    public Message(long chatId, long senderId, String contentType, long contentId, String linkToBlob) {
-        this.chatId = chatId;
-        this.senderId = senderId;
-        this.contentType = contentType;
-        this.contentId = contentId;
-        this.linkToBlob = linkToBlob;
+        this.attachmentId = attachmentId;
     }
 
     public void setMessageId (long messageId) {
@@ -98,20 +78,12 @@ public final class Message {
         this.senderId = senderId;
     }
 
-    public void setContentType (String contentType) {
-        this.contentType = contentType;
-    }
-
     public void setTextContent (String textContent) {
         this.textContent = textContent;
     }
 
-    public void setContentId (long contentId) {
-        this.contentId = contentId;
-    }
-
-    public void setLinkToBlob (String linkToBlob) {
-        this.linkToBlob = linkToBlob;
+    public void setAttachmentId (Long attachmentId) {
+        this.attachmentId = attachmentId;
     }
 
     public void setReceivedTs (Timestamp receivedTs) {
@@ -134,20 +106,12 @@ public final class Message {
         return senderId;
     }
 
-    public String getContentType () {
-        return contentType;
-    }
-
     public String getTextContent () {
         return textContent;
     }
 
-    public long getContentId () {
-        return contentId;
-    }
-
-    public String getLinkToBlob () {
-        return linkToBlob;
+    public Long getAttachmentId () {
+        return attachmentId;
     }
 
     public Timestamp getSentTs () {

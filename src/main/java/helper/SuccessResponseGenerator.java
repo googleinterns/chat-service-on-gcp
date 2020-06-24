@@ -78,7 +78,6 @@ public final class SuccessResponseGenerator {
             responseBody.put("SentByCurrentUser", false);
         }
 
-        responseBody.put("ContentType", message.getContentType());
         responseBody.put("TextContent", message.getTextContent());
         responseBody.put("SentTs", message.getSentTs());
         responseBody.put("ReceivedTs", message.getReceivedTs());
@@ -113,7 +112,6 @@ public final class SuccessResponseGenerator {
             messageForResponseBody.put("SentByCurrentUser", false);
         }
         
-        messageForResponseBody.put("ContentType", message.getContentType());
         messageForResponseBody.put("TextContent", message.getTextContent());
         messageForResponseBody.put("SentTs", message.getSentTs());
         messageForResponseBody.put("ReceivedTs", message.getReceivedTs());

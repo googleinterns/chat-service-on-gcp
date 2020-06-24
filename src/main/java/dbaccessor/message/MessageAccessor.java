@@ -2,13 +2,22 @@ package dbaccessor.message;
 
 import entity.Chat;
 import entity.Message;
+import entity.Attachment;
+import main.ApplicationVariable;
 
+import java.util.List;
+import java.util.Optional;
+import java.io.IOException;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.cloud.Timestamp;
 import com.google.cloud.spanner.Statement.Builder;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
-import java.util.List;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerOperations;
@@ -42,9 +51,21 @@ public final class MessageAccessor {
     /**
      * Completes all DB insertions for the CreateMessage API in a single transaction.
      */
-    public boolean createMessageInTransaction(Message message, Chat chat) {
-        return spannerOperations.performReadWriteTransaction(
+    public boolean createMessageInTransaction(Message message, Chat chat, Optional<Attachment> optionalAttachment) {
+        return spannerOperations.performReadWriteTransaction (
             transactionSpannerOperations -> {
+                if (optionalAttachment.isPresent()) {
+                    Attachment attachment = optionalAttachment.get();
+                    Storage storage = StorageOptions.newBuilder().setProjectId(ApplicationVariable.GCP_PROJECT).build().getService();
+                    BlobId blobId = BlobId.of(ApplicationVariable.GCS_BUCKET, Long.toString(attachment.getAttachmentId()));
+
+                    try {
+                        storage.create(BlobInfo.newBuilder(blobId).build(), attachment.getFile().getBytes());
+                    } catch (IOException e) {
+                        return false;    
+                    }
+                    transactionSpannerOperations.insert(attachment);
+                }
                 transactionSpannerOperations.insert(message);
                 transactionSpannerOperations.update(chat, "ChatID", "LastSentMessageID");
 
@@ -87,7 +108,6 @@ public final class MessageAccessor {
      * (1)  MessageId
      * (2)  ChatId
      * (3)  SenderId
-     * (4)  ContentType
      * (5)  TextContent
      * (6)  Sent Timestamp
      * (7)  Received Timestamp

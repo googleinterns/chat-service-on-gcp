@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
  * (2)  Creation Timestamp
  * (3)  ChatId
  * (4)  SentByCurrentUser
- * (5)  ContentType
  * (6)  TextContent
  * (7)  Sent Timestamp
  * (8)  Received Timestamp

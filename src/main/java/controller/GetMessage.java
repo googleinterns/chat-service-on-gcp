@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable;
  * (1)  MessageId
  * (2)  ChatId
  * (3)  SentByCurrentUser
- * (4)  ContentType
  * (5)  TextContent
  * (6)  Sent Timestamp
  * (7)  Received Timestamp

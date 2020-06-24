@@ -3,13 +3,13 @@ package exceptions;
 import java.lang.RuntimeException;
 import org.springframework.http.HttpStatus;
 
-public final class ContentTypeMissingFromRequestBodyException extends RuntimeException {
+public final class EmptyMessageException extends RuntimeException {
 
     public static final HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;
-    private static final String message = "Key: 'contentType' Missing From Request Body";
+    private static final String message = "Empty Message Cannot Be Sent";
     private final String path;
 
-    public ContentTypeMissingFromRequestBodyException(String path) {
+    public EmptyMessageException(String path) {
         super();
         this.path = path;
     }
