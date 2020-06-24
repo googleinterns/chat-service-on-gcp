@@ -30,4 +30,4 @@ Build the project & run it on any Android device with min SDK level 24
 
 ## Possible Enhancements
 - Find out better ways to synchronize various DB & Network threads rather than just using conditionVariables.
-- When a user is typing a username to send a message for the first time, then show suggestions while typing (Probably with the current set of API's it's not possible to do so).
+	- When a user is typing a username to send a message for the first time, then show suggestions while typing (Probably with the current set of API's it's not possible to do so).

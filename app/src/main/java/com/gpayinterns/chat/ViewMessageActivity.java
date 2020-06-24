@@ -6,13 +6,18 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -132,9 +137,17 @@ public class ViewMessageActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 String messageText = messageEditText.getText().toString().trim();
+                ImageView sendImage = (ImageView) findViewById(R.id.send_image);
+                if( sendImage.getDrawable()!=null)
+                {
+                    //TODO send image to server
+                    addImageToScreen();
+                    removeImageFromEditText();
+                    hideSoftKeyboard();
+                    return;
+                }
                 if(messageText.equals(""))
                 {
-                    pickImage();
                     hideSoftKeyboard();
                     return;
                 }
@@ -150,6 +163,13 @@ public class ViewMessageActivity extends AppCompatActivity
                 }
             }
         });
+    }
+
+    private void removeImageFromEditText()
+    {
+        ImageView sendImage = (ImageView) findViewById(R.id.send_image);
+        sendImage.setImageDrawable(null);
+        messageEditText.setVisibility(View.VISIBLE);
     }
 
     private void sendMessageToServer(String messageText) throws JSONException
@@ -298,6 +318,18 @@ public class ViewMessageActivity extends AppCompatActivity
             sendImage.setImageURI(selectedImage);
             messageEditText.setVisibility(View.INVISIBLE);
         }
+    }
+    private void addImageToScreen()
+    {
+        ImageView sendImage = (ImageView) findViewById(R.id.send_image);
+        sendImage.invalidate();
+        BitmapDrawable drawable = (BitmapDrawable) sendImage.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+
+        List <Message> newMessage = new ArrayList<Message>();
+        newMessage.add(new Message("0",chatID,false,"", Long.toString(System.currentTimeMillis()),bitmap));
+        messageRecyclerAdapter.addMessages(newMessage);
+        recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }
 
     private void receivePreviousMessagesFromServer()
@@ -555,7 +587,7 @@ public class ViewMessageActivity extends AppCompatActivity
         lastMessageID = messageID;
         findViewById(R.id.view_message_constraint_layout).requestFocus();
         List <Message> newMessage = new ArrayList<Message>();
-        newMessage.add(new Message(messageID,chatID,false,messageEditText.getText().toString(),"0"));
+        newMessage.add(new Message(messageID,chatID,false,messageEditText.getText().toString(),"0",null));
         Log.d("here",Integer.toString(newMessage.size()));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
@@ -583,7 +615,7 @@ public class ViewMessageActivity extends AppCompatActivity
         JSONObject sendTime = message.getJSONObject("CreationTs");
         String seconds = sendTime.getString("seconds");
 
-        return new Message(messageID,chatID,received,text,seconds+"000");
+        return new Message(messageID,chatID,received,text,seconds+"000",null);
     }
 
     private void pickImage()
@@ -592,5 +624,27 @@ public class ViewMessageActivity extends AppCompatActivity
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.view_messages_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // Handle item selection
+        switch (item.getItemId())
+        {
+            case R.id.menu_send_image:
+                pickImage();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

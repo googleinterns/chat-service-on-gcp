@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gpayinterns.chat.R;
@@ -28,6 +29,8 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
 
     //mViewType 0: left side text
     //mViewType 1: right side text
+    //mViewType 2: left side image
+    //mViewType 3: right side image
 
     @Override
     public int getItemViewType(int position)
@@ -39,6 +42,12 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         else
         {
             mViewType = 1;
+        }
+
+        if(mMessages.get(position).image!=null)//image
+        {
+            Log.d("position","b"+position);
+            mViewType += 2;
         }
         return mViewType;
     }
@@ -57,21 +66,39 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     {
 
         View itemView;
-        if(viewType==0)
+        switch(viewType)
         {
-            itemView = mLayoutInflater.inflate(R.layout.item_recieve_message_list,parent,false);
+            case 0:
+                itemView = mLayoutInflater.inflate(R.layout.item_recieve_message_list,parent,false);
+                break;
+            case 1:
+                itemView = mLayoutInflater.inflate(R.layout.item_send_message_list,parent,false);
+                break;
+            case 2:
+                itemView = mLayoutInflater.inflate(R.layout.item_recieve_image_list,parent,false);
+                break;
+            case 3:
+                itemView = mLayoutInflater.inflate(R.layout.item_send_image_list,parent,false);
+                break;
+            default:
+                itemView = null;
         }
-        else
-        {
-            itemView = mLayoutInflater.inflate(R.layout.item_send_message_list,parent,false);
-        }
+        assert itemView != null;
         return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
-        holder.mMessage.setText(mMessages.get(position).text);
+        Log.d("position","a"+position);
+        if(mViewType<=1)//text
+        {
+            holder.mMessage.setText(mMessages.get(position).text);
+        }
+        else//image
+        {
+            holder.mImage.setImageBitmap(mMessages.get(position).image);
+        }
         holder.mTime.setText(convertDate(mMessages.get(position).sendTime));
     }
 
@@ -86,17 +113,20 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     {
         public final TextView mMessage;
         public final TextView mTime;
+        public final ImageView mImage;
         public ViewHolder(@NonNull View itemView)
         {
             super(itemView);
-            if(mViewType==0)
+            if(mViewType%2==0)//received
             {
                 mMessage = (TextView) itemView.findViewById(R.id.receive_message_text);
+                mImage = (ImageView) itemView.findViewById(R.id.receive_message_image);
                 mTime = (TextView) itemView.findViewById(R.id.time_receive_message_text);
             }
             else
             {
                 mMessage = (TextView) itemView.findViewById(R.id.send_message_text);
+                mImage = (ImageView) itemView.findViewById(R.id.send_message_image);
                 mTime = (TextView) itemView.findViewById(R.id.time_send_message_text);
             }
         }
