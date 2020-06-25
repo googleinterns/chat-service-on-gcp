@@ -30,4 +30,23 @@ public final class AttachmentAccessor {
  
         return !resultSet.isEmpty();
     }
+
+    /**
+     * Returns details of Attachment with the given AttachmentId.
+     * Details include:
+     * <ol>
+     * <li> AttachmentId </li>
+     * <li> FileName </li>
+     * <li> FileType </li>
+     * <li> FileSize </li>
+     * </ol>
+     */
+    public Attachment getAttachment(long attachmentId) {
+
+        String SQLStatment = "SELECT * FROM Attachment WHERE AttachmentID=@attachmentId";
+        Statement statement = Statement.newBuilder(SQLStatment).bind("attachmentId").to(attachmentId).build();
+        List<Attachment> resultSet = spannerTemplate.query(Attachment.class, statement, null);
+ 
+        return resultSet.get(0);
+    }
 }

@@ -1,9 +1,11 @@
 package controller;
 
 import entity.Message;
+import entity.Attachment;
 import dbaccessor.user.UserAccessor;
 import dbaccessor.chat.ChatAccessor;
 import dbaccessor.message.MessageAccessor;
+import dbaccessor.message.AttachmentAccessor;
 import dbaccessor.userchat.UserChatAccessor;
 import helper.SuccessResponseGenerator;
 import exceptions.UserIdDoesNotExistException;
@@ -45,6 +47,9 @@ public final class GetMessage {
 
     @Autowired
     private MessageAccessor queryMessage;
+
+    @Autowired
+    private AttachmentAccessor queryAttachment;
 
     @Autowired
     private UserChatAccessor queryUserChat;
@@ -109,7 +114,14 @@ public final class GetMessage {
         }
 
         Message message = queryMessage.getMessage(messageId);
-    
-        return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, userId);
+        Attachment attachment = null;
+
+        if (message.getAttachmentId().isPresent()) {
+            attachment = queryAttachment.getAttachment(message.getAttachmentId().get());
+
+            return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, attachment, userId);
+        } else {
+            return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, userId);
+        }
     }
 }
