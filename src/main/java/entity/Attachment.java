@@ -14,12 +14,22 @@ public final class Attachment {
     @Column(name = "AttachmentID")
     private long attachmentId;
 
+    /**
+     * Attribute containing file name and extension
+     */
     @Column(name = "FileName")
     private String fileName;
 
+    /**
+     * Attribute containing file type such as text/plain 
+     * Different from file extension
+     */
     @Column(name = "FileType")
     private String fileType;
 
+    /**
+     * Attribute containing file size in bytes
+     */
     @Column(name = "FileSize")
     private long fileSize;
 

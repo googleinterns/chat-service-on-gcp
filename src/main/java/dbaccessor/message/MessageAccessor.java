@@ -50,6 +50,7 @@ public final class MessageAccessor {
 
     /**
      * Completes all DB insertions for the CreateMessage API in a single transaction.
+     * Returns true in case of Success and false if an IO Exception occurs
      */
     public boolean createMessageInTransaction(Message message, Chat chat, Optional<Attachment> optionalAttachment) {
         return spannerOperations.performReadWriteTransaction(
