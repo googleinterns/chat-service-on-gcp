@@ -134,10 +134,12 @@ public final class CreateMessage {
         if (file != null) {
             attachment = new Attachment(uniqueIdGenerator.generateUniqueId("Attachment"), file);
             newMessage.setAttachmentId(attachment.getAttachmentId());
-        } 
 
-        if (!insertMessage.createMessageInTransaction(newMessage, new Chat(chatId, newMessage.getMessageId()), Optional.ofNullable(attachment))) {
-            throw new IOException("IOException Occurred While Parsing File");
+            if (!insertMessage.createMessageInTransaction(newMessage, new Chat(chatId, newMessage.getMessageId()), attachment)) {
+                throw new IOException("IOException Occurred While Parsing File");
+            }
+        } else {
+            insertMessage.createMessageInTransaction(newMessage, new Chat(chatId, newMessage.getMessageId()));
         }
         
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Message", newMessage.getMessageId());

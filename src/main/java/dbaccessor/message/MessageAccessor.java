@@ -49,24 +49,37 @@ public final class MessageAccessor {
     }
 
     /**
-     * Completes all DB insertions for the CreateMessage API in a single transaction.
-     * Returns true in case of Success and false if an IO Exception occurs
+     * Completes all DB insertions for the CreateMessage API for a Message without Attachment in a single transaction.
+     * Returns true in case of Success.
      */
-    public boolean createMessageInTransaction(Message message, Chat chat, Optional<Attachment> optionalAttachment) {
+    public boolean createMessageInTransaction(Message message, Chat chat) {
         return spannerOperations.performReadWriteTransaction(
             transactionSpannerOperations -> {
-                if (optionalAttachment.isPresent()) {
-                    Attachment attachment = optionalAttachment.get();
-                    Storage storage = StorageOptions.newBuilder().setProjectId(ApplicationVariable.GCP_PROJECT).build().getService();
-                    BlobId blobId = BlobId.of(ApplicationVariable.GCS_BUCKET, Long.toString(attachment.getAttachmentId()));
+                transactionSpannerOperations.insert(message);
+                transactionSpannerOperations.update(chat, "ChatID", "LastSentMessageID");
 
-                    try {
-                        storage.create(BlobInfo.newBuilder(blobId).build(), attachment.getFile().getBytes());
-                    } catch (IOException e) {
-                        return false;    
-                    }
-                    transactionSpannerOperations.insert(attachment);
+                return true;
+            }
+        );
+    }
+
+    /**
+     * Completes all DB insertions for the CreateMessage API for a Message with Attachment in a single transaction.
+     * Returns true in case of Success and false if an IO Exception occurs
+     */
+    public boolean createMessageInTransaction(Message message, Chat chat, Attachment attachment) {
+        return spannerOperations.performReadWriteTransaction(
+            transactionSpannerOperations -> {
+                Storage storage = StorageOptions.newBuilder().setProjectId(ApplicationVariable.GCP_PROJECT).build().getService();
+                BlobId blobId = BlobId.of(ApplicationVariable.GCS_BUCKET, Long.toString(attachment.getAttachmentId()));
+
+                try {
+                    storage.create(BlobInfo.newBuilder(blobId).build(), attachment.getFile().getBytes());
+                } catch (IOException e) {
+                    return false;    
                 }
+                
+                transactionSpannerOperations.insert(attachment);
                 transactionSpannerOperations.insert(message);
                 transactionSpannerOperations.update(chat, "ChatID", "LastSentMessageID");
 
