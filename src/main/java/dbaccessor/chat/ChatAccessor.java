@@ -51,8 +51,8 @@ public final class ChatAccessor {
      */
     public boolean checkIfChatIdExists(long chatId) {
 
-        String SQLStatment = "SELECT ChatID FROM Chat WHERE ChatID=@chatId";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("chatId").to(chatId).build();
+        String sqlStatment = "SELECT ChatID FROM Chat WHERE ChatID=@chatId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("chatId").to(chatId).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return !resultSet.isEmpty();        
@@ -69,8 +69,8 @@ public final class ChatAccessor {
      */
     public Chat getChat(long chatId) {
 
-        String SQLStatment = "SELECT * FROM Chat WHERE ChatID=@chatId";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("chatId").to(chatId).build();
+        String sqlStatment = "SELECT * FROM Chat WHERE ChatID=@chatId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("chatId").to(chatId).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement, null);
  
         return resultSet.get(0);
@@ -87,8 +87,8 @@ public final class ChatAccessor {
      */
     public List<Chat> getChatsForUser(User user) {
 
-        String SQLStatment = "SELECT * FROM Chat WHERE ChatID in (SELECT ChatID FROM UserChat WHERE UserID=@userId)";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(user.getUserId()).build();
+        String sqlStatment = "SELECT * FROM Chat WHERE ChatID in (SELECT ChatID FROM UserChat WHERE UserID=@userId)";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(user.getUserId()).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement, null);
  
         return resultSet;

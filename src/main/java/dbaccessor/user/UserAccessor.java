@@ -49,8 +49,8 @@ public class UserAccessor {
   
   /** Gets the UserID of the user having the given email-id */
     public OptionalLong getUserIdFromEmail(String emailID) {
-        String SQLStatment = "SELECT UserID FROM User WHERE EmailID=@EmailID";
-        Statement statement = Statement.newBuilder(SQLStatment)
+        String sqlStatment = "SELECT UserID FROM User WHERE EmailID=@EmailID";
+        Statement statement = Statement.newBuilder(sqlStatment)
                 .bind("EmailID")
                 .to(emailID)
                 .build();
@@ -67,8 +67,8 @@ public class UserAccessor {
      * Otherwise returns EnumSet of matching fields
      */
     public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username, String emailID) {
-        String SQLStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username OR EmailID=@EmailID";
-        Statement statement = Statement.newBuilder(SQLStatment)
+        String sqlStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username OR EmailID=@EmailID";
+        Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("Username")
                                 .to(username)
                                 .bind("EmailID")
@@ -91,8 +91,8 @@ public class UserAccessor {
      * Checks if a User with the given userId already exists.
      */
     public boolean checkIfUserIdExists(long id) {
-        String SQLStatment = "SELECT UserID FROM User WHERE UserID=@userID";
-        Statement statement = Statement.newBuilder(SQLStatment)
+        String sqlStatment = "SELECT UserID FROM User WHERE UserID=@userID";
+        Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("UserID")
                                 .to(id)
                                 .build();
@@ -105,8 +105,8 @@ public class UserAccessor {
      * Returns the UserId of the User with the given username.
      */
     public long getUserIdFromUsername(String username) {
-        String SQLStatment = "SELECT UserID FROM User WHERE Username=@Username";
-        Statement statement = Statement.newBuilder(SQLStatment)
+        String sqlStatment = "SELECT UserID FROM User WHERE Username=@Username";
+        Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("Username")
                                 .to(username)
                                 .build();
@@ -120,8 +120,8 @@ public class UserAccessor {
      * If no such user exists, returns -1
      */
     public long login(String username, String password) {
-        String SQLStatment = "SELECT UserID from User WHERE Username=@username AND Password=@password";
-        Statement statement = Statement.newBuilder(SQLStatment)
+        String sqlStatment = "SELECT UserID from User WHERE Username=@username AND Password=@password";
+        Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("username")
                                 .to(username)
                                 .bind("password")
@@ -139,8 +139,8 @@ public class UserAccessor {
      * If no such user exists, returns null
      */
     public User getUser(String username) {
-        String SQLStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User WHERE Username=@Username";
-        Statement statement = Statement.newBuilder(SQLStatment)
+        String sqlStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User WHERE Username=@Username";
+        Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("Username")
                                 .to(username)
                                 .build();
@@ -156,8 +156,8 @@ public class UserAccessor {
      */
     public boolean checkIfUsernameExists(String username) {
 
-        String SQLStatment = "SELECT Username FROM User WHERE Username=@username";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("username").to(username).build();
+        String sqlStatment = "SELECT Username FROM User WHERE Username=@username";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("username").to(username).build();
         return !spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)).isEmpty();
     }
 
@@ -172,8 +172,8 @@ public class UserAccessor {
      */
     public User getUser(long userId) {
 
-        String SQLStatment = "SELECT * FROM User WHERE UserID=@userId";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
+        String sqlStatment = "SELECT * FROM User WHERE UserID=@userId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).build();
         return spannerTemplate.query(User.class, statement, null).get(0);
     }
 
@@ -187,8 +187,8 @@ public class UserAccessor {
      */
     public ImmutableList<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
 
-        String SQLStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
+        String sqlStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).build();
         return ImmutableList.copyOf(spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true)));
     }
 }

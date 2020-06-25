@@ -109,8 +109,8 @@ public final class MessageAccessor {
      */
     public boolean checkIfMessageIdExists(long messageId) {
 
-        String SQLStatment = "SELECT MessageID FROM Message WHERE MessageID=@messageId";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("messageId").to(messageId).build();
+        String sqlStatment = "SELECT MessageID FROM Message WHERE MessageID=@messageId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("messageId").to(messageId).build();
         List<Message> resultSet = spannerTemplate.query(Message.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return !resultSet.isEmpty();
@@ -131,8 +131,8 @@ public final class MessageAccessor {
      */
     public Message getMessage(long messageId) {
 
-        String SQLStatment = "SELECT * FROM Message WHERE MessageID=@messageId";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("messageId").to(messageId).build();
+        String sqlStatment = "SELECT * FROM Message WHERE MessageID=@messageId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("messageId").to(messageId).build();
         List<Message> resultSet = spannerTemplate.query(Message.class, statement, null);
  
         return resultSet.get(0);
@@ -143,8 +143,8 @@ public final class MessageAccessor {
      */
     public Timestamp getCreationTsForMessageId(long messageId) {
 
-        String SQLStatment = "SELECT CreationTS FROM Message WHERE MessageID=@messageId";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("messageId").to(messageId).build();
+        String sqlStatment = "SELECT CreationTS FROM Message WHERE MessageID=@messageId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("messageId").to(messageId).build();
         List<Message> resultSet = spannerTemplate.query(Message.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return resultSet.get(0).getCreationTs();
@@ -155,8 +155,8 @@ public final class MessageAccessor {
      */
     public boolean checkIfMessageIdBelongsToChatId(long messageId, long chatId) {
         
-        String SQLStatment = "SELECT MessageID FROM Message WHERE MessageID=@messageId and ChatID=@chatId";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("messageId").to(messageId).bind("chatId").to(chatId).build();
+        String sqlStatment = "SELECT MessageID FROM Message WHERE MessageID=@messageId and ChatID=@chatId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("messageId").to(messageId).bind("chatId").to(chatId).build();
         List<Message> resultSet = spannerTemplate.query(Message.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return !resultSet.isEmpty(); 
@@ -164,19 +164,19 @@ public final class MessageAccessor {
 
     private List<Message> listCountMessagesOfChatId(Timestamp startCreationTs, Timestamp endCreationTs, int count, long chatId) {
 
-        String SQLStatment = "SELECT * FROM Message WHERE ChatID = @chatId";
+        String sqlStatment = "SELECT * FROM Message WHERE ChatID = @chatId";
 
         if (startCreationTs != null) {
-            SQLStatment += " AND CreationTS >= @startCreationTs";
+            sqlStatment += " AND CreationTS >= @startCreationTs";
         }
 
         if (endCreationTs != null) {
-            SQLStatment += " AND CreationTS <= @endCreationTs";
+            sqlStatment += " AND CreationTS <= @endCreationTs";
         }
         
-        SQLStatment += " ORDER BY CreationTS DESC LIMIT @count";
+        sqlStatment += " ORDER BY CreationTS DESC LIMIT @count";
 
-        Builder builder = Statement.newBuilder(SQLStatment).bind("chatId").to(chatId);
+        Builder builder = Statement.newBuilder(sqlStatment).bind("chatId").to(chatId);
 
         if (startCreationTs != null) {
             builder.bind("startCreationTs").to(startCreationTs);
@@ -235,8 +235,8 @@ public final class MessageAccessor {
      */
     public List<Message> getCreationTsOfLastSentMessageIdForChatsOfUser(long userId) {
 
-        String SQLStatment = "SELECT ChatID, CreationTS FROM Message WHERE MessageID IN (SELECT LastSentMessageID FROM Chat WHERE ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND LastSentMessageID IS NOT NULL)";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).build();
+        String sqlStatment = "SELECT ChatID, CreationTS FROM Message WHERE MessageID IN (SELECT LastSentMessageID FROM Chat WHERE ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND LastSentMessageID IS NOT NULL)";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).build();
         List<Message> resultSet = spannerTemplate.query(Message.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
         return resultSet;

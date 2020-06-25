@@ -114,14 +114,13 @@ public final class GetMessage {
         }
 
         Message message = queryMessage.getMessage(messageId);
-        Attachment attachment = null;
 
         if (message.getAttachmentId().isPresent()) {
-            attachment = queryAttachment.getAttachment(message.getAttachmentId().get());
+            Attachment attachment = queryAttachment.getAttachment(message.getAttachmentId().get());
 
             return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, attachment, userId);
-        } else {
-            return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, userId);
-        }
+        } 
+        
+        return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, userId);
     }
 }
