@@ -73,13 +73,7 @@ public final class SuccessResponseGenerator {
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
         responseBody.put("MessageId", message.getMessageId());
         responseBody.put("ChatId", message.getChatId());
-        
-        if (message.getSenderId() == userId) {
-            responseBody.put("SentByCurrentUser", true);
-        } else {
-            responseBody.put("SentByCurrentUser", false);
-        }
-
+        responseBody.put("SentByCurrentUser", message.getSenderId() == userId);
         responseBody.put("SentTs", message.getSentTs());
         responseBody.put("ReceivedTs", message.getReceivedTs());
         responseBody.put("CreationTs", message.getCreationTs());
@@ -97,13 +91,7 @@ public final class SuccessResponseGenerator {
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
         responseBody.put("MessageId", message.getMessageId());
         responseBody.put("ChatId", message.getChatId());
-        
-        if (message.getSenderId() == userId) {
-            responseBody.put("SentByCurrentUser", true);
-        } else {
-            responseBody.put("SentByCurrentUser", false);
-        }
-
+        responseBody.put("SentByCurrentUser", message.getSenderId() == userId);
         responseBody.put("SentTs", message.getSentTs());
         responseBody.put("ReceivedTs", message.getReceivedTs());
         responseBody.put("CreationTs", message.getCreationTs());
@@ -134,13 +122,7 @@ public final class SuccessResponseGenerator {
         messageForResponseBody.put("MessageId", message.getMessageId());
         messageForResponseBody.put("CreationTs", message.getCreationTs());
         messageForResponseBody.put("ChatId", message.getChatId());
-
-        if (message.getSenderId() == userId) {
-            messageForResponseBody.put("SentByCurrentUser", true);
-        } else {
-            messageForResponseBody.put("SentByCurrentUser", false);
-        }
-        
+        messageForResponseBody.put("SentByCurrentUser", message.getSenderId() == userId);
         messageForResponseBody.put("TextContent", message.getTextContent());
         messageForResponseBody.put("SentTs", message.getSentTs());
         messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
