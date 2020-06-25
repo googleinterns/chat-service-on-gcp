@@ -33,5 +33,6 @@ local.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
-
+gradlew.bat
+gradlew
 
