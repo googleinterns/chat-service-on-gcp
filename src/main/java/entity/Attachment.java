@@ -40,43 +40,43 @@ public final class Attachment {
         this.file = file;
     }
 
-    public void setAttachmentId (long attachmentId) {
+    public void setAttachmentId(long attachmentId) {
         this.attachmentId = attachmentId;
     }
 
-    public void setFileName (String fileName) {
+    public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
-    public void setFileType (String fileType) {
+    public void setFileType(String fileType) {
         this.fileType = fileType;
     }
 
-    public void setFileSize (long fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
 
-    public void setFile (MultipartFile file) {
+    public void setFile(MultipartFile file) {
         this.file = file;
     }
 
-    public long getAttachmentId () {
+    public long getAttachmentId() {
         return attachmentId;
     }
 
-    public String getFileName () {
+    public String getFileName() {
         return fileName;
     }
 
-    public String getFileType () {
+    public String getFileType() {
         return fileType;
     }
 
-    public long getFileSize () {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public MultipartFile getFile () {
+    public MultipartFile getFile() {
         return file;
     }
 }

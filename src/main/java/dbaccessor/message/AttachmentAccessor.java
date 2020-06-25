@@ -28,6 +28,6 @@ public final class AttachmentAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("attachmentId").to(attachmentId).build();
         List<Attachment> resultSet = spannerTemplate.query(Attachment.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        return (!resultSet.isEmpty());
+        return !resultSet.isEmpty();
     }
 }

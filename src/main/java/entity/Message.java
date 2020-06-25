@@ -66,59 +66,59 @@ public final class Message {
         this.attachmentId = attachmentId;
     }
 
-    public void setMessageId (long messageId) {
+    public void setMessageId(long messageId) {
         this.messageId = messageId;
     }
 
-    public void setChatId (long chatId) {
+    public void setChatId(long chatId) {
         this.chatId = chatId;
     }
 
-    public void setSenderId (long senderId) {
+    public void setSenderId(long senderId) {
         this.senderId = senderId;
     }
 
-    public void setTextContent (String textContent) {
+    public void setTextContent(String textContent) {
         this.textContent = textContent;
     }
 
-    public void setAttachmentId (Long attachmentId) {
+    public void setAttachmentId(Long attachmentId) {
         this.attachmentId = attachmentId;
     }
 
-    public void setReceivedTs (Timestamp receivedTs) {
+    public void setReceivedTs(Timestamp receivedTs) {
         this.receivedTs = receivedTs;
     }
 
-    public Timestamp getCreationTs () {
+    public Timestamp getCreationTs() {
         return creationTs;
     }
 
-    public long getMessageId () {
+    public long getMessageId() {
         return messageId;
     }
 
-    public long getChatId () {
+    public long getChatId() {
         return chatId;
     }
 
-    public long getSenderId () {
+    public long getSenderId() {
         return senderId;
     }
 
-    public String getTextContent () {
+    public String getTextContent() {
         return textContent;
     }
 
-    public Long getAttachmentId () {
+    public Long getAttachmentId() {
         return attachmentId;
     }
 
-    public Timestamp getSentTs () {
+    public Timestamp getSentTs() {
         return sentTs;
     }
 
-    public Timestamp getReceivedTs () {
+    public Timestamp getReceivedTs() {
         return receivedTs;
     }
 }

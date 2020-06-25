@@ -94,7 +94,10 @@ public final class CreateMessage {
      * Returns MessageId of the sent Message.
      */
     @PostMapping("/users/{userId}/chats/{chatId}/messages")
-    public Map<String, Object> createMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestParam(value = "textContent", required = false) String textContent, @RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) throws IOException {
+    public Map<String, Object> createMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") 
+    String chatIdString, @RequestParam(value = "textContent", required = false) String textContent, 
+    @RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) throws 
+    IOException {
 
         String path = request.getRequestURI();
 

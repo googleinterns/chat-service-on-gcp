@@ -55,7 +55,7 @@ public final class ChatAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("chatId").to(chatId).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        return (!resultSet.isEmpty());        
+        return !resultSet.isEmpty();        
     }
 
     /**

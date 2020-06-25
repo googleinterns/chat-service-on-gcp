@@ -52,7 +52,7 @@ public final class MessageAccessor {
      * Completes all DB insertions for the CreateMessage API in a single transaction.
      */
     public boolean createMessageInTransaction(Message message, Chat chat, Optional<Attachment> optionalAttachment) {
-        return spannerOperations.performReadWriteTransaction (
+        return spannerOperations.performReadWriteTransaction(
             transactionSpannerOperations -> {
                 if (optionalAttachment.isPresent()) {
                     Attachment attachment = optionalAttachment.get();
@@ -99,7 +99,7 @@ public final class MessageAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("messageId").to(messageId).build();
         List<Message> resultSet = spannerTemplate.query(Message.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        return (!resultSet.isEmpty());
+        return !resultSet.isEmpty();
     }
 
     /**
@@ -143,7 +143,7 @@ public final class MessageAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("messageId").to(messageId).bind("chatId").to(chatId).build();
         List<Message> resultSet = spannerTemplate.query(Message.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        return (!resultSet.isEmpty()); 
+        return !resultSet.isEmpty(); 
     }
 
     private List<Message> listCountMessagesOfChatId(Timestamp startCreationTs, Timestamp endCreationTs, int count, long chatId) {

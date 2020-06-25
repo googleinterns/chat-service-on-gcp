@@ -59,9 +59,9 @@ public final class ListChats {
         @Column(name = "ChatID")
         private long chatId;
 
-        public UsernameChatId () {}
+        public UsernameChatId() {}
 
-        public UsernameChatId (String username, long chatId) {
+        public UsernameChatId(String username, long chatId) {
             this.username = username;
             this.chatId = chatId;
         }
