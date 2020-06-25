@@ -88,14 +88,7 @@ public final class SuccessResponseGenerator {
      */
     public static Map<String, Object> getSuccessResponseForGetMessage(Message message, Attachment attachment, long userId) {
 
-        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("MessageId", message.getMessageId());
-        responseBody.put("ChatId", message.getChatId());
-        responseBody.put("SentByCurrentUser", message.getSenderId() == userId);
-        responseBody.put("SentTs", message.getSentTs());
-        responseBody.put("ReceivedTs", message.getReceivedTs());
-        responseBody.put("CreationTs", message.getCreationTs());
-        responseBody.put("TextContent", message.getTextContent());
+        Map<String, Object> responseBody = getSuccessResponseForGetMessage(Message message, long userId);
         responseBody.put("FileName", attachment.getFileName());
         responseBody.put("FileType", attachment.getFileType());
         responseBody.put("FileSize", Long.toString(attachment.getFileSize()) + " B");
