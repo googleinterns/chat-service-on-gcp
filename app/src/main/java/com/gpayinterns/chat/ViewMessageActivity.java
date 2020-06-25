@@ -90,7 +90,6 @@ public class ViewMessageActivity extends AppCompatActivity
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         setContentView(R.layout.activity_view_message);
 
-
         getCurrentUser();
         messageEditText=(EditText)findViewById(R.id.send_message_text);
 
@@ -98,7 +97,6 @@ public class ViewMessageActivity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initializeDisplayContent();
-
         final Button button = findViewById(R.id.send_message_button);
         button.setOnClickListener(new View.OnClickListener()
         {
@@ -131,11 +129,8 @@ public class ViewMessageActivity extends AppCompatActivity
                 + "/" + currentUser + "/" + CHATS
                 + "/" + chatID + "/" + MESSAGES;
 
-
         JSONObject jsonBody = new JSONObject();
-
         Log.d("messageText sent to server: ",messageText);
-
         jsonBody.put("contentType", "text");
         jsonBody.put("textContent",messageText);
 
@@ -208,8 +203,6 @@ public class ViewMessageActivity extends AppCompatActivity
         SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
         currentUser = mPrefs.getString("currentUser","");
     }
-
-
 
     private void initializeDisplayContent()
     {
@@ -294,7 +287,6 @@ public class ViewMessageActivity extends AppCompatActivity
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
-
     @Override
     protected void onResume()
     {
@@ -310,10 +302,7 @@ public class ViewMessageActivity extends AppCompatActivity
 
         hideSoftKeyboard();
         firstReceiveMessageFromServer();
-
     }
-
-
 
     private void ReceiveMessagePeriodically()
     {
@@ -396,7 +385,6 @@ public class ViewMessageActivity extends AppCompatActivity
         };
 
         VolleyController.getInstance(this).addToRequestQueueWithRetry(jsonObjectRequest);
-
     }
 
     private void receiveMessageFromServer()
@@ -404,8 +392,6 @@ public class ViewMessageActivity extends AppCompatActivity
         Log.d("currentUser",currentUser);
         Log.d("chatID:",chatID);
         Log.d("lastMessageID:",lastMessageID);
-
-
         String URL = BASE_URL + USERS +
                 "/" + currentUser + "/" + CHATS +
                 "/" + chatID + "/" + MESSAGES + "?" +
@@ -432,7 +418,6 @@ public class ViewMessageActivity extends AppCompatActivity
                                     newMessages.add(newMessage);
                                     messageIDSet.add(newMessage.messageID);
                                 }
-
                                 if(i==messageList.length()-1)
                                 {
                                     lastMessageID = newMessage.messageID;
@@ -469,13 +454,6 @@ public class ViewMessageActivity extends AppCompatActivity
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-    }
-
     private void addMessageToScreen(String messageID)
     {
         messageIDSet.add(messageID);
@@ -486,9 +464,7 @@ public class ViewMessageActivity extends AppCompatActivity
         Log.d("here",Integer.toString(newMessage.size()));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
-
     }
-
 
     private void hideSoftKeyboard()
     {

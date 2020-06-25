@@ -49,12 +49,10 @@ public class ViewContactsActivity extends AppCompatActivity
 
     private static boolean active = false;
 
-
     ContactsRecyclerAdapter contactsRecyclerAdapter;
     LinearLayoutManager contactLayoutManager;
     private FloatingActionButton fab;
     private List<User> users = new ArrayList<User>();
-
 
     private String currentUser;
     RecyclerView recyclerContacts;
@@ -62,7 +60,6 @@ public class ViewContactsActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-
         super.onCreate(savedInstanceState);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 
@@ -91,7 +88,6 @@ public class ViewContactsActivity extends AppCompatActivity
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {
-
                     @Override
                     public void onResponse(JSONObject response)
                     {
@@ -111,7 +107,6 @@ public class ViewContactsActivity extends AppCompatActivity
                                 Log.d("here",username);
                                 contacts.add(new User(username,chatID,lastMessageID));
                             }
-
                             contactsRecyclerAdapter.updateContactsList(contacts);
                         }
                         catch (JSONException e)
@@ -125,7 +120,6 @@ public class ViewContactsActivity extends AppCompatActivity
                     public void onErrorResponse(VolleyError error)
                     {
                         // TODO: Handle error
-
                     }
                 }){
             @Override
@@ -215,7 +209,6 @@ public class ViewContactsActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -223,7 +216,6 @@ public class ViewContactsActivity extends AppCompatActivity
         inflater.inflate(R.menu.menu_logout,menu);
         final MenuItem searchItem = menu.findItem(R.id.contacts_search_menu);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-
 
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
@@ -310,7 +302,6 @@ public class ViewContactsActivity extends AppCompatActivity
                 })
                 .setNegativeButton(android.R.string.no, null)
                 .create();
-
 
         dialog.setOnShowListener( new DialogInterface.OnShowListener() {
             @Override

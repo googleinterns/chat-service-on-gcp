@@ -21,7 +21,6 @@ public class ChatContentProvider extends android.content.ContentProvider
         sURIMatcher.addURI(ChatProviderContract.AUTHORITY, ChatProviderContract.Messages.PATH, MESSAGES);
         sURIMatcher.addURI(ChatProviderContract.AUTHORITY, ChatProviderContract.Users.PATH,USERS);
         sURIMatcher.addURI(ChatProviderContract.AUTHORITY, ChatProviderContract.Chat.PATH,CHAT);
-
     }
 
     public ChatContentProvider()
@@ -72,9 +71,7 @@ public class ChatContentProvider extends android.content.ContentProvider
                 return null;
             rowUri = ContentUris.withAppendedId(ChatProviderContract.Chat.CONTENT_URI,rowId);
         }
-
         return rowUri;
-
     }
 
     @Override
@@ -106,7 +103,6 @@ public class ChatContentProvider extends android.content.ContentProvider
             cursor=db.query(DatabaseContract.chatEntry.TABLE_NAME,projection,selection,selectionArgs,
                     null,null,sortOrder);
         }
-
         return cursor;
     }
 
@@ -114,7 +110,6 @@ public class ChatContentProvider extends android.content.ContentProvider
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs)
     {
-
         int uriMatch = sURIMatcher.match(uri);
         SQLiteDatabase db =mDbOpenHelper.getReadableDatabase();
         if(uriMatch==MESSAGES)

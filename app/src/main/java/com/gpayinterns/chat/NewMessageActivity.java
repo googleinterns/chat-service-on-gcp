@@ -211,7 +211,6 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
 
         String username = ((EditText)findViewById(R.id.new_message_username)).getText().toString();
 
-
         JSONObject jsonBody = new JSONObject();
         Log.d("username sent to server: ",username);
         jsonBody.put("username",username);
@@ -281,7 +280,6 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
             }
         };
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
-
     }
 
     private void sendFirstMessageToServer() throws JSONException
@@ -293,7 +291,6 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         Log.d("message sent to server: ",messageText);
 
         JSONObject jsonBody = new JSONObject();
-
         jsonBody.put("contentType","text");
         jsonBody.put("textContent",messageText);
 
@@ -358,8 +355,6 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
             }
         };
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
-
-
     }
 
     private void switchToViewMessages(String lastMessageID)

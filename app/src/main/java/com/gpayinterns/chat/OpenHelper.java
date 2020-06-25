@@ -34,9 +34,6 @@ public class OpenHelper extends SQLiteOpenHelper
         db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_INDEX1);
         db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_INDEX2);
         db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_INDEX3);
-
-
-
     }
 
     @Override

@@ -18,10 +18,7 @@ public class NewMessageRecyclerAdapter extends RecyclerView.Adapter <NewMessageR
 {
     private Context mContext;
     private LayoutInflater mLayoutInflater;
-
     private List<String> mMessages;
-
-
 
     @Override
     public int getItemViewType(int position)
@@ -40,7 +37,6 @@ public class NewMessageRecyclerAdapter extends RecyclerView.Adapter <NewMessageR
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-
         View itemView = mLayoutInflater.inflate(R.layout.item_send_message_list,parent,false);
         return new ViewHolder(itemView);
     }
@@ -66,6 +62,4 @@ public class NewMessageRecyclerAdapter extends RecyclerView.Adapter <NewMessageR
             mMessage = (TextView) itemView.findViewById(R.id.send_message_text);
         }
     }
-
-
 }

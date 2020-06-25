@@ -39,7 +39,6 @@ import static com.gpayinterns.chat.ServerHelper.USER_USERNAME;
 
 public class RegistrationActivity extends AppCompatActivity
 {
-
     //Edittexts
     private EditText usernameEditText;
     private EditText phoneNumEditText;
@@ -49,7 +48,6 @@ public class RegistrationActivity extends AppCompatActivity
 
     private long mLastClickTime = 0;
     private static boolean active = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -64,7 +62,6 @@ public class RegistrationActivity extends AppCompatActivity
         emailEditText=findViewById(R.id.email_input_register);
         passwordEditText =findViewById(R.id.password_input_register);
         confirmPasswordEditText =findViewById(R.id.confirm_password_input);
-
 
         //Button
         Button registrationButton = (Button) findViewById(R.id.register_button);
@@ -121,26 +118,17 @@ public class RegistrationActivity extends AppCompatActivity
         String password = passwordEditText.getText().toString();
         String URL = BASE_URL + SIGNUP;
 
-
         JSONObject jsonBody = new JSONObject();
-
-
         jsonBody.put(USER_USERNAME, userName);
         jsonBody.put(USER_EMAIL, emailID);
         jsonBody.put(USER_MOBILE,phoneNum);
         jsonBody.put(USER_PASSWORD,password);
-
-
-
-
 
         final Long mRequestStartTime = System.currentTimeMillis();
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                  (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
                 {
-
-
                     @Override
                     public void onResponse(JSONObject response)
                     {
@@ -176,8 +164,6 @@ public class RegistrationActivity extends AppCompatActivity
                     {
                         long totalRequestTime = System.currentTimeMillis() - mRequestStartTime;
                         Log.d("failureLatencyTime: ",Long.toString(totalRequestTime));
-
-
                         Log.d("errorMessage",error.toString());
                         if (error instanceof TimeoutError || error instanceof NoConnectionError)
                         {
@@ -196,7 +182,6 @@ public class RegistrationActivity extends AppCompatActivity
                             {
                                 e.printStackTrace();
                             }
-
                             assert data != null;
                             String message = data.optString("message");
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
@@ -251,8 +236,6 @@ public class RegistrationActivity extends AppCompatActivity
             emailEditText.requestFocus();
             return false;
         }
-
-
         if (TextUtils.isEmpty(password))
         {
             passwordEditText.setFocusable(true);
@@ -276,7 +259,6 @@ public class RegistrationActivity extends AppCompatActivity
             passwordEditText.requestFocus();
             return false;
         }
-
         if(TextUtils.isEmpty(phoneNum))
         {
             phoneNumEditText.setFocusable(true);
@@ -284,7 +266,6 @@ public class RegistrationActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), "Enter a phone number", Toast.LENGTH_SHORT).show();
             return false;
         }
-
         return true;
     }
 
@@ -315,5 +296,4 @@ public class RegistrationActivity extends AppCompatActivity
                 + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
                 + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$").matcher(email).matches();
     }
-
 }

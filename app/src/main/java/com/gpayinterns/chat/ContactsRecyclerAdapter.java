@@ -38,7 +38,6 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         mContext = context;
         mUsers = users;
         mLayoutInflater = LayoutInflater.from(mContext);
-
     }
 
 
@@ -46,7 +45,6 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-
         View itemView = mLayoutInflater.inflate(R.layout.item_contact,parent,false);
         return new ViewHolder(itemView);
     }
@@ -91,7 +89,6 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             mPicName = (TextView) itemView.findViewById(R.id.tvWeekDayFirstLetter);
             mContactIcon = (RelativeLayout) itemView.findViewById(R.id.rlWeekDay);
 
-
             itemView.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -127,7 +124,6 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             @Override
             protected FilterResults performFiltering(CharSequence constraint)
             {
-
                 FilterResults results = new FilterResults();
                 List <User> filteredResult = new ArrayList<>();
                 if(constraint.length()>0 && !(mUsers.isEmpty()))
@@ -142,7 +138,6 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                     }
                 }
                 results.values = filteredResult;
-
                 return results;
             }
 

@@ -11,8 +11,6 @@ public class ServerHelper
     public static final String START_MESSAGE = "startMessageId";
     public static final String END_MESSAGE = "endMessageId";
 
-
-
     public static final String USER_USERNAME = "Username";
     public static final String USER_EMAIL = "EmailID";
     public static final String USER_MOBILE = "MobileNo";

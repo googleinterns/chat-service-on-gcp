@@ -116,9 +116,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onResume();
     }
 
-
-
-
     public boolean validateForm()
     {
         boolean valid = true;
@@ -144,7 +141,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         {
             passwordEditText.setError(null);
         }
-
         return valid;
     }
 
@@ -186,13 +182,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void signIn() throws JSONException
     {
-
         if (!validateForm())
         {
             shakeLoginButton();
             return;
         }
-
         authenticateFromServer();
     }
 
@@ -210,13 +204,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         String URL = BASE_URL + LOGIN;
 
-
         JSONObject jsonBody = new JSONObject();
-
-
         jsonBody.put(USER_USERNAME, userName);
         jsonBody.put(USER_PASSWORD,password);
-
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
@@ -285,8 +275,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         };
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
-
-
 
     private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
     private long mBackPressed;

@@ -24,8 +24,6 @@ public final class DatabaseContract
                         COLUMN_LAST_MESSAGE+" TEXT , " +
                         COLUMN_SERVER_USER_ID+" TEXT UNIQUE ) ";
 
-
-
         public static final String INDEX1 = TABLE_NAME  + "_index1";
         public static final String SQL_CREATE_INDEX1 =
                 "CREATE INDEX "+INDEX1+" ON "+TABLE_NAME
@@ -49,7 +47,6 @@ public final class DatabaseContract
                         COLUMN_TEXT + " TEXT NOT NULL , "+
                         COLUMN_SEND_TIME + " INTEGER NOT NULL ) ";
 
-
         public static final String INDEX1 = TABLE_NAME  + "_index1";
         public static final String SQL_CREATE_INDEX1 =
                 "CREATE INDEX "+INDEX1+" ON "+TABLE_NAME
@@ -65,12 +62,10 @@ public final class DatabaseContract
                 "CREATE INDEX "+INDEX3+" ON "+TABLE_NAME
                         +"( " + COLUMN_SEND_TIME+" )";
 
-
         public static final String INDEX4 = TABLE_NAME  + "_index4";
         public static final String SQL_CREATE_INDEX4 =
                 "CREATE INDEX "+INDEX4+" ON "+TABLE_NAME
                         +"( " + COLUMN_SENDER+" , "+ COLUMN_RECEIVER +" )";
-
 
     }
     public static final class chatEntry implements BaseColumns
@@ -88,27 +83,20 @@ public final class DatabaseContract
                         COLUMN_LAST_MESSAGE+" TEXT  , " +
                         " UNIQUE ( user1 , user2 )  ) ";
 
-
-
         //Sql Indices
         public static final String INDEX1 = TABLE_NAME  + "_index1";
         public static final String SQL_CREATE_INDEX1 =
                 "CREATE INDEX "+INDEX1+" ON "+TABLE_NAME
                         +"( " + COLUMN_USER1+" )";
 
-
         public static final String INDEX2 = TABLE_NAME  + "_index2";
         public static final String SQL_CREATE_INDEX2 =
                 "CREATE INDEX "+INDEX2+" ON "+TABLE_NAME
                         +"( " + COLUMN_USER2+" )";
 
-
         public static final String INDEX3 = TABLE_NAME  + "_index3";
         public static final String SQL_CREATE_INDEX3 =
                 "CREATE INDEX "+INDEX3+" ON "+TABLE_NAME
                         +"( " + COLUMN_USER1+" , " + COLUMN_USER2+ " )";
-
-
-
     }
 }

@@ -22,7 +22,6 @@ public class VolleyController
         return instance;
     }
 
-
     private VolleyController(Context context)
     {
         ctx = context;
