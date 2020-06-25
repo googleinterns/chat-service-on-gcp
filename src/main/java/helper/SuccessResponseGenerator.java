@@ -64,22 +64,42 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
+    private static Map<String, Object> addAttachmentMetadataToResponseBody(Map<String, Object> responseBody, Attachment attachment) {
+        responseBody.put("FileName", attachment.getFileName());
+        responseBody.put("FileType", attachment.getFileType());
+        responseBody.put("FileSize", Long.toString(attachment.getFileSize()) + " B");
+
+        return responseBody;
+    }
+
+    private static Map<String, Object> getMessageForResponseBody(long userId, Message message) {
+    
+        Map<String, Object> messageForResponseBody = new LinkedHashMap<String, Object>();
+
+        messageForResponseBody.put("MessageId", message.getMessageId());
+        messageForResponseBody.put("ChatId", message.getChatId());
+        messageForResponseBody.put("SentByCurrentUser", message.getSenderId() == userId);
+        messageForResponseBody.put("CreationTs", message.getCreationTs());
+        messageForResponseBody.put("SentTs", message.getSentTs());
+        messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
+        messageForResponseBody.put("TextContent", message.getTextContent());
+
+        return messageForResponseBody;
+    }
+
+    private static Map<String, Object> getMessageForResponseBody(long userId, Message message, Attachment attachment) {
+    
+        Map<String, Object> messageForResponseBody = getMessageForResponseBody(userId, message);
+
+        return addAttachmentMetadataToResponseBody(messageForResponseBody, attachment);
+    }
+
     /**
      * Renders the given parameters in a Map to return a successful HTTP response 
      * for all client requests to the GetMessage API for messages without attachments.
      */
     public static Map<String, Object> getSuccessResponseForGetMessage(Message message, long userId) {
-
-        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("MessageId", message.getMessageId());
-        responseBody.put("ChatId", message.getChatId());
-        responseBody.put("SentByCurrentUser", message.getSenderId() == userId);
-        responseBody.put("SentTs", message.getSentTs());
-        responseBody.put("ReceivedTs", message.getReceivedTs());
-        responseBody.put("CreationTs", message.getCreationTs());
-        responseBody.put("TextContent", message.getTextContent());
-
-        return responseBody;
+        return getMessageForResponseBody(userId, message);
     }
 
     /**
@@ -87,13 +107,7 @@ public final class SuccessResponseGenerator {
      * for all client requests to the GetMessage API for messages with attachments.
      */
     public static Map<String, Object> getSuccessResponseForGetMessage(Message message, Attachment attachment, long userId) {
-
-        Map<String, Object> responseBody = getSuccessResponseForGetMessage(Message message, long userId);
-        responseBody.put("FileName", attachment.getFileName());
-        responseBody.put("FileType", attachment.getFileType());
-        responseBody.put("FileSize", Long.toString(attachment.getFileSize()) + " B");
-
-        return responseBody;
+        return getMessageForResponseBody(userId, message, attachment);
     }
 
     /**
@@ -108,19 +122,11 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
-    private static Map<String, Object> getMessageForResponseBody(long userId, Message message) {
-    
-        Map<String, Object> messageForResponseBody = new LinkedHashMap<String, Object>();
-
-        messageForResponseBody.put("MessageId", message.getMessageId());
-        messageForResponseBody.put("CreationTs", message.getCreationTs());
-        messageForResponseBody.put("ChatId", message.getChatId());
-        messageForResponseBody.put("SentByCurrentUser", message.getSenderId() == userId);
-        messageForResponseBody.put("TextContent", message.getTextContent());
-        messageForResponseBody.put("SentTs", message.getSentTs());
-        messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
-
-        return messageForResponseBody;
+    private static Map<String, List<Map<String, Object>>> getResponseBodyForListMessages(List<Map<String, Object>> listOfMessages) {
+        Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
+        responseBody.put("payload", listOfMessages);
+       
+        return responseBody;
     }
 
     /**
@@ -133,13 +139,33 @@ public final class SuccessResponseGenerator {
         //Sorts the messages in  ascending order of Creation Timestamp
         Collections.sort(messages, Comparator.comparing(Message::getCreationTs));
         
-        for (int i = 0; i < messages.size(); ++i) {
-            listOfMessages.add(getMessageForResponseBody(userId, messages.get(i)));
+        for (Message message : messages) {
+            listOfMessages.add(getMessageForResponseBody(userId, message));
         }
 
-        Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
-        responseBody.put("payload", listOfMessages);
-       
-        return responseBody;
+        return getResponseBodyForListMessages(listOfMessages);
+    }
+
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the ListMessages API.
+     */
+    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userId, List<Message> messages, 
+    List<Attachment> attachments, Map<Long, Integer> attachmentIdToIndexInList) {
+
+        List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
+        
+        //Sorts the messages in  ascending order of Creation Timestamp
+        Collections.sort(messages, Comparator.comparing(Message::getCreationTs));
+        
+        for (Message message : messages) {
+            if (message.getAttachmentId().isPresent()) {
+                Attachment attachment = attachments.get(attachmentIdToIndexInList.get(message.getAttachmentId().get()));
+                listOfMessages.add(getMessageForResponseBody(userId, message, attachment));
+            } else {
+                listOfMessages.add(getMessageForResponseBody(userId, message));
+            }
+        }
+
+        return getResponseBodyForListMessages(listOfMessages);
     }
 }

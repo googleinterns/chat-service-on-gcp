@@ -1,9 +1,11 @@
 package controller;
 
 import entity.Message;
+import entity.Attachment;
 import dbaccessor.user.UserAccessor;
 import dbaccessor.chat.ChatAccessor;
 import dbaccessor.message.MessageAccessor;
+import dbaccessor.message.AttachmentAccessor;
 import dbaccessor.userchat.UserChatAccessor;
 import helper.SuccessResponseGenerator;
 import exceptions.UserIdDoesNotExistException;
@@ -16,7 +18,7 @@ import exceptions.ChatIdMissingFromRequestURLPathException;
 import exceptions.InvalidCountValueInRequestURLParameterException;
 
 import java.util.Map;
-
+import java.util.HashMap;
 import com.google.cloud.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
@@ -51,6 +53,9 @@ public final class ListMessages {
 
     @Autowired 
     private MessageAccessor queryMessage;
+
+    @Autowired
+    private AttachmentAccessor queryAttachment;
 
     @Autowired 
     private UserChatAccessor queryUserChat;
@@ -199,15 +204,31 @@ public final class ListMessages {
          * If it is null, sets it to the time when listMessages was called.
          */
         List<Message> messageListForReceivedTsUpdate = new ArrayList<Message>();
+        List<Long> attachmentIdList = new ArrayList<Long>();
 
         for (Message message : messages) {
             if (message.getReceivedTs() == null && message.getSenderId() != userId) {
                 message.setReceivedTs(receivedTs);
                 messageListForReceivedTsUpdate.add(message);
             }
+
+            if (message.getAttachmentId().isPresent()) {
+                attachmentIdList.add(message.getAttachmentId().get());
+            } 
         }
         
         insertMessage.updateReceivedTsForMessages(messageListForReceivedTsUpdate);
+
+        if (!attachmentIdList.isEmpty()) {
+            List<Attachment> attachments = queryAttachment.getAttachments(attachmentIdList);
+            Map<Long, Integer> attachmentIdToIndexInList = new HashMap<Long, Integer>();
+
+            for (int i = 0; i < attachments.size(); ++i) {
+                attachmentIdToIndexInList.put(attachments.get(i).getAttachmentId(), i);
+            }
+
+            return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messages, attachments, attachmentIdToIndexInList);
+        }
          
         return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messages);
     }

@@ -47,4 +47,22 @@ public final class AttachmentAccessor {
  
         return resultSet.get(0);
     }
+
+    /**
+     * Returns details of Attachments for the given list of AttachmentIds.
+     * Details include:
+     * <ol>
+     * <li> AttachmentId </li>
+     * <li> FileName </li>
+     * <li> FileType </li>
+     * <li> FileSize </li>
+     * </ol>
+     */
+    public List<Attachment> getAttachments(List<Long> attachmentIdList) {
+        String sqlStatment = "SELECT * FROM Attachment WHERE AttachmentID IN UNNEST (@attachmentIdList)";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("attachmentIdList").toInt64Array(attachmentIdList).build();
+        List<Attachment> resultSet = spannerTemplate.query(Attachment.class, statement, null);
+ 
+        return resultSet;
+    }
 }
