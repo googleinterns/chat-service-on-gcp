@@ -38,7 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import util.Message;
+import com.gpayinterns.chat.Message;
 
 import static com.gpayinterns.chat.ServerHelper.BASE_URL;
 import static com.gpayinterns.chat.ServerHelper.CHATS;

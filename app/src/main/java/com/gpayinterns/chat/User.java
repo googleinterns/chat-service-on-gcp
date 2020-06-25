@@ -1,4 +1,4 @@
-package util;
+package com.gpayinterns.chat;
 
 
 public class User

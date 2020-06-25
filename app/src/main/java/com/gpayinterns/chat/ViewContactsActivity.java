@@ -36,7 +36,7 @@ import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import util.User;
+import com.gpayinterns.chat.User;
 
 import static com.gpayinterns.chat.ServerHelper.USERS;
 import static com.gpayinterns.chat.ServerHelper.BASE_URL;

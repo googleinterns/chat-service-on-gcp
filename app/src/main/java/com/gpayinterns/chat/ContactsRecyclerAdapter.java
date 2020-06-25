@@ -22,7 +22,7 @@ import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import util.User;
+import com.gpayinterns.chat.User;
 
 public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyclerAdapter.ViewHolder>
     implements Filterable
