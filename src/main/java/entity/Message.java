@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.Optional;
 import com.google.cloud.Timestamp;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
@@ -110,8 +111,8 @@ public final class Message {
         return textContent;
     }
 
-    public Long getAttachmentId() {
-        return attachmentId;
+    public Optional<Long> getAttachmentId() {
+        return Optional.ofNullable(attachmentId);
     }
 
     public Timestamp getSentTs() {
