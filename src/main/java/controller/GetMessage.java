@@ -24,13 +24,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Controller which responds to client requests to get the details of a message.
  * The response contains:
- * (1)  MessageId
- * (2)  ChatId
- * (3)  SentByCurrentUser
- * (5)  TextContent
- * (6)  Sent Timestamp
- * (7)  Received Timestamp
- * (8)  Creation Timestamp
+ * <ol>
+ * <li> MessageId </li>
+ * <li> ChatId </li>
+ * <li> SentByCurrentUser </li>
+ * <li> TextContent </li>
+ * <li> Sent Timestamp </li>
+ * <li> Received Timestamp </li>
+ * <li> Creation Timestamp </li>
+ * </ol>
  */
 @RestController
 public final class GetMessage {

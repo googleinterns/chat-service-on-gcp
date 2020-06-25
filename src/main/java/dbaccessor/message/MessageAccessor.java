@@ -105,13 +105,15 @@ public final class MessageAccessor {
     /**
      * Returns details of Message with the given MessageId.
      * Details include:
-     * (1)  MessageId
-     * (2)  ChatId
-     * (3)  SenderId
-     * (5)  TextContent
-     * (6)  Sent Timestamp
-     * (7)  Received Timestamp
-     * (8)  Creation Timestamp
+     * <ol>
+     * <li> MessageId </li>
+     * <li> ChatId </li>
+     * <li> SenderId </li>
+     * <li> TextContent </li>
+     * <li> Sent Timestamp </li>
+     * <li> Received Timestamp </li>
+     * <li> Creation Timestamp </li>
+     * </ol>
      */
     public Message getMessage(long messageId) {
 
@@ -212,8 +214,10 @@ public final class MessageAccessor {
     /**
      * Returns details of Messages which were sent last in the Chats which the given User is engaged in.
      * Details include:
-     * (1)  ChatId
-     * (2)  Creation Timestamp (of the Message)
+     * <ol>
+     * <li> ChatId </li>
+     * <li> Creation Timestamp (of the Message) </li>
+     * </ol>
      */
     public List<Message> getCreationTsOfLastSentMessageIdForChatsOfUser(long userId) {
 

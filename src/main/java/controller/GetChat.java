@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Controller which responds to client requests to get the details of a chat.
  * The response contains:
- * (1)  ChatId
- * (2)  LastSentMessageId
- * (3)  Creation Timestamp
+ * <ol>
+ * <li> ChatId </li>
+ * <li> LastSentMessageId </li>
+ * <li> Creation Timestamp </li>
+ * </ol>
  */
 @RestController
 public final class GetChat {
