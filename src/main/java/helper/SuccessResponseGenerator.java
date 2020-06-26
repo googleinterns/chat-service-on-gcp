@@ -56,12 +56,16 @@ public final class SuccessResponseGenerator {
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetChat API.
      */
-    public static ImmutableMap<String, Object> getSuccessResponseForGetChat(Chat chat) {
-        ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
-                                                                .put("ChatId", chat.getChatId())
-                                                                .put("LastSentMessageId", chat.getLastSentMessageId())
-                                                                .put("CreationTs", chat.getCreationTs())
-                                                                .build();
+    public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetChat(Chat chat) {
+        Map<String, Object> response = new LinkedHashMap<String, Object>();
+
+        response.put("ChatId", chat.getChatId());
+        response.put("LastSentMessageId", chat.getLastSentMessageId());
+        response.put("CreationTs", chat.getCreationTs());
+
+        ImmutableMap<String, Map<String, Object>> responseBody = ImmutableMap.<String, Map<String, Object>> builder()
+                                                                            .put("payload", response)
+                                                                            .build();
 
         return responseBody;
     }
