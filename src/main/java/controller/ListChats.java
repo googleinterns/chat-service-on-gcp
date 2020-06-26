@@ -128,7 +128,16 @@ public final class ListChats {
 
         User user = User.newBuilder().userId(userId).build();
         List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
-        ImmutableList<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getCreationTsOfLastSentMessageIdForChatsOfUser(userId);
+        List<Long> listOfChatId = new ArrayList<Long>();
+
+        for (Chat chat : chatsOfUser) {
+            listOfChatId.add(chat.getChatId());
+        }
+
+        ImmutableList<Long> listOfChatIdImmutable = ImmutableList.<Long> builder()
+                                                                .addAll(listOfChatId)
+                                                                .build();
+        ImmutableList<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getCreationTsOfLastSentMessageIdForChatsOfUser(userId, listOfChatIdImmutable);
 
         //Stores time of the last Message sent in each ChatId of the User against ChatId.
         Map<Long, Timestamp> chatIdCreationTsOflastSentMessageIdMap = new LinkedHashMap<Long, Timestamp>();
