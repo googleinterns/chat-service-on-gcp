@@ -212,9 +212,7 @@ public final class ListMessages {
                 messageListForReceivedTsUpdate.add(message);
             }
 
-            if (message.getAttachmentId().isPresent()) {
-                attachmentIdList.add(message.getAttachmentId().get());
-            } 
+            message.getAttachmentId().ifPresent(attachmentIdList::add); 
         }
         
         insertMessage.updateReceivedTsForMessages(messageListForReceivedTsUpdate);
