@@ -168,4 +168,16 @@ public final class SuccessResponseGenerator {
 
         return getResponseBodyForListMessages(listOfMessages);
     }
+
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetAttachment API.
+     */
+    public static Map<String, Object> getSuccessResponseForGetAttachment(Attachment attachment, byte[] blob) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
+
+        responseBody.put("Blob", blob);
+
+        return addAttachmentMetadataToResponseBody(responseBody, attachment);
+    }
 }

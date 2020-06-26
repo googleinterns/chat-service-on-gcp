@@ -233,4 +233,17 @@ public final class ExceptionHandlerAdvice {
 
         return new ResponseEntity<Object>(responseBody, EmptyMessageException.HTTP_STATUS);
     }
+
+    @ExceptionHandler(MessageDoesNotContainAttachmentException.class)
+    public ResponseEntity<Object> MessageDoesNotContainAttachmentException(MessageDoesNotContainAttachmentException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", MessageDoesNotContainAttachmentException.HTTP_STATUS.value());
+        responseBody.put("error", MessageDoesNotContainAttachmentException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, MessageDoesNotContainAttachmentException.HTTP_STATUS);
+    }
 } 

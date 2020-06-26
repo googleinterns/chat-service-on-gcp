@@ -241,4 +241,22 @@ public final class MessageAccessor {
  
         return resultSet;
     }
+
+    /**
+     * Returns details of Attachment corresponding to the Message with the given MessageId.
+     * Details include:
+     * <ol>
+     * <li> AttachmentId </li>
+     * <li> FileName </li>
+     * <li> FileType </li>
+     * <li> FileSize </li>
+     * </ol>
+     */
+    public Attachment getAttachmentFromMessageId(long messageId) {
+        String sqlStatment = "SELECT Attachment.AttachmentID as AttachmentID, Attachment.FileName as FileName, Attachment.FileType as FileType, Attachment.FileSize as FileSize FROM Message LEFT OUTER JOIN Attachment ON Message.AttachmentID = Attachment.AttachmentID WHERE Message.MessageID = @messageId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("messageId").to(messageId).build();
+        List<Attachment> resultSet = spannerTemplate.query(Attachment.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
+ 
+        return resultSet.get(0);
+    }
 }
