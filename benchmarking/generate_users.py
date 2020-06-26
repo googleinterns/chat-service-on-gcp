@@ -14,7 +14,7 @@ USERNAME_MAX_LENGTH = 8
 PASSWORD_LENGTH = 8
 MOBILE_NUMBER_LENGTH = 10
 EMAIL_DOMAIN = "@dummy.com"
-ITERATIONS = 100
+ITERATIONS = 1000000
 OUTPUT_FILE_NAME = "users.csv"
 CSV_COLUMN_NAMES = ["UserID", "Username", "EmailID", "Password", "MobileNo", "Response Time"]
 
