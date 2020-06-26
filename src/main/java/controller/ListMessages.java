@@ -110,7 +110,7 @@ public final class ListMessages {
      * Returns the list of message details of the given Chat.
      */
     @GetMapping("/users/{userId}/chats/{chatId}/messages")
-    public Map<String, List<Map<String, Object>>> listMessages(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestParam(value = "startMessageId", required = false) String startMessageIdString, @RequestParam(value = "endMessageId", required = false) String endMessageIdString, @RequestParam(value = "count", required = false) String countString, HttpServletRequest request) {
+    public ImmutableMap<String, ImmutableList<Map<String, Object>>> listMessages(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestParam(value = "startMessageId", required = false) String startMessageIdString, @RequestParam(value = "endMessageId", required = false) String endMessageIdString, @RequestParam(value = "count", required = false) String countString, HttpServletRequest request) {
 
         Timestamp receivedTs = Timestamp.now();
         String path = request.getRequestURI();

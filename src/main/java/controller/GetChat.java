@@ -12,6 +12,8 @@ import exceptions.UserIdMissingFromRequestURLPathException;
 
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +57,7 @@ public final class GetChat {
      * Returns details of the requested Chat.
      */
     @GetMapping("/users/{userId}/chats/{chatId}")
-    public Map<String, Object> getChat(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, HttpServletRequest request) {
+    public ImmutableMap<String, Object> getChat(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
         Map<String, Object> responseBody;

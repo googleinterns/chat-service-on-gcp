@@ -15,7 +15,8 @@ import exceptions.UsernameMissingFromRequestBodyException;
 import java.util.Map;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public final class CreateChat {
      * Returns ChatId of the Chat between the two Users.
      */
     @PostMapping("/users/{userId}/chats")
-    public Map<String, Object> createChat(@PathVariable("userId") String userIdString, 
+    public ImmutableMap<String, Object> createChat(@PathVariable("userId") String userIdString, 
     @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         
         String path = request.getRequestURI();
