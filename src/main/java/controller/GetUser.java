@@ -8,6 +8,8 @@ import helper.SuccessResponseGenerator;
 
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,7 @@ public final class GetUser {
      * Returns details of the requested User.
      */
     @GetMapping("/users/{userId}")
-    public Map<String, Object> getUser(@PathVariable("userId") String userIdString, HttpServletRequest request) {
+    public ImmutableMap<String, Object> getUser(@PathVariable("userId") String userIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
         Map<String, Object> responseBody;

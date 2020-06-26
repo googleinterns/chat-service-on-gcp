@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import com.google.cloud.Timestamp;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Controller which responds to client requests to get the list of chats which the user is engaged in.
@@ -86,12 +88,13 @@ public final class ListChats {
      * <li> LastSentMessageId </li>
      * </ol>
      */
-    Map<String, Object> getChatInfoOfChatInMap(Chat chat, String usernameOfSecondUser) {
+    ImmutableMap<String, Object> getChatInfoOfChatInMap(Chat chat, String usernameOfSecondUser) {
         
-        Map<String, Object> chatInfoOfChatInMap = new LinkedHashMap<String, Object>();
-        chatInfoOfChatInMap.put("ChatId", chat.getChatId());
-        chatInfoOfChatInMap.put("Username", usernameOfSecondUser);
-        chatInfoOfChatInMap.put("LastSentMessageId", chat.getLastSentMessageId());
+        ImmutableMap<String, Object> chatInfoOfChatInMap = ImmutableMap.<String, Object> builder()
+                                                                        .put("ChatId", chat.getChatId())
+                                                                        .put("Username", usernameOfSecondUser)
+                                                                        .put("LastSentMessageId", chat.getLastSentMessageId())
+                                                                        .build();
 
         return chatInfoOfChatInMap;
     }
@@ -113,7 +116,7 @@ public final class ListChats {
      * Returns the list of chats which the User id engaged in.
      */
     @GetMapping("/users/{userId}/chats")
-    public Map<String,List<Map<String, Object>>> listChats(@PathVariable("userId") String userIdString, HttpServletRequest request) {
+    public ImmutableMap<String, ImmutableList<ImmutableMap<String, Object>>> listChats(@PathVariable("userId") String userIdString, HttpServletRequest request) {
         
         String path = request.getRequestURI();
 
@@ -160,12 +163,16 @@ public final class ListChats {
         }
 
         //Stores list of all details of each Chat of the User.
-        List<Map<String, Object>> chatInfoOfChatsOfUser = new ArrayList<Map<String, Object>>();
+        List<ImmutableMap<String, Object>> chatInfoOfChatsOfUser = new ArrayList<ImmutableMap<String, Object>>();
 
         for (Chat chat : chatsOfUser) {
             chatInfoOfChatsOfUser.add(getChatInfoOfChatInMap(chat, chatIdSecondUsernameMap.get(chat.getChatId())));
         }
 
-        return SuccessResponseGenerator.getSuccessResponseForListChats(chatInfoOfChatsOfUser);
+        ImmutableList<ImmutableMap<String, Object>> chatInfoOfChatsOfUserImmutable = ImmutableList.<ImmutableMap<String, Object>> builder()
+                                                                                                .addAll(chatInfoOfChatsOfUser)
+                                                                                                .build();
+
+        return SuccessResponseGenerator.getSuccessResponseForListChats(chatInfoOfChatsOfUserImmutable);
     }
 }

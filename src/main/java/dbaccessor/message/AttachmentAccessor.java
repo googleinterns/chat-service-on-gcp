@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Accessor which performs database accesses for the Attachment entity.
@@ -64,7 +65,7 @@ public final class AttachmentAccessor {
      * <li> FileSize </li>
      * </ol>
      */
-    public List<Attachment> getAttachments(List<Long> attachmentIdList) {
+    public List<Attachment> getAttachments(ImmutableList<Long> attachmentIdList) {
         String sqlStatment = "SELECT * FROM Attachment WHERE AttachmentID IN UNNEST (@attachmentIdList)";
         Statement statement = Statement.newBuilder(sqlStatment).bind("attachmentIdList").toInt64Array(attachmentIdList).build();
         List<Attachment> resultSet = spannerTemplate.query(Attachment.class, statement, null);
