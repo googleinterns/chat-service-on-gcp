@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Generator which generates the successful HTTP response for all client requests to APIs.
@@ -122,7 +124,7 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
-    private static List<Message> sortMessagesByCreationTs(List<Message> messages) {
+    private static List<Message> sortMessagesByCreationTs(ImmutableList<Message> messages) {
         
         List<Message> copyOfMessages = new ArrayList<Message>(messages);
         Collections.sort(copyOfMessages, Comparator.comparing(Message::getCreationTs));
@@ -140,7 +142,7 @@ public final class SuccessResponseGenerator {
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the ListMessages API.
      */
-    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userId, List<Message> messages) {
+    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userId, ImmutableList<Message> messages) {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
         
@@ -156,8 +158,8 @@ public final class SuccessResponseGenerator {
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the ListMessages API.
      */
-    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userId, List<Message> messages, 
-    List<Attachment> attachments, Map<Long, Integer> attachmentIdToIndexInList) {
+    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userId, ImmutableList<Message> messages, 
+    ImmutableList<Attachment> attachments, ImmutableMap<Long, Integer> attachmentIdToIndexInList) {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
         
