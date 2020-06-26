@@ -157,7 +157,7 @@ public final class ListChats {
         
         Collections.sort(chatsOfUser, Comparator.comparing(Chat::getLastSentTime).reversed());
 
-        ImmutableList<UsernameChatId> usernameChatIdForSecondUsers = queryUser.getUsernameChatIdForSecondUsers(userId);
+        ImmutableList<UsernameChatId> usernameChatIdForSecondUsers = queryUser.getUsernameChatIdForSecondUsers(userId, listOfChatIdImmutable);
 
         //Stores username of the other User against ChatId for each Chat of the User.
         Map<Long, String> chatIdSecondUsernameMap = new LinkedHashMap<Long, String>();

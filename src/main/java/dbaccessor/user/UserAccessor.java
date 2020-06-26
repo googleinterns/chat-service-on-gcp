@@ -185,10 +185,10 @@ public class UserAccessor {
      * <li> ChatId </li>
      * </ol>
      */
-    public ImmutableList<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
+    public ImmutableList<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId, ImmutableList<Long> listOfChatIdOfUser) {
 
-        String sqlStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND UserChat.UserID != @userId";
-        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).build();
+        String sqlStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN UNNEST (@listOfChatIdOfUser) AND UserChat.UserID != @userId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).bind("listOfChatIdOfUser").toInt64Array(listOfChatIdOfUser).build();
         return ImmutableList.copyOf(spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true)));
     }
 }
