@@ -85,7 +85,7 @@ public final class GetMessage {
      * Returns details of the requested Message.
      */
     @GetMapping("/users/{userId}/chats/{chatId}/messages/{messageId}")
-    public Map<String, Object> getMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @PathVariable("messageId") String messageIdString, HttpServletRequest request) {
+    public ImmutableMap<String, Map<String, Object>> getMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @PathVariable("messageId") String messageIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
