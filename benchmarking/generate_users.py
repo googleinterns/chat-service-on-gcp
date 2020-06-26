@@ -8,15 +8,25 @@ import concurrent.futures
 import random_string
 import requests
 import csv
+import configparser
 
-USERNAME_MIN_LENGTH = 4
-USERNAME_MAX_LENGTH = 8
-PASSWORD_LENGTH = 8
-MOBILE_NUMBER_LENGTH = 10
-EMAIL_DOMAIN = "@dummy.com"
-ITERATIONS = 1000000
-OUTPUT_FILE_NAME = "users.csv"
+config = configparser.ConfigParser()
+config.read('config.ini')
+user_constants = config['User Constants']
+url_constants = config['URL Constants']
+file_names = config['FILE NAMES']
+
+USERNAME_MIN_LENGTH = int(user_constants['USERNAME_MIN_LENGTH'])
+USERNAME_MAX_LENGTH = int(user_constants['USERNAME_MAX_LENGTH'])
+PASSWORD_LENGTH = int(user_constants['PASSWORD_LENGTH'])
+MOBILE_NUMBER_LENGTH = int(user_constants['MOBILE_NUMBER_LENGTH'])
+EMAIL_DOMAIN = user_constants['EMAIL_DOMAIN']
+OUTPUT_FILE_NAME = file_names['USERS']
+SIGNUP_URL = url_constants['SIGNUP_URL']
+
 CSV_COLUMN_NAMES = ["UserID", "Username", "EmailID", "Password", "MobileNo", "Response Time"]
+ITERATIONS = 1000000
+MAX_TRIES = 5
 
 
 def signup_request():
@@ -24,23 +34,25 @@ def signup_request():
     email = username + EMAIL_DOMAIN
     mobile_no = random_string.numeric_fixed_length(MOBILE_NUMBER_LENGTH)
     password = random_string.alpha_numeric_fixed_length(PASSWORD_LENGTH)
-    response = requests.post('https://gcp-chat-service.an.r.appspot.com/signup',
+    response = requests.post(SIGNUP_URL,
                              json={"Username": username,
                                    "EmailID": email,
                                    "MobileNo": mobile_no,
                                    "Password": password,
                                    }
                              )
-    while response.status_code != 200:
+    tries = 1
+    while response.status_code != 200 and tries < MAX_TRIES:
         username = random_string.alpha_numeric_variable_length(USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH)
         email = username + EMAIL_DOMAIN
-        response = requests.post('https://gcp-chat-service.an.r.appspot.com/signup',
+        response = requests.post(SIGNUP_URL,
                                  json={"Username": username,
                                        "EmailID": email,
                                        "MobileNo": mobile_no,
                                        "Password": password,
                                        }
                                  )
+        tries += 1
     return response, username, email, mobile_no, password
 
 
