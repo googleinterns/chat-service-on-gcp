@@ -3,9 +3,9 @@ package exceptionhandler;
 import exceptions.*;
 
 import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 import java.util.LinkedHashMap;
 import java.time.LocalDateTime;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -237,12 +237,13 @@ public final class ExceptionHandlerAdvice {
     @ExceptionHandler(MessageDoesNotContainAttachmentException.class)
     public ResponseEntity<Object> MessageDoesNotContainAttachmentException(MessageDoesNotContainAttachmentException e) {
 
-        Map<String, Object> responseBody = new LinkedHashMap<>();
-        responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", MessageDoesNotContainAttachmentException.HTTP_STATUS.value());
-        responseBody.put("error", MessageDoesNotContainAttachmentException.HTTP_STATUS.toString());
-        responseBody.put("message", e.getMessage());
-        responseBody.put("path", e.getPath());
+        ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object>builder()
+                                                                .put("timestamp", LocalDateTime.now()) 
+                                                                .put("status", MessageDoesNotContainAttachmentException.HTTP_STATUS.value()) 
+                                                                .put("error", MessageDoesNotContainAttachmentException.HTTP_STATUS.toString()) 
+                                                                .put("message", e.getMessage())
+                                                                .put("path", e.getPath())
+                                                                .build();
 
         return new ResponseEntity<Object>(responseBody, MessageDoesNotContainAttachmentException.HTTP_STATUS);
     }

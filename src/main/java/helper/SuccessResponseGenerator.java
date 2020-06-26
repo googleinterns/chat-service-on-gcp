@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Generator which generates the successful HTTP response for all client requests to APIs.
@@ -178,6 +179,8 @@ public final class SuccessResponseGenerator {
 
         responseBody.put("Blob", blob);
 
-        return addAttachmentMetadataToResponseBody(responseBody, attachment);
+        return ImmutableMap.<String, Object>builder() 
+                            .putAll(addAttachmentMetadataToResponseBody(responseBody, attachment)) 
+                            .build(); 
     }
 }
