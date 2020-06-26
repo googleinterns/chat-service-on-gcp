@@ -47,7 +47,7 @@ public final class GetUser {
      * Returns details of the requested User.
      */
     @GetMapping("/users/{userId}")
-    public ImmutableMap<String, Object> getUser(@PathVariable("userId") String userIdString, HttpServletRequest request) {
+    public ImmutableMap<String, Map<String, Object>> getUser(@PathVariable("userId") String userIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
         Map<String, Object> responseBody;

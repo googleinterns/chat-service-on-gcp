@@ -43,12 +43,16 @@ public final class SuccessResponseGenerator {
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetUser API.
      */
-    public static ImmutableMap<String, Object> getSuccessResponseForGetUser(User user) {
-        ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
-                                                                .put("UserId", user.getUserId())
-                                                                .put("Username", user.getUsername())
-                                                                .put("CreationTs", user.getCreationTs())
-                                                                .build();
+    public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetUser(User user) {
+        Map<String, Object> response = new LinkedHashMap<String, Object>();
+
+        response.put("UserId", user.getUserId());
+        response.put("Username", user.getUsername());
+        response.put("CreationTs", user.getCreationTs());
+
+        ImmutableMap<String, Map<String, Object>> responseBody = ImmutableMap.<String, Map<String, Object>> builder()
+                                                                            .put("payload", response)
+                                                                            .build();
 
         return responseBody;
     }
