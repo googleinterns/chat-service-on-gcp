@@ -14,9 +14,9 @@ USERNAME_MAX_LENGTH = 8
 PASSWORD_LENGTH = 8
 MOBILE_NUMBER_LENGTH = 10
 EMAIL_DOMAIN = "@dummy.com"
-ITERATIONS = 1000000
+ITERATIONS = 100
 OUTPUT_FILE_NAME = "users.csv"
-CSV_COLUMN_NAMES = ["UserID", "Username", "EmailID", "Password", "MobileNo", "Response Time", "Response Status"]
+CSV_COLUMN_NAMES = ["UserID", "Username", "EmailID", "Password", "MobileNo", "Response Time"]
 
 
 def signup_request():
@@ -55,7 +55,6 @@ def get_user(result):
         "Password": password,
         "MobileNo": mobile_no,
         "Response Time": response_time,
-        "Response Status": response.status_code,
     }
 
 
