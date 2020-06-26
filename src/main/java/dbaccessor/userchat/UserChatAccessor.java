@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
 import java.util.List;
+import com.google.common.collect.ImmutableList;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 
@@ -29,11 +30,13 @@ public final class UserChatAccessor {
      * Returns ChatId of the Chat between the given Users.
      * Returns an empty List if Chat does not exist between the given Users. 
      */
-    public List<UserChat> getChatIdIfChatExistsBetweenUserIds(long userId1, long userId2) {
+    public ImmutableList<UserChat> getChatIdIfChatExistsBetweenUserIds(long userId1, long userId2) {
 
         String sqlStatment = "SELECT ChatID FROM UserChat WHERE UserID=@userId2 AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userId1)";
         Statement statement = Statement.newBuilder(sqlStatment).bind("userId2").to(userId2).bind("userId1").to(userId1).build();
-        List<UserChat> resultSet = spannerTemplate.query(UserChat.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
+        ImmutableList<UserChat> resultSet = ImmutableList.<UserChat> builder()
+                                                        .addAll(spannerTemplate.query(UserChat.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)))
+                                                        .build();
     
         return resultSet;
     }
