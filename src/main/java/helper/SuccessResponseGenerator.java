@@ -122,6 +122,14 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
+    private static List<Message> sortMessagesByCreationTs(List<Message> messages) {
+        
+        List<Message> copyOfMessages = new ArrayList<Message>(messages);
+        Collections.sort(copyOfMessages, Comparator.comparing(Message::getCreationTs));
+
+        return copyOfMessages;
+    }
+
     private static Map<String, List<Map<String, Object>>> getResponseBodyForListMessages(List<Map<String, Object>> listOfMessages) {
         Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
         responseBody.put("payload", listOfMessages);
@@ -136,10 +144,9 @@ public final class SuccessResponseGenerator {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
         
-        //Sorts the messages in  ascending order of Creation Timestamp
-        Collections.sort(messages, Comparator.comparing(Message::getCreationTs));
+        List<Message> copyOfMessages = sortMessagesByCreationTs(messages);
         
-        for (Message message : messages) {
+        for (Message message : copyOfMessages) {
             listOfMessages.add(getMessageForResponseBody(userId, message));
         }
 
@@ -154,10 +161,9 @@ public final class SuccessResponseGenerator {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
         
-        //Sorts the messages in  ascending order of Creation Timestamp
-        Collections.sort(messages, Comparator.comparing(Message::getCreationTs));
+        List<Message> copyOfMessages = sortMessagesByCreationTs(messages);
         
-        for (Message message : messages) {
+        for (Message message : copyOfMessages) {
             if (message.getAttachmentId().isPresent()) {
                 Attachment attachment = attachments.get(attachmentIdToIndexInList.get(message.getAttachmentId().get()));
                 listOfMessages.add(getMessageForResponseBody(userId, message, attachment));
