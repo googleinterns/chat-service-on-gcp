@@ -88,7 +88,7 @@ public final class SuccessResponseGenerator {
      */
     public static Map<String, Object> getSuccessResponseForGetMessage(Message message, Attachment attachment, long userId) {
 
-        Map<String, Object> responseBody = getSuccessResponseForGetMessage(Message message, long userId);
+        Map<String, Object> responseBody = getSuccessResponseForGetMessage(message, userId);
         responseBody.put("FileName", attachment.getFileName());
         responseBody.put("FileType", attachment.getFileType());
         responseBody.put("FileSize", Long.toString(attachment.getFileSize()) + " B");
