@@ -31,6 +31,16 @@ def signup_request():
                                    "Password": password,
                                    }
                              )
+    while response.status_code != 200:
+        username = random_string.alpha_numeric_variable_length(USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH)
+        email = username + EMAIL_DOMAIN
+        response = requests.post('https://gcp-chat-service.an.r.appspot.com/signup',
+                                 json={"Username": username,
+                                       "EmailID": email,
+                                       "MobileNo": mobile_no,
+                                       "Password": password,
+                                       }
+                                 )
     return response, username, email, mobile_no, password
 
 
