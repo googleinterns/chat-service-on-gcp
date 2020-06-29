@@ -19,7 +19,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.gpayinterns.chat.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,11 +35,10 @@ import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.gpayinterns.chat.User;
 
-import static com.gpayinterns.chat.ServerHelper.USERS;
-import static com.gpayinterns.chat.ServerHelper.BASE_URL;
-import static com.gpayinterns.chat.ServerHelper.CHATS;
+import static com.gpayinterns.chat.ServerConstants.USERS;
+import static com.gpayinterns.chat.ServerConstants.BASE_URL;
+import static com.gpayinterns.chat.ServerConstants.CHATS;
 
 public class ViewContactsActivity extends AppCompatActivity
 {

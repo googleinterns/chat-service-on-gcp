@@ -19,7 +19,6 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.gpayinterns.chat.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,14 +37,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.gpayinterns.chat.Message;
 
-import static com.gpayinterns.chat.ServerHelper.BASE_URL;
-import static com.gpayinterns.chat.ServerHelper.CHATS;
-import static com.gpayinterns.chat.ServerHelper.END_MESSAGE;
-import static com.gpayinterns.chat.ServerHelper.MESSAGES;
-import static com.gpayinterns.chat.ServerHelper.START_MESSAGE;
-import static com.gpayinterns.chat.ServerHelper.USERS;
+import static com.gpayinterns.chat.ServerConstants.BASE_URL;
+import static com.gpayinterns.chat.ServerConstants.CHATS;
+import static com.gpayinterns.chat.ServerConstants.END_MESSAGE;
+import static com.gpayinterns.chat.ServerConstants.MESSAGES;
+import static com.gpayinterns.chat.ServerConstants.START_MESSAGE;
+import static com.gpayinterns.chat.ServerConstants.USERS;
 
 public class ViewMessageActivity extends AppCompatActivity
 {

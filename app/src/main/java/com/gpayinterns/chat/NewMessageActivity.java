@@ -32,7 +32,6 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.gpayinterns.chat.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,10 +41,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.gpayinterns.chat.ServerHelper.BASE_URL;
-import static com.gpayinterns.chat.ServerHelper.CHATS;
-import static com.gpayinterns.chat.ServerHelper.MESSAGES;
-import static com.gpayinterns.chat.ServerHelper.USERS;
+import static com.gpayinterns.chat.ServerConstants.BASE_URL;
+import static com.gpayinterns.chat.ServerConstants.CHATS;
+import static com.gpayinterns.chat.ServerConstants.MESSAGES;
+import static com.gpayinterns.chat.ServerConstants.USERS;
 
 public class NewMessageActivity extends AppCompatActivity implements View.OnClickListener
 {

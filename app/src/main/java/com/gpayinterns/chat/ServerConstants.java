@@ -1,6 +1,6 @@
 package com.gpayinterns.chat;
 
-public class ServerHelper
+public final class ServerConstants
 {
     public static final String BASE_URL = "https://gcp-chat-service.an.r.appspot.com/";
     public static final String SIGNUP = "signup";
@@ -16,5 +16,8 @@ public class ServerHelper
     public static final String USER_MOBILE = "MobileNo";
     public static final String USER_PASSWORD = "Password";
 
+    private ServerConstants()
+    {
 
+    }
 }

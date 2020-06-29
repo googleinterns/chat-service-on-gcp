@@ -29,12 +29,12 @@ import java.util.regex.Pattern;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import static com.gpayinterns.chat.ServerHelper.BASE_URL;
-import static com.gpayinterns.chat.ServerHelper.SIGNUP;
-import static com.gpayinterns.chat.ServerHelper.USER_EMAIL;
-import static com.gpayinterns.chat.ServerHelper.USER_MOBILE;
-import static com.gpayinterns.chat.ServerHelper.USER_PASSWORD;
-import static com.gpayinterns.chat.ServerHelper.USER_USERNAME;
+import static com.gpayinterns.chat.ServerConstants.BASE_URL;
+import static com.gpayinterns.chat.ServerConstants.SIGNUP;
+import static com.gpayinterns.chat.ServerConstants.USER_EMAIL;
+import static com.gpayinterns.chat.ServerConstants.USER_MOBILE;
+import static com.gpayinterns.chat.ServerConstants.USER_PASSWORD;
+import static com.gpayinterns.chat.ServerConstants.USER_USERNAME;
 
 
 public class RegistrationActivity extends AppCompatActivity

@@ -26,7 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.gpayinterns.chat.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,10 +35,10 @@ import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import static com.gpayinterns.chat.ServerHelper.BASE_URL;
-import static com.gpayinterns.chat.ServerHelper.LOGIN;
-import static com.gpayinterns.chat.ServerHelper.USER_PASSWORD;
-import static com.gpayinterns.chat.ServerHelper.USER_USERNAME;
+import static com.gpayinterns.chat.ServerConstants.BASE_URL;
+import static com.gpayinterns.chat.ServerConstants.LOGIN;
+import static com.gpayinterns.chat.ServerConstants.USER_PASSWORD;
+import static com.gpayinterns.chat.ServerConstants.USER_USERNAME;
 
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
