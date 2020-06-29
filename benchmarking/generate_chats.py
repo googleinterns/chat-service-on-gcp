@@ -16,7 +16,7 @@ file_names = config['File Names']
 USERS_FILE_NAME = file_names['USERS']
 OUTPUT_FILE_NAME = file_names['CHATS']
 BASE_URL = url_constants['BASE_URL']
-CSV_COLUMN_NAMES = ["UserID1", "UserID2", "ChatID", "Response Time"]
+CSV_COLUMN_NAMES = ["UserID1", "UserID2", "ChatID", "ResponseTime"]
 
 
 def generate_data():
@@ -62,7 +62,7 @@ def get_chat(result):
         "UserID1": user_id1,
         "UserID2": user_id2,
         "ChatID": response.json()["ChatId"],
-        "Response Time": response_time,
+        "ResponseTime": response_time,
     }
 
 
