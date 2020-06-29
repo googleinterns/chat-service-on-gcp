@@ -12,9 +12,9 @@ import configparser
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-user_constants = config['User Constants']
-url_constants = config['URL Constants']
-file_names = config['FILE NAMES']
+user_constants = config['User']
+url_constants = config['Url']
+file_names = config['File Names']
 
 USERNAME_MIN_LENGTH = int(user_constants['USERNAME_MIN_LENGTH'])
 USERNAME_MAX_LENGTH = int(user_constants['USERNAME_MAX_LENGTH'])
