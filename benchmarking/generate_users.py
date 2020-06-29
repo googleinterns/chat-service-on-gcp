@@ -24,7 +24,7 @@ EMAIL_DOMAIN = user_constants['EMAIL_DOMAIN']
 OUTPUT_FILE_NAME = file_names['USERS']
 SIGNUP_URL = url_constants['SIGNUP_URL']
 
-CSV_COLUMN_NAMES = ["UserID", "Username", "EmailID", "Password", "MobileNo", "Response Time"]
+CSV_COLUMN_NAMES = ["UserID", "Username", "EmailID", "Password", "MobileNo", "ResponseTime"]
 ITERATIONS = 1000000
 MAX_TRIES = 5
 
@@ -66,7 +66,7 @@ def get_user(result):
         "EmailID": email,
         "Password": password,
         "MobileNo": mobile_no,
-        "Response Time": response_time,
+        "ResponseTime": response_time,
     }
 
 
