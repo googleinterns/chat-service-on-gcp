@@ -161,7 +161,7 @@ public final class SuccessResponseGenerator {
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the ListMessages API.
      */
     public static ImmutableMap<String, ImmutableList<Map<String, Object>>> getSuccessResponseForListMessages(long userId, ImmutableList<Message> messages, 
-    ImmutableList<Attachment> attachments, ImmutableMap<Long, Integer> attachmentIdToIndexInList) {
+    ImmutableMap<Long, Attachment> attachmentIdToAttachment) {
 
         List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
         
@@ -169,7 +169,7 @@ public final class SuccessResponseGenerator {
         
         for (Message message : copyOfMessages) {
             if (message.getAttachmentId().isPresent()) {
-                Attachment attachment = attachments.get(attachmentIdToIndexInList.get(message.getAttachmentId().get()));
+                Attachment attachment = attachmentIdToAttachment.get(message.getAttachmentId().get());
                 listOfMessages.add(getMessageForResponseBody(userId, message, attachment));
             } else {
                 listOfMessages.add(getMessageForResponseBody(userId, message));

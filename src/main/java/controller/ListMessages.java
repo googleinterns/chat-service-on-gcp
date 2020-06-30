@@ -232,15 +232,16 @@ public final class ListMessages {
                                                                 .addAll(queryAttachment.getAttachments(attachmentIdList)) 
                                                                 .build(); 
 
-            ImmutableMap.Builder<Long, Integer> attachmentIdToIndexInListBuilder = ImmutableMap.builder();
+            ImmutableMap.Builder<Long, Attachment> attachmentIdToAttachmentBuilder = ImmutableMap.builder();
 
             for (int i = 0; i < attachments.size(); ++i) {
-                attachmentIdToIndexInListBuilder.put(attachments.get(i).getAttachmentId(), i);
+                Attachment attachment = attachments.get(i);
+                attachmentIdToAttachmentBuilder.put(attachment.getAttachmentId(), attachment);
             }
 
-            ImmutableMap<Long, Integer> attachmentIdToIndexInList = attachmentIdToIndexInListBuilder.build();
+            ImmutableMap<Long, Attachment> attachmentIdToAttachment = attachmentIdToAttachmentBuilder.build();
 
-            return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messagesImmutable, attachments, attachmentIdToIndexInList);
+            return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messagesImmutable, attachmentIdToAttachment);
         }
          
         return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messagesImmutable);
