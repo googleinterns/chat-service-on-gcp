@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools"
+        android:background="#FFFFFF"
+        android:layout_margin="0dp"
+        android:focusableInTouchMode="true"
+        android:focusable="true" xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:padding="48dp"
+
+                    tools:layout_editor_absoluteX="465dp"
+                    tools:layout_editor_absoluteY="66dp">
+
+
+                <TextView
+                        android:id="@+id/name_label"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:text="@string/name_label"
+                        android:textColor="#000000"
+
+                        android:textSize="16sp"
+
+                />
+
+                <EditText
+                        android:focusableInTouchMode="true"
+                        android:focusable="true"
+
+                        android:id="@+id/name_input"
+                        android:inputType="textPersonName"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_below="@id/name_label"
+                        android:layout_alignParentStart="true"
+
+                        android:backgroundTint="@color/vote_color"
+                />
+
+                <TextView
+
+                    android:id="@+id/phone_num_label_register"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_below="@id/name_input"
+                    android:layout_alignParentStart="true"
+
+                    android:layout_marginTop="20dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+
+                    android:text="Phone Number"
+                    android:textColor="#000000"
+                    android:textSize="16sp"/>
+
+                <EditText
+                    android:focusableInTouchMode="true"
+                    android:focusable="true"
+
+                    android:id="@+id/phone_num_input_register"
+                    android:inputType="phone"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:layout_below="@id/phone_num_label_register"
+                    android:layout_alignParentStart="true"
+
+                    android:backgroundTint="#C63339"
+
+                    />
+
+                <TextView
+
+                        android:id="@+id/email_label_register"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_below="@id/phone_num_input_register"
+                        android:layout_alignParentStart="true"
+
+                        android:layout_marginTop="20dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+
+                        android:text="Email ID"
+                        android:textColor="#000000"
+                        android:textSize="16sp"/>
+
+                <EditText
+                        android:focusableInTouchMode="true"
+                        android:focusable="true"
+
+                        android:id="@+id/email_input_register"
+                        android:inputType="textEmailAddress"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_below="@id/email_label_register"
+                        android:layout_alignParentStart="true"
+
+                        android:backgroundTint="#C63339"
+
+                />
+
+                <TextView
+
+                        android:id="@+id/password_label_register"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_below="@id/email_input_register"
+                        android:layout_alignParentStart="true"
+
+                        android:layout_marginTop="20dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+
+                        android:text="@string/password"
+                        android:textColor="#000000"
+                        android:textSize="16sp"/>
+
+                <EditText
+
+                        android:focusableInTouchMode="true"
+                        android:focusable="true"
+
+                        android:id="@+id/password_input_register"
+                        android:inputType="textPassword"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_below="@id/password_label_register"
+                        android:layout_alignParentStart="true"
+
+                        android:backgroundTint="#C63339"
+
+                />
+
+                <TextView
+
+                        android:id="@+id/confirm_password_label"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_below="@id/password_input_register"
+                        android:layout_alignParentStart="true"
+
+                        android:layout_marginTop="20dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+
+                        android:text="@string/confirm_password"
+                        android:textColor="#000000"
+                        android:textSize="16sp"/>
+
+                <EditText
+
+                        android:focusableInTouchMode="true"
+                        android:focusable="true"
+
+                        android:id="@+id/confirm_password_input"
+                        android:inputType="textPassword"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_below="@id/confirm_password_label"
+                        android:layout_alignParentStart="true"
+
+                        android:backgroundTint="#C63339"
+
+                />
+
+                <Button
+
+                        android:focusableInTouchMode="true"
+                        android:focusable="true"
+
+                        android:id="@+id/register_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_below="@id/confirm_password_input"
+                        android:layout_centerHorizontal="true"
+
+                        android:backgroundTint="@color/indigo"
+
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:paddingLeft="32dp"
+                        android:paddingRight="32dp"
+                        android:layout_marginTop="32dp"
+
+                        android:text="@string/register"
+                        android:textSize="20sp"
+                        android:textColor="#FFFFFF"
+
+                />
+            </RelativeLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
