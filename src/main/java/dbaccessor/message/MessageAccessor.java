@@ -21,6 +21,7 @@ import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerOperations;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Accessor which performs database accesses for the Message entity.
@@ -91,7 +92,7 @@ public final class MessageAccessor {
     /**
      * Completes all DB insertions for the ListMessages API in a single transaction.
      */
-    public boolean updateReceivedTsForMessages(List<Message> messageList) {
+    public boolean updateReceivedTsForMessages(ImmutableList<Message> messageList) {
         return spannerOperations.performReadWriteTransaction(
             transactionSpannerOperations -> {
 

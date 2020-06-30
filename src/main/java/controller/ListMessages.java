@@ -1,9 +1,11 @@
 package controller;
 
 import entity.Message;
+import entity.Attachment;
 import dbaccessor.user.UserAccessor;
 import dbaccessor.chat.ChatAccessor;
 import dbaccessor.message.MessageAccessor;
+import dbaccessor.message.AttachmentAccessor;
 import dbaccessor.userchat.UserChatAccessor;
 import helper.SuccessResponseGenerator;
 import exceptions.UserIdDoesNotExistException;
@@ -16,11 +18,13 @@ import exceptions.ChatIdMissingFromRequestURLPathException;
 import exceptions.InvalidCountValueInRequestURLParameterException;
 
 import java.util.Map;
-
+import java.util.HashMap;
 import com.google.cloud.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +55,9 @@ public final class ListMessages {
 
     @Autowired 
     private MessageAccessor queryMessage;
+
+    @Autowired
+    private AttachmentAccessor queryAttachment;
 
     @Autowired 
     private UserChatAccessor queryUserChat;
@@ -103,11 +110,10 @@ public final class ListMessages {
      * Returns the list of message details of the given Chat.
      */
     @GetMapping("/users/{userId}/chats/{chatId}/messages")
-    public Map<String, List<Map<String, Object>>> listMessages(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestParam(value = "startMessageId", required = false) String startMessageIdString, @RequestParam(value = "endMessageId", required = false) String endMessageIdString, @RequestParam(value = "count", required = false) String countString, HttpServletRequest request) {
+    public ImmutableMap<String, ImmutableList<Map<String, Object>>> listMessages(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestParam(value = "startMessageId", required = false) String startMessageIdString, @RequestParam(value = "endMessageId", required = false) String endMessageIdString, @RequestParam(value = "count", required = false) String countString, HttpServletRequest request) {
 
         Timestamp receivedTs = Timestamp.now();
         String path = request.getRequestURI();
-        Map<String, List<Map<String, Object>>> responseBody;
 
         long userId = Long.parseLong(userIdString);
         long chatId = Long.parseLong(chatIdString);
@@ -199,16 +205,45 @@ public final class ListMessages {
          * If it is null, sets it to the time when listMessages was called.
          */
         List<Message> messageListForReceivedTsUpdate = new ArrayList<Message>();
+        ImmutableList.Builder<Long> attachmentIdListBuilder = ImmutableList.builder();
 
         for (Message message : messages) {
             if (message.getReceivedTs() == null && message.getSenderId() != userId) {
                 message.setReceivedTs(receivedTs);
                 messageListForReceivedTsUpdate.add(message);
             }
+
+            message.getAttachmentId().ifPresent(attachmentIdListBuilder::add); 
         }
-        
-        insertMessage.updateReceivedTsForMessages(messageListForReceivedTsUpdate);
+
+        ImmutableList<Long> attachmentIdList = attachmentIdListBuilder.build();
+        ImmutableList<Message> messagesImmutable = ImmutableList.<Message>builder()
+                                                                .addAll(messages)
+                                                                .build();
+
+        ImmutableList<Message> messageListForReceivedTsUpdateImmutable = ImmutableList.<Message>builder()
+                                                                                    .addAll(messageListForReceivedTsUpdate)
+                                                                                    .build();
+
+        insertMessage.updateReceivedTsForMessages(messageListForReceivedTsUpdateImmutable);
+
+        if (!attachmentIdList.isEmpty()) {
+            ImmutableList<Attachment> attachments = ImmutableList.<Attachment>builder() 
+                                                                .addAll(queryAttachment.getAttachments(attachmentIdList)) 
+                                                                .build(); 
+
+            ImmutableMap.Builder<Long, Attachment> attachmentIdToAttachmentBuilder = ImmutableMap.builder();
+
+            for (int i = 0; i < attachments.size(); ++i) {
+                Attachment attachment = attachments.get(i);
+                attachmentIdToAttachmentBuilder.put(attachment.getAttachmentId(), attachment);
+            }
+
+            ImmutableMap<Long, Attachment> attachmentIdToAttachment = attachmentIdToAttachmentBuilder.build();
+
+            return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messagesImmutable, attachmentIdToAttachment);
+        }
          
-        return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messages);
+        return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messagesImmutable);
     }
 }

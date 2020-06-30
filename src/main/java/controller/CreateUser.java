@@ -9,6 +9,8 @@ import exceptions.UsernameMissingFromRequestBodyException;
 
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ public final class CreateUser {
      * Returns UserId of the new User.
      */
     @PostMapping("/users")
-    public Map<String, Object> createUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
+    public ImmutableMap<String, Object> createUser(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
 
         String path = request.getRequestURI();
 

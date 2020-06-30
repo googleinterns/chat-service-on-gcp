@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Generator which generates the successful HTTP response for all client requests to APIs.
@@ -20,75 +22,51 @@ public final class SuccessResponseGenerator {
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the CreateUser, CreateChat and CreateMessage APIs.
      */
-    public static Map<String, Object> getSuccessResponseForCreateEntity(String className, long Id) {
-
-        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-
-        responseBody.put("message", "Success");
-        responseBody.put(className+"Id", Id);
+    public static ImmutableMap<String, Object> getSuccessResponseForCreateEntity(String className, long Id) {
+        ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
+                                                                .put("message", "Success")
+                                                                .put(className+"Id", Id)
+                                                                .build();
 
         return responseBody;
     }
   
-    public static Map<String, Object> getSuccessResponseForLogin(long ID) {
-        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("message", "Success");
-        responseBody.put("UserId", ID);
+    public static ImmutableMap<String, Object> getSuccessResponseForLogin(long ID) {
+        ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
+                                                                .put("message", "Success")
+                                                                .put("UserId", ID)
+                                                                .build();
+
         return responseBody;
     }
 
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetUser API.
      */
-    public static Map<String, Object> getSuccessResponseForGetUser(User user) {
-
-        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("UserId", user.getUserId());
-        responseBody.put("Username", user.getUsername());
-        responseBody.put("CreationTs", user.getCreationTs());
+    public static ImmutableMap<String, Object> getSuccessResponseForGetUser(User user) {
+        ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
+                                                                .put("UserId", user.getUserId())
+                                                                .put("Username", user.getUsername())
+                                                                .put("CreationTs", user.getCreationTs())
+                                                                .build();
 
         return responseBody;
-        
     }
 
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetChat API.
      */
-    public static Map<String, Object> getSuccessResponseForGetChat(Chat chat) {
-
-        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("ChatId", chat.getChatId());
-        responseBody.put("LastSentMessageId", chat.getLastSentMessageId());
-        responseBody.put("CreationTs", chat.getCreationTs());
-
-        return responseBody;
-    }
-
-    /**
-     * Renders the given parameters in a Map to return a successful HTTP response 
-     * for all client requests to the GetMessage API for messages without attachments.
-     */
-    public static Map<String, Object> getSuccessResponseForGetMessage(Message message, long userId) {
-
-        Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
-        responseBody.put("MessageId", message.getMessageId());
-        responseBody.put("ChatId", message.getChatId());
-        responseBody.put("SentByCurrentUser", message.getSenderId() == userId);
-        responseBody.put("SentTs", message.getSentTs());
-        responseBody.put("ReceivedTs", message.getReceivedTs());
-        responseBody.put("CreationTs", message.getCreationTs());
-        responseBody.put("TextContent", message.getTextContent());
+    public static ImmutableMap<String, Object> getSuccessResponseForGetChat(Chat chat) {
+        ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
+                                                                .put("ChatId", chat.getChatId())
+                                                                .put("LastSentMessageId", chat.getLastSentMessageId())
+                                                                .put("CreationTs", chat.getCreationTs())
+                                                                .build();
 
         return responseBody;
     }
 
-    /**
-     * Renders the given parameters in a Map to return a successful HTTP response 
-     * for all client requests to the GetMessage API for messages with attachments.
-     */
-    public static Map<String, Object> getSuccessResponseForGetMessage(Message message, Attachment attachment, long userId) {
-
-        Map<String, Object> responseBody = getSuccessResponseForGetMessage(message, userId);
+    private static Map<String, Object> addAttachmentMetadataToResponseBody(Map<String, Object> responseBody, Attachment attachment) {
         responseBody.put("FileName", attachment.getFileName());
         responseBody.put("FileType", attachment.getFileType());
         responseBody.put("FileSize", Long.toString(attachment.getFileSize()) + " B");
@@ -96,50 +74,105 @@ public final class SuccessResponseGenerator {
         return responseBody;
     }
 
+    private static Map<String, Object> getMessageForResponseBody(long userId, Message message) {
+        Map<String, Object> messageForResponseBody = new LinkedHashMap<String, Object>();
+
+        messageForResponseBody.put("MessageId", message.getMessageId());
+        messageForResponseBody.put("ChatId", message.getChatId());
+        messageForResponseBody.put("SentByCurrentUser", message.getSenderId() == userId);
+        messageForResponseBody.put("CreationTs", message.getCreationTs());
+        messageForResponseBody.put("SentTs", message.getSentTs());
+        messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
+        messageForResponseBody.put("TextContent", message.getTextContent());
+
+        return messageForResponseBody;
+    }
+
+    private static Map<String, Object> getMessageForResponseBody(long userId, Message message, Attachment attachment) {
+        Map<String, Object> messageForResponseBody = getMessageForResponseBody(userId, message);
+
+        return addAttachmentMetadataToResponseBody(messageForResponseBody, attachment);
+    }
+
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response 
+     * for all client requests to the GetMessage API for messages without attachments.
+     */
+    public static Map<String, Object> getSuccessResponseForGetMessage(Message message, long userId) {
+        return getMessageForResponseBody(userId, message);
+    }
+
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response 
+     * for all client requests to the GetMessage API for messages with attachments.
+     */
+    public static Map<String, Object> getSuccessResponseForGetMessage(Message message, Attachment attachment, long userId) {
+        return getMessageForResponseBody(userId, message, attachment);
+    }
+
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the ListChats API.
      */
-    public static Map<String,List<Map<String, Object>>> getSuccessResponseForListChats(List<Map<String, Object>> chatInfoOfChatsOfUser) {
-
-        Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
-
-        responseBody.put("payload", chatInfoOfChatsOfUser);
+    public static ImmutableMap<String,ImmutableList<ImmutableMap<String, Object>>> getSuccessResponseForListChats(ImmutableList<ImmutableMap<String, Object>> chatInfoOfChatsOfUser) {
+        ImmutableMap<String, ImmutableList<ImmutableMap<String, Object>>> responseBody = ImmutableMap.<String, ImmutableList<ImmutableMap<String, Object>>> builder()
+                                                                                                    .put("payload", chatInfoOfChatsOfUser)
+                                                                                                    .build();
 
         return responseBody;
     }
 
-    private static Map<String, Object> getMessageForResponseBody(long userId, Message message) {
-    
-        Map<String, Object> messageForResponseBody = new LinkedHashMap<String, Object>();
+    private static ImmutableMap<String, ImmutableList<Map<String, Object>>> getResponseBodyForListMessages(ImmutableList<Map<String, Object>> listOfMessages) {
+        return ImmutableMap.<String, ImmutableList<Map<String, Object>>> builder()
+                            .put("payload", listOfMessages)
+                            .build();
+    }
 
-        messageForResponseBody.put("MessageId", message.getMessageId());
-        messageForResponseBody.put("CreationTs", message.getCreationTs());
-        messageForResponseBody.put("ChatId", message.getChatId());
-        messageForResponseBody.put("SentByCurrentUser", message.getSenderId() == userId);
-        messageForResponseBody.put("TextContent", message.getTextContent());
-        messageForResponseBody.put("SentTs", message.getSentTs());
-        messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
-
-        return messageForResponseBody;
+    private static ImmutableList<Message> sortMessagesByCreationTs(ImmutableList<Message> messages) {
+        return messages
+                .stream()
+                .sorted(Comparator.comparing(Message::getCreationTs))
+                .collect(ImmutableList.toImmutableList());
     }
 
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the ListMessages API.
      */
-    public static Map<String, List<Map<String, Object>>> getSuccessResponseForListMessages(long userId, List<Message> messages) {
+    public static ImmutableMap<String, ImmutableList<Map<String, Object>>> getSuccessResponseForListMessages(long userId, ImmutableList<Message> messages) {
 
-        List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
+        ImmutableList.Builder<Map<String, Object>> listOfMessagesBuilder = ImmutableList.builder();
         
-        //Sorts the messages in  ascending order of Creation Timestamp
-        Collections.sort(messages, Comparator.comparing(Message::getCreationTs));
+        ImmutableList<Message> copyOfMessages = sortMessagesByCreationTs(messages);
         
-        for (int i = 0; i < messages.size(); ++i) {
-            listOfMessages.add(getMessageForResponseBody(userId, messages.get(i)));
+        for (Message message : copyOfMessages) {
+            listOfMessagesBuilder.add(getMessageForResponseBody(userId, message));
         }
 
-        Map<String, List<Map<String, Object>>> responseBody = new LinkedHashMap<String, List<Map<String, Object>>>();
-        responseBody.put("payload", listOfMessages);
-       
-        return responseBody;
+        ImmutableList<Map<String, Object>> listOfMessages = listOfMessagesBuilder.build();
+        
+        return getResponseBodyForListMessages(listOfMessages);
+    }
+
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the ListMessages API.
+     */
+    public static ImmutableMap<String, ImmutableList<Map<String, Object>>> getSuccessResponseForListMessages(long userId, ImmutableList<Message> messages, 
+    ImmutableMap<Long, Attachment> attachmentIdToAttachment) {
+
+        ImmutableList.Builder<Map<String, Object>> listOfMessagesBuilder = ImmutableList.builder();
+        
+        ImmutableList<Message> copyOfMessages = sortMessagesByCreationTs(messages);
+        
+        for (Message message : copyOfMessages) {
+            if (message.getAttachmentId().isPresent()) {
+                Attachment attachment = attachmentIdToAttachment.get(message.getAttachmentId().get());
+                listOfMessagesBuilder.add(getMessageForResponseBody(userId, message, attachment));
+            } else {
+                listOfMessagesBuilder.add(getMessageForResponseBody(userId, message));
+            }
+        }
+
+        ImmutableList<Map<String, Object>> listOfMessages = listOfMessagesBuilder.build();
+        
+        return getResponseBodyForListMessages(listOfMessages);
     }
 }
