@@ -128,16 +128,14 @@ public final class ListChats {
 
         User user = User.newBuilder().userId(userId).build();
         List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
-        List<Long> listOfChatId = new ArrayList<Long>();
+        ImmutableList.Builder<Long> listOfChatIdBuilder = ImmutableList.builder();
 
         for (Chat chat : chatsOfUser) {
-            listOfChatId.add(chat.getChatId());
+            listOfChatIdBuilder.add(chat.getChatId());
         }
 
-        ImmutableList<Long> listOfChatIdImmutable = ImmutableList.<Long> builder()
-                                                                .addAll(listOfChatId)
-                                                                .build();
-        ImmutableList<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getCreationTsOfLastSentMessageIdForChatsOfUser(userId, listOfChatIdImmutable);
+        ImmutableList<Long> listOfChatId = listOfChatIdBuilder.build();
+        ImmutableList<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getCreationTsOfLastSentMessageIdForChatsOfUser(userId, listOfChatId);
 
         //Stores time of the last Message sent in each ChatId of the User against ChatId.
         Map<Long, Timestamp> chatIdCreationTsOflastSentMessageIdMap = new LinkedHashMap<Long, Timestamp>();
@@ -157,7 +155,7 @@ public final class ListChats {
         
         Collections.sort(chatsOfUser, Comparator.comparing(Chat::getLastSentTime).reversed());
 
-        ImmutableList<UsernameChatId> usernameChatIdForSecondUsers = queryUser.getUsernameChatIdForSecondUsers(userId, listOfChatIdImmutable);
+        ImmutableList<UsernameChatId> usernameChatIdForSecondUsers = queryUser.getUsernameChatIdForSecondUsers(userId, listOfChatId);
 
         //Stores username of the other User against ChatId for each Chat of the User.
         Map<Long, String> chatIdSecondUsernameMap = new LinkedHashMap<Long, String>();
