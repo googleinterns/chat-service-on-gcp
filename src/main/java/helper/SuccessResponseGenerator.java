@@ -45,9 +45,9 @@ public final class SuccessResponseGenerator {
      */
     public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetUser(User user) {
         ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
-                                                            .put("UserId", user.getUserId());
-                                                            .put("Username", user.getUsername());
-                                                            .put("CreationTs", user.getCreationTs());
+                                                            .put("UserId", user.getUserId())
+                                                            .put("Username", user.getUsername())
+                                                            .put("CreationTs", user.getCreationTs())
                                                             .build();
 
         return ImmutableMap.of("payload", responseBody);
@@ -58,9 +58,9 @@ public final class SuccessResponseGenerator {
      */
     public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetChat(Chat chat) {
         ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
-                                                            .put("ChatId", chat.getChatId());
-                                                            .put("LastSentMessageId", chat.getLastSentMessageId());
-                                                            .put("CreationTs", chat.getCreationTs());
+                                                            .put("ChatId", chat.getChatId())
+                                                            .put("LastSentMessageId", chat.getLastSentMessageId())
+                                                            .put("CreationTs", chat.getCreationTs())
                                                             .build();
 
         return ImmutableMap.of("payload", responseBody);
@@ -107,7 +107,7 @@ public final class SuccessResponseGenerator {
      * for all client requests to the GetMessage API for messages with attachments.
      */
     public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetMessage(Message message, Attachment attachment, long userId) {
-        return ImmutableMap.of("payload", getMessageForResponseBody(userId, message, attachment);
+        return ImmutableMap.of("payload", getMessageForResponseBody(userId, message, attachment));
     }
 
     /**
