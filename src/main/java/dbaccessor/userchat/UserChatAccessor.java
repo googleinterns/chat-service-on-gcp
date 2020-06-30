@@ -34,9 +34,7 @@ public final class UserChatAccessor {
 
         String sqlStatment = "SELECT ChatID FROM UserChat WHERE UserID=@userId2 AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userId1)";
         Statement statement = Statement.newBuilder(sqlStatment).bind("userId2").to(userId2).bind("userId1").to(userId1).build();
-        ImmutableList<UserChat> resultSet = ImmutableList.<UserChat> builder()
-                                                        .addAll(spannerTemplate.query(UserChat.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)))
-                                                        .build();
+        ImmutableList<UserChat> resultSet = ImmutableList.copyOf(spannerTemplate.query(UserChat.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)));
     
         return resultSet;
     }

@@ -7,20 +7,20 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 @Component
 public final class GoogleAuthenticator {
 
     private static final String CLIENT_SECRET_FILE =
-        "src/main/resources/client_secret_731468299245-enaig2iil558lcjp15jmejvpphn5vpg5.apps.googleusercontent.com.json";
+            "/client_secret_731468299245-enaig2iil558lcjp15jmejvpphn5vpg5.apps.googleusercontent.com.json";
     private static final String REDIRECT_URI = "";
     private final GoogleClientSecrets clientSecrets;
 
     public GoogleAuthenticator() throws IOException {
         clientSecrets = GoogleClientSecrets.load(
-                JacksonFactory.getDefaultInstance(), new FileReader(CLIENT_SECRET_FILE));
+                JacksonFactory.getDefaultInstance(), new InputStreamReader(getClass().getResourceAsStream(CLIENT_SECRET_FILE)));
     }
 
     public GoogleUser getGoogleUser(String authCode) throws IOException {

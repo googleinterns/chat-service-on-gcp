@@ -60,7 +60,7 @@ public class UserAPITest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Map<String, String> data = new HashMap<>();
-        data.put("Username", "user1");
+        data.put("Username", "test_1");
         data.put("Password", "1234");
         HttpEntity<Map<String, String>> request = new HttpEntity<>(data, headers);
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, request, typeRef);

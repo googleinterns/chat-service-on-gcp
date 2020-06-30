@@ -205,7 +205,7 @@ public final class ListMessages {
          * If it is null, sets it to the time when listMessages was called.
          */
         List<Message> messageListForReceivedTsUpdate = new ArrayList<Message>();
-        List<Long> attachmentIdList = new ArrayList<Long>();
+        ImmutableList.Builder<Long> attachmentIdListBuilder = ImmutableList.builder();
 
         for (Message message : messages) {
             if (message.getReceivedTs() == null && message.getSenderId() != userId) {
@@ -213,9 +213,10 @@ public final class ListMessages {
                 messageListForReceivedTsUpdate.add(message);
             }
 
-            message.getAttachmentId().ifPresent(attachmentIdList::add); 
+            message.getAttachmentId().ifPresent(attachmentIdListBuilder::add); 
         }
-        
+
+        ImmutableList<Long> attachmentIdList = attachmentIdListBuilder.build();
         ImmutableList<Message> messagesImmutable = ImmutableList.<Message>builder()
                                                                 .addAll(messages)
                                                                 .build();
@@ -224,28 +225,23 @@ public final class ListMessages {
                                                                                     .addAll(messageListForReceivedTsUpdate)
                                                                                     .build();
 
-        ImmutableList<Long> attachmentIdListImmutable = ImmutableList.<Long>builder()
-                                                                .addAll(attachmentIdList)
-                                                                .build();
-
         insertMessage.updateReceivedTsForMessages(messageListForReceivedTsUpdateImmutable);
 
-        if (!attachmentIdListImmutable.isEmpty()) {
+        if (!attachmentIdList.isEmpty()) {
             ImmutableList<Attachment> attachments = ImmutableList.<Attachment>builder() 
-                                                                .addAll(queryAttachment.getAttachments(attachmentIdListImmutable)) 
+                                                                .addAll(queryAttachment.getAttachments(attachmentIdList)) 
                                                                 .build(); 
 
-            Map<Long, Integer> attachmentIdToIndexInList = new HashMap<Long, Integer>();
+            ImmutableMap.Builder<Long, Attachment> attachmentIdToAttachmentBuilder = ImmutableMap.builder();
 
             for (int i = 0; i < attachments.size(); ++i) {
-                attachmentIdToIndexInList.put(attachments.get(i).getAttachmentId(), i);
+                Attachment attachment = attachments.get(i);
+                attachmentIdToAttachmentBuilder.put(attachment.getAttachmentId(), attachment);
             }
 
-            ImmutableMap<Long, Integer> attachmentIdToIndexInListImmutable = ImmutableMap.<Long, Integer>builder() 
-                                                                                        .putAll(attachmentIdToIndexInList) 
-                                                                                        .build();
+            ImmutableMap<Long, Attachment> attachmentIdToAttachment = attachmentIdToAttachmentBuilder.build();
 
-            return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messagesImmutable, attachments, attachmentIdToIndexInListImmutable);
+            return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messagesImmutable, attachmentIdToAttachment);
         }
          
         return SuccessResponseGenerator.getSuccessResponseForListMessages(userId, messagesImmutable);

@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 
 /**
- * Controller which responds to client requests to get the details of a message.
+ * Controller which responds to client requests to get the details of a Message and its Attachment(if any).
  * The response contains:
  * <ol>
  * <li> MessageId </li>
