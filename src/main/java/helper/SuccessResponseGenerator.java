@@ -99,11 +99,7 @@ public final class SuccessResponseGenerator {
      * for all client requests to the GetMessage API for messages without attachments.
      */
     public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetMessage(Message message, long userId) {
-        ImmutableMap<String, Map<String, Object>> responseBody = ImmutableMap.<String, Map<String, Object>> builder()
-                                                                            .put("payload", getMessageForResponseBody(userId, message))
-                                                                            .build();
-
-        return responseBody;
+        return ImmutableMap.of("payload", getMessageForResponseBody(userId, message));
     }
 
     /**
@@ -111,11 +107,7 @@ public final class SuccessResponseGenerator {
      * for all client requests to the GetMessage API for messages with attachments.
      */
     public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetMessage(Message message, Attachment attachment, long userId) {
-        ImmutableMap<String, Map<String, Object>> responseBody = ImmutableMap.<String, Map<String, Object>> builder()
-                                                                            .put("payload", getMessageForResponseBody(userId, message, attachment))
-                                                                            .build();
-
-        return responseBody;
+        return ImmutableMap.of("payload", getMessageForResponseBody(userId, message, attachment);
     }
 
     /**
