@@ -235,12 +235,11 @@ public final class MessageAccessor {
      * <li> Creation Timestamp (of the Message) </li>
      * </ol>
      */
-    public ImmutableList<Message> getCreationTsOfLastSentMessageIdForChatsOfUser(long userId) {
-
+    public ImmutableList<Message> getCreationTsOfLastSentMessageIdForChatsOfUser(long userId, ImmutableList<Long> listOfChatIdOfUser) {
         String sqlStatment = "SELECT ChatID, CreationTS FROM Message WHERE MessageID IN (SELECT LastSentMessageID FROM Chat WHERE ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND LastSentMessageID IS NOT NULL)";
         Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).build();
         ImmutableList<Message> resultSet = ImmutableList.copyOf(spannerTemplate.query(Message.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)));
- 
+
         return resultSet;
     }
 
