@@ -182,19 +182,6 @@ public final class ExceptionHandlerAdvice {
         return new ResponseEntity<Object>(responseBody, TextContentMissingFromRequestBodyException.HTTP_STATUS);
     }
 
-    @ExceptionHandler(ContentTypeMissingFromRequestBodyException.class)
-    public ResponseEntity<Object> handleContentTypeMissingFromRequestBodyException(ContentTypeMissingFromRequestBodyException e) {
-
-        Map<String, Object> responseBody = new LinkedHashMap<>();
-        responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", ContentTypeMissingFromRequestBodyException.HTTP_STATUS.value());
-        responseBody.put("error", ContentTypeMissingFromRequestBodyException.HTTP_STATUS.toString());
-        responseBody.put("message", e.getMessage());
-        responseBody.put("path", e.getPath());
-
-        return new ResponseEntity<Object>(responseBody, ContentTypeMissingFromRequestBodyException.HTTP_STATUS);
-    }
-
     @ExceptionHandler(ChatIdMissingFromRequestURLPathException.class)
     public ResponseEntity<Object> handleChatIdMissingFromRequestURLPathException(ChatIdMissingFromRequestURLPathException e) {
 
@@ -233,4 +220,17 @@ public final class ExceptionHandlerAdvice {
 
         return new ResponseEntity<Object>(responseBody, InvalidCountValueInRequestURLParameterException.HTTP_STATUS);
     }  
+
+    @ExceptionHandler(EmptyMessageException.class)
+    public ResponseEntity<Object> EmptyMessageException(EmptyMessageException e) {
+
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("timestamp", LocalDateTime.now());
+        responseBody.put("status", EmptyMessageException.HTTP_STATUS.value());
+        responseBody.put("error", EmptyMessageException.HTTP_STATUS.toString());
+        responseBody.put("message", e.getMessage());
+        responseBody.put("path", e.getPath());
+
+        return new ResponseEntity<Object>(responseBody, EmptyMessageException.HTTP_STATUS);
+    }
 } 

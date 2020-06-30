@@ -162,9 +162,11 @@ public class UserAccessor {
     /**
      * Returns details of the User with the given UserId.
      * Details include:
-     * (1)  UserId
-     * (2)  Username
-     * (3)  Creation Timestamp 
+     * <ol>
+     * <li> UserId </li>
+     * <li> Username </li>
+     * <li> Creation Timestamp </li>
+     * </ol>
      */
     public User getUser(long userId) {
 
@@ -176,8 +178,10 @@ public class UserAccessor {
     /**
      * Returns details of Users with whome the given User is engaged in a Chat with.
      * Details include:
-     * (1) Username
-     * (2) ChatId
+     * <ol>
+     * <li> Username </li>
+     * <li> ChatId </li>
+     * </ol>
      */
     public ImmutableList<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId) {
 

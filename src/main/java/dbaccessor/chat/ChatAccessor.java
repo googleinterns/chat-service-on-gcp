@@ -55,15 +55,17 @@ public final class ChatAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("chatId").to(chatId).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        return (!resultSet.isEmpty());        
+        return !resultSet.isEmpty();        
     }
 
     /**
      * Returns details of the Chat with the given ChatId.
      * Details include:
-     * (1)  ChatId
-     * (2)  LastSentMessageId
-     * (3)  Creation Timestamp
+     * <ol>
+     * <li> ChatId </li>
+     * <li> LastSentMessageId </li>
+     * <li> Creation Timestamp </li>
+     * </ol>
      */
     public Chat getChat(long chatId) {
 
@@ -77,9 +79,11 @@ public final class ChatAccessor {
     /**
      * Returns details of all Chats which the given User id engaged in.
      * Details include:
-     * (1)  ChatId
-     * (2)  LastSentMessageId
-     * (3)  Creation Timestamp
+     * <ol>
+     * <li> ChatId </li>
+     * <li> LastSentMessageId </li>
+     * <li> Creation Timestamp </li>
+     * </ol>
      */
     public List<Chat> getChatsForUser(User user) {
 

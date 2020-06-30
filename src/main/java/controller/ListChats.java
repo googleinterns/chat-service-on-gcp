@@ -29,9 +29,11 @@ import com.google.cloud.Timestamp;
 /**
  * Controller which responds to client requests to get the list of chats which the user is engaged in.
  * Each entry in the response contains:
- * (1)  ChatId
- * (2)  Username of the other user
- * (3)  LastSentMessageId
+ * <ol>
+ * <li> ChatId </li>
+ * <li> Username of the other user </li>
+ * <li> LastSentMessageId </li>
+ * </ol>
  */
 @RestController
 public final class ListChats {
@@ -59,9 +61,9 @@ public final class ListChats {
         @Column(name = "ChatID")
         private long chatId;
 
-        public UsernameChatId () {}
+        public UsernameChatId() {}
 
-        public UsernameChatId (String username, long chatId) {
+        public UsernameChatId(String username, long chatId) {
             this.username = username;
             this.chatId = chatId;
         }
@@ -78,9 +80,11 @@ public final class ListChats {
     /**
      * Returns details of given Chat in a Map.
      * Details include:
-     * (1)  ChatId
-     * (2)  Username (of the other user)
-     * (3)  LastSentMessageId
+     * <ol>
+     * <li> ChatId </li>
+     * <li> Username (of the other user) </li>
+     * <li> LastSentMessageId </li>
+     * </ol>
      */
     Map<String, Object> getChatInfoOfChatInMap(Chat chat, String usernameOfSecondUser) {
         

@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.OptionalLong;
 import com.google.cloud.Timestamp;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
@@ -21,18 +22,12 @@ public final class Message {
     @Column(name = "SenderID")
     private long senderId;
 
-    @Column(name = "ContentType")
-    private String contentType;
-
     @Column(name = "TextContent")
     private String textContent;
+
+    @Column(name = "AttachmentID")
+    public Long attachmentId;
     
-    @Column(name = "ContentID")
-    private long contentId;
-
-    @Column(name = "LinkToBlob")
-    private String linkToBlob;
-
     @Column(name = "SentTS", spannerCommitTimestamp = true) 
     private Timestamp sentTs;
 
@@ -41,120 +36,94 @@ public final class Message {
 
     public Message() {}
 
-    public Message(long messageId, long chatId, long senderId, String contentType) {
+    public Message(long messageId, long chatId, long senderId) {
         this.messageId = messageId;
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
     }
 
-    public Message(long chatId, long senderId, String contentType) {
+    public Message(long chatId, long senderId) {
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
     }
 
-    public Message(long messageId, long chatId, long senderId, String contentType, String textContent) {
+    public Message(long messageId, long chatId, long senderId, String textContent) {
         this.messageId = messageId;
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
         this.textContent = textContent;
     }
 
-    public Message(long chatId, long senderId, String contentType, String textContent) {
+    public Message(long chatId, long senderId, String textContent) {
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
         this.textContent = textContent;
     }
 
-    public Message(long messageId, long chatId, long senderId, String contentType, long contentId, String linkToBlob) {
+    public Message(long messageId, long chatId, long senderId, Long attachmentId) {
         this.messageId = messageId;
         this.chatId = chatId;
         this.senderId = senderId;
-        this.contentType = contentType;
-        this.contentId = contentId;
-        this.linkToBlob = linkToBlob;
+        this.attachmentId = attachmentId;
     }
 
-    public Message(long chatId, long senderId, String contentType, long contentId, String linkToBlob) {
-        this.chatId = chatId;
-        this.senderId = senderId;
-        this.contentType = contentType;
-        this.contentId = contentId;
-        this.linkToBlob = linkToBlob;
-    }
-
-    public void setMessageId (long messageId) {
+    public void setMessageId(long messageId) {
         this.messageId = messageId;
     }
 
-    public void setChatId (long chatId) {
+    public void setChatId(long chatId) {
         this.chatId = chatId;
     }
 
-    public void setSenderId (long senderId) {
+    public void setSenderId(long senderId) {
         this.senderId = senderId;
     }
 
-    public void setContentType (String contentType) {
-        this.contentType = contentType;
-    }
-
-    public void setTextContent (String textContent) {
+    public void setTextContent(String textContent) {
         this.textContent = textContent;
     }
 
-    public void setContentId (long contentId) {
-        this.contentId = contentId;
+    public void setAttachmentId(Long attachmentId) {
+        this.attachmentId = attachmentId;
     }
 
-    public void setLinkToBlob (String linkToBlob) {
-        this.linkToBlob = linkToBlob;
-    }
-
-    public void setReceivedTs (Timestamp receivedTs) {
+    public void setReceivedTs(Timestamp receivedTs) {
         this.receivedTs = receivedTs;
     }
 
-    public Timestamp getCreationTs () {
+    public Timestamp getCreationTs() {
         return creationTs;
     }
 
-    public long getMessageId () {
+    public long getMessageId() {
         return messageId;
     }
 
-    public long getChatId () {
+    public long getChatId() {
         return chatId;
     }
 
-    public long getSenderId () {
+    public long getSenderId() {
         return senderId;
     }
 
-    public String getContentType () {
-        return contentType;
-    }
-
-    public String getTextContent () {
+    public String getTextContent() {
         return textContent;
     }
 
-    public long getContentId () {
-        return contentId;
+    public OptionalLong getAttachmentId() {
+        if (attachmentId == null) {
+            return OptionalLong.empty();
+        } 
+        
+        return OptionalLong.of(attachmentId);
     }
 
-    public String getLinkToBlob () {
-        return linkToBlob;
-    }
-
-    public Timestamp getSentTs () {
+    public Timestamp getSentTs() {
         return sentTs;
     }
 
-    public Timestamp getReceivedTs () {
+    public Timestamp getReceivedTs() {
         return receivedTs;
     }
 }

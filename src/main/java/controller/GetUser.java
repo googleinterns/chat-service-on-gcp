@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Controller which responds to client requests to get the details of the user itself.
  * The response contains:
- * (1)  UserId
- * (2)  Username
- * (3)  Creation Timestamp
+ * <ol>
+ * <li> UserId </li>
+ * <li> Username </li>
+ * <li> Creation Timestamp </li>
+ * </ol>
  */
 @RestController
 public final class GetUser {

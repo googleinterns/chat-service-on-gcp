@@ -3,27 +3,30 @@ package controller;
 import helper.UniqueIdGenerator;
 import entity.Chat;
 import entity.Message;
+import entity.Attachment;
 import dbaccessor.user.UserAccessor;
 import dbaccessor.chat.ChatAccessor;
 import dbaccessor.message.MessageAccessor;
 import dbaccessor.userchat.UserChatAccessor;
 import helper.SuccessResponseGenerator;
+import exceptions.EmptyMessageException;
 import exceptions.UserIdDoesNotExistException;
 import exceptions.ChatIdDoesNotExistException;
 import exceptions.UserChatIdDoesNotExistException;
 import exceptions.UserIdMissingFromRequestURLPathException;
 import exceptions.ChatIdMissingFromRequestURLPathException;
-import exceptions.ContentTypeMissingFromRequestBodyException;
-import exceptions.TextContentMissingFromRequestBodyException;
 
 import java.util.Map;
+import java.util.Optional;
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Controller which responds to client requests to create (and send) a message in a chat.
@@ -91,24 +94,17 @@ public final class CreateMessage {
      * Returns MessageId of the sent Message.
      */
     @PostMapping("/users/{userId}/chats/{chatId}/messages")
-    public Map<String, Object> createMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @RequestBody Map<String, String> requestBody, HttpServletRequest request) {
-        
+    public Map<String, Object> createMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") 
+    String chatIdString, @RequestParam(value = "textContent", required = false) String textContent, 
+    @RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) throws 
+    IOException {
+
         String path = request.getRequestURI();
 
         long userId = Long.parseLong(userIdString);
         long chatId = Long.parseLong(chatIdString);
-
-        if (!requestBody.containsKey("contentType")) {
-            throw new ContentTypeMissingFromRequestBodyException(path);
-        }
-
-        String contentType = requestBody.get("contentType");
-
-        if (!requestBody.containsKey("textContent")) {
-            throw new TextContentMissingFromRequestBodyException(path);
-        }
-
-        String textContent = requestBody.get("textContent");
+        Message newMessage;
+        Attachment attachment = null;
        
         if (!queryUser.checkIfUserIdExists(userId)) {
             throw new UserIdDoesNotExistException(path);
@@ -122,12 +118,29 @@ public final class CreateMessage {
         if (!queryUserChat.checkIfUserChatIdExists(userId, chatId)) {
             throw new UserChatIdDoesNotExistException(path);
         }
+
+        if (textContent == null && file == null) {
+            throw new EmptyMessageException(path);
+        }
         
-        Message newMessage = new Message(chatId, userId, contentType, textContent);
+        if (textContent != null) {
+            newMessage = new Message(chatId, userId, textContent);
+        } else {
+            newMessage = new Message(chatId, userId);
+        }
 
         newMessage.setMessageId(uniqueIdGenerator.generateUniqueId("Message"));
 
-        insertMessage.createMessageInTransaction(newMessage, new Chat(chatId, newMessage.getMessageId()));
+        if (file != null) {
+            attachment = new Attachment(uniqueIdGenerator.generateUniqueId("Attachment"), file);
+            newMessage.setAttachmentId(attachment.getAttachmentId());
+
+            if (!insertMessage.createMessageInTransaction(newMessage, new Chat(chatId, newMessage.getMessageId()), attachment)) {
+                throw new IOException("IOException Occurred While Parsing File");
+            }
+        } else {
+            insertMessage.createMessageInTransaction(newMessage, new Chat(chatId, newMessage.getMessageId()));
+        }
         
         return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Message", newMessage.getMessageId());
     }

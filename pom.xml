@@ -94,6 +94,10 @@
 			<artifactId>guava</artifactId>
 			<version>29.0-jre</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-storage</artifactId>
+		</dependency>
     </dependencies>
 
 		<!--<dependency>

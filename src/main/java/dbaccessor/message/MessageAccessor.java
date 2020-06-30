@@ -2,13 +2,22 @@ package dbaccessor.message;
 
 import entity.Chat;
 import entity.Message;
+import entity.Attachment;
+import main.ApplicationVariable;
 
+import java.util.List;
+import java.util.Optional;
+import java.io.IOException;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.cloud.Timestamp;
 import com.google.cloud.spanner.Statement.Builder;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerTemplate;
-import java.util.List;
 import com.google.cloud.spanner.Statement;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerQueryOptions;
 import org.springframework.cloud.gcp.data.spanner.core.SpannerOperations;
@@ -40,11 +49,37 @@ public final class MessageAccessor {
     }
 
     /**
-     * Completes all DB insertions for the CreateMessage API in a single transaction.
+     * Completes all DB insertions for the CreateMessage API for a Message without Attachment in a single transaction.
+     * Returns true in case of Success.
      */
     public boolean createMessageInTransaction(Message message, Chat chat) {
         return spannerOperations.performReadWriteTransaction(
             transactionSpannerOperations -> {
+                transactionSpannerOperations.insert(message);
+                transactionSpannerOperations.update(chat, "ChatID", "LastSentMessageID");
+
+                return true;
+            }
+        );
+    }
+
+    /**
+     * Completes all DB insertions for the CreateMessage API for a Message with Attachment in a single transaction.
+     * Returns true in case of Success and false if an IO Exception occurs
+     */
+    public boolean createMessageInTransaction(Message message, Chat chat, Attachment attachment) {
+        return spannerOperations.performReadWriteTransaction(
+            transactionSpannerOperations -> {
+                Storage storage = StorageOptions.newBuilder().setProjectId(ApplicationVariable.GCP_PROJECT).build().getService();
+                BlobId blobId = BlobId.of(ApplicationVariable.GCS_BUCKET, Long.toString(attachment.getAttachmentId()));
+
+                try {
+                    storage.create(BlobInfo.newBuilder(blobId).build(), attachment.getFile().getBytes());
+                } catch (IOException e) {
+                    return false;    
+                }
+                
+                transactionSpannerOperations.insert(attachment);
                 transactionSpannerOperations.insert(message);
                 transactionSpannerOperations.update(chat, "ChatID", "LastSentMessageID");
 
@@ -78,20 +113,21 @@ public final class MessageAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("messageId").to(messageId).build();
         List<Message> resultSet = spannerTemplate.query(Message.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        return (!resultSet.isEmpty());
+        return !resultSet.isEmpty();
     }
 
     /**
      * Returns details of Message with the given MessageId.
      * Details include:
-     * (1)  MessageId
-     * (2)  ChatId
-     * (3)  SenderId
-     * (4)  ContentType
-     * (5)  TextContent
-     * (6)  Sent Timestamp
-     * (7)  Received Timestamp
-     * (8)  Creation Timestamp
+     * <ol>
+     * <li> MessageId </li>
+     * <li> ChatId </li>
+     * <li> SenderId </li>
+     * <li> TextContent </li>
+     * <li> Sent Timestamp </li>
+     * <li> Received Timestamp </li>
+     * <li> Creation Timestamp </li>
+     * </ol>
      */
     public Message getMessage(long messageId) {
 
@@ -123,7 +159,7 @@ public final class MessageAccessor {
         Statement statement = Statement.newBuilder(SQLStatment).bind("messageId").to(messageId).bind("chatId").to(chatId).build();
         List<Message> resultSet = spannerTemplate.query(Message.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
  
-        return (!resultSet.isEmpty()); 
+        return !resultSet.isEmpty(); 
     }
 
     private List<Message> listCountMessagesOfChatId(Timestamp startCreationTs, Timestamp endCreationTs, int count, long chatId) {
@@ -192,8 +228,10 @@ public final class MessageAccessor {
     /**
      * Returns details of Messages which were sent last in the Chats which the given User is engaged in.
      * Details include:
-     * (1)  ChatId
-     * (2)  Creation Timestamp (of the Message)
+     * <ol>
+     * <li> ChatId </li>
+     * <li> Creation Timestamp (of the Message) </li>
+     * </ol>
      */
     public List<Message> getCreationTsOfLastSentMessageIdForChatsOfUser(long userId) {
 

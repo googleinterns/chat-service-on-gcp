@@ -3,6 +3,7 @@ package helper;
 import dbaccessor.user.UserAccessor;
 import dbaccessor.chat.ChatAccessor;
 import dbaccessor.message.MessageAccessor;
+import dbaccessor.message.AttachmentAccessor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,9 @@ public final class UniqueIdGenerator {
 
     @Autowired
     private MessageAccessor queryMessage; 
+
+    @Autowired
+    private AttachmentAccessor queryAttachment; 
     
     /**
      * Generates long type unique Id value for the given table and its corres Id attribute
@@ -51,9 +55,15 @@ public final class UniqueIdGenerator {
                         return id;
                     }
                     break;
+
+                case "Attachment": 
+                    if (!queryAttachment.checkIfAttachmentIdExists(id)) {
+                        return id;
+                    }
+                    break;
                 
                 default: 
-                    throw new IllegalArgumentException("Invalid DB Relation Name passed to UniqueIdGenerator");
+                    throw new IllegalArgumentException("Invalid DB Relation Name Passed To UniqueIdGenerator");
             }
         }
     }
