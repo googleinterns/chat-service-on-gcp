@@ -238,9 +238,7 @@ public final class MessageAccessor {
 
         String sqlStatment = "SELECT ChatID, CreationTS FROM Message WHERE MessageID IN (SELECT LastSentMessageID FROM Chat WHERE ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND LastSentMessageID IS NOT NULL)";
         Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).build();
-        ImmutableList<Message> resultSet = ImmutableList.<Message> builder()
-                                                        .addAll(spannerTemplate.query(Message.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)))
-                                                        .build();
+        ImmutableList<Message> resultSet = ImmutableList.copyOf(spannerTemplate.query(Message.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)));
  
         return resultSet;
     }
