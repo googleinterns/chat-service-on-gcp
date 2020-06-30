@@ -31,7 +31,7 @@ public final class Attachment {
      * Attribute containing file size in bytes
      */
     @Column(name = "FileSize")
-    private long fileSize;
+    private long fileSizeInBytes;
 
     @NotMapped
     private MultipartFile file;
@@ -46,7 +46,7 @@ public final class Attachment {
         this.attachmentId = attachmentId;
         this.fileName = file.getOriginalFilename();
         this.fileType = file.getContentType();
-        this.fileSize = file.getSize();
+        this.fileSizeInBytes = file.getSize();
         this.file = file;
     }
 
@@ -62,8 +62,8 @@ public final class Attachment {
         this.fileType = fileType;
     }
 
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
+    public void setFileSizeInBytes(long fileSizeInBytes) {
+        this.fileSizeInBytes = fileSizeInBytes;
     }
 
     public void setFile(MultipartFile file) {
@@ -82,8 +82,8 @@ public final class Attachment {
         return fileType;
     }
 
-    public long getFileSize() {
-        return fileSize;
+    public long getFileSizeInBytes() {
+        return fileSizeInBytes;
     }
 
     public MultipartFile getFile() {

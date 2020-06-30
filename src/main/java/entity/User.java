@@ -1,6 +1,8 @@
 package entity;
 
 import com.google.cloud.Timestamp;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
@@ -37,7 +39,7 @@ public class User {
     }
 
     public Builder password(String password) {
-      this.password = password;
+      this.password = hashPassword(password);
       return this;
     }
 
@@ -59,10 +61,10 @@ public class User {
     public User build() {
       User user = new User();
       user.CreationTS = this.creationTs;
-      user.UserID = this.userId;
+      user.UserId = this.userId;
       user.Username = this.username;
       user.Password = this.password;
-      user.EmailID = this.emailId;
+      user.EmailId = this.emailId;
       user.MobileNo = this.mobileNo;
       user.Picture = this.picture;
       return user;
@@ -74,7 +76,7 @@ public class User {
   
   @PrimaryKey
   @Column(name = "UserID")
-  private long UserID;
+  private long UserId;
 
   @Column(name = "Username")
   private String Username;
@@ -83,7 +85,7 @@ public class User {
   private String Password;
 
   @Column(name = "EmailID")
-  private String EmailID;
+  private String EmailId;
 
   @Column(name = "MobileNo")
   private String MobileNo;
@@ -103,16 +105,21 @@ public class User {
     return new Builder();
   }
 
+  public static String hashPassword(String password) {
+    HashFunction hashFunction = Hashing.farmHashFingerprint64();
+    return hashFunction.hashUnencodedChars(password).toString();
+  }
+
   public long getUserId(){
-    return this.UserID;
+    return this.UserId;
   }
 
   public String getUsername(){
     return this.Username;
   }
 
-  public String getEmailID(){
-    return this.EmailID;
+  public String getEmailId(){
+    return this.EmailId;
   }
 
   public String getPassword(){
@@ -132,19 +139,19 @@ public class User {
   }
 
   public void setUserId(long id){
-    this.UserID = id;
+    this.UserId = id;
   }
 
   public void setUsername(String username){
     this.Username = username;
   }
 
-  public void setEmailID(String emailID){
-    this.EmailID = emailID;
+  public void setEmailId(String emailId){
+    this.EmailId = emailId;
   }
 
   public void setPassword(String password){
-    this.Password = password;
+    this.Password = hashPassword(password);
   }
 
   public void setMobileNumber(String mobileNo){
