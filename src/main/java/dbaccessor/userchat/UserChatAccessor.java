@@ -31,8 +31,8 @@ public final class UserChatAccessor {
      */
     public List<UserChat> getChatIdIfChatExistsBetweenUserIds(long userId1, long userId2) {
 
-        String SQLStatment = "SELECT ChatID FROM UserChat WHERE UserID=@userId2 AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userId1)";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userId2").to(userId2).bind("userId1").to(userId1).build();
+        String sqlStatment = "SELECT ChatID FROM UserChat WHERE UserID=@userId2 AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userId1)";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("userId2").to(userId2).bind("userId1").to(userId1).build();
         List<UserChat> resultSet = spannerTemplate.query(UserChat.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
     
         return resultSet;
@@ -43,8 +43,8 @@ public final class UserChatAccessor {
      */
     public boolean checkIfUserChatIdExists(long userId, long chatId) {
 
-        String SQLStatment = "SELECT * FROM UserChat WHERE UserID=@userId AND ChatID=@chatId";
-        Statement statement = Statement.newBuilder(SQLStatment).bind("userId").to(userId).bind("chatId").to(chatId).build();
+        String sqlStatment = "SELECT * FROM UserChat WHERE UserID=@userId AND ChatID=@chatId";
+        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).bind("chatId").to(chatId).build();
         List<UserChat> resultSet = spannerTemplate.query(UserChat.class, statement, null);
     
         return !resultSet.isEmpty();

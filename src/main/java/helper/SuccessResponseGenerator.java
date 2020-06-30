@@ -3,6 +3,7 @@ package helper;
 import entity.User;
 import entity.Chat;
 import entity.Message;
+import entity.Attachment;
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -64,24 +65,33 @@ public final class SuccessResponseGenerator {
     }
 
     /**
-     * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetMessage API.
+     * Renders the given parameters in a Map to return a successful HTTP response 
+     * for all client requests to the GetMessage API for messages without attachments.
      */
     public static Map<String, Object> getSuccessResponseForGetMessage(Message message, long userId) {
 
         Map<String, Object> responseBody = new LinkedHashMap<String, Object>();
         responseBody.put("MessageId", message.getMessageId());
         responseBody.put("ChatId", message.getChatId());
-        
-        if (message.getSenderId() == userId) {
-            responseBody.put("SentByCurrentUser", true);
-        } else {
-            responseBody.put("SentByCurrentUser", false);
-        }
-
-        responseBody.put("TextContent", message.getTextContent());
+        responseBody.put("SentByCurrentUser", message.getSenderId() == userId);
         responseBody.put("SentTs", message.getSentTs());
         responseBody.put("ReceivedTs", message.getReceivedTs());
         responseBody.put("CreationTs", message.getCreationTs());
+        responseBody.put("TextContent", message.getTextContent());
+
+        return responseBody;
+    }
+
+    /**
+     * Renders the given parameters in a Map to return a successful HTTP response 
+     * for all client requests to the GetMessage API for messages with attachments.
+     */
+    public static Map<String, Object> getSuccessResponseForGetMessage(Message message, Attachment attachment, long userId) {
+
+        Map<String, Object> responseBody = getSuccessResponseForGetMessage(message, userId);
+        responseBody.put("FileName", attachment.getFileName());
+        responseBody.put("FileType", attachment.getFileType());
+        responseBody.put("FileSize", Long.toString(attachment.getFileSize()) + " B");
 
         return responseBody;
     }
@@ -105,13 +115,7 @@ public final class SuccessResponseGenerator {
         messageForResponseBody.put("MessageId", message.getMessageId());
         messageForResponseBody.put("CreationTs", message.getCreationTs());
         messageForResponseBody.put("ChatId", message.getChatId());
-
-        if (message.getSenderId() == userId) {
-            messageForResponseBody.put("SentByCurrentUser", true);
-        } else {
-            messageForResponseBody.put("SentByCurrentUser", false);
-        }
-        
+        messageForResponseBody.put("SentByCurrentUser", message.getSenderId() == userId);
         messageForResponseBody.put("TextContent", message.getTextContent());
         messageForResponseBody.put("SentTs", message.getSentTs());
         messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
