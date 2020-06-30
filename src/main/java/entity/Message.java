@@ -114,9 +114,9 @@ public final class Message {
     public OptionalLong getAttachmentId() {
         if (attachmentId == null) {
             return OptionalLong.empty();
-        } else {
-            return OptionalLong.of(attachmentId);
-        }
+        } 
+        
+        return OptionalLong.of(attachmentId);
     }
 
     public Timestamp getSentTs() {
