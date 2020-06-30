@@ -15,31 +15,27 @@ import exceptions.UserChatIdDoesNotExistException;
 import exceptions.UserIdMissingFromRequestURLPathException;
 import exceptions.ChatIdMissingFromRequestURLPathException;
 import exceptions.MessageIdDoesNotBelongToChatIdException;
+import exceptions.MessageDoesNotContainAttachmentException;
 
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 
 /**
- * Controller which responds to client requests to get the details of a Message and its Attachment(if any).
+ * Controller which responds to client requests to get the details and Blob of an Attachment.
  * The response contains:
  * <ol>
- * <li> MessageId </li>
- * <li> ChatId </li>
- * <li> SentByCurrentUser </li>
- * <li> TextContent </li>
- * <li> Sent Timestamp </li>
- * <li> Received Timestamp </li>
- * <li> Creation Timestamp </li>
+ * <li> FileName </li>
+ * <li> FileType </li>
+ * <li> FileSize </li>
+ * <li> Blob </li>
  * </ol>
  */
 @RestController
-public final class GetMessage {
+public final class GetAttachment {
 
     @Autowired
     private UserAccessor queryUser;
@@ -60,8 +56,8 @@ public final class GetMessage {
      * Responds to requests with missing userId URL Path Variable.
      * Throws an exception for the same. 
      */
-    @GetMapping("/users/chats/{chatId}/messages/{messageId}")
-    public void getMessageWithoutUserIdPathVariable(HttpServletRequest request) {
+    @GetMapping("/users/chats/{chatId}/messages/{messageId}/attachments")
+    public void getAttachmentWithoutUserIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
@@ -72,8 +68,8 @@ public final class GetMessage {
      * Responds to requests with missing chatId URL Path Variable.
      * Throws an exception for the same. 
      */
-    @GetMapping("/users/{userId}/chats/messages/{messageId}")
-    public void getMessageWithoutChatIdPathVariable(HttpServletRequest request) {
+    @GetMapping("/users/{userId}/chats/messages/{messageId}/attachments")
+    public void getAttachmentWithoutChatIdPathVariable(HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
@@ -82,10 +78,10 @@ public final class GetMessage {
 
     /**
      * Responds to complete requests.
-     * Returns details of the requested Message.
+     * Returns details and Blob of the requested Attachment.
      */
-    @GetMapping("/users/{userId}/chats/{chatId}/messages/{messageId}")
-    public Map<String, Object> getMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @PathVariable("messageId") String messageIdString, HttpServletRequest request) {
+    @GetMapping("/users/{userId}/chats/{chatId}/messages/{messageId}/attachments")
+    public Map<String, Object> getAttachment(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, @PathVariable("messageId") String messageIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
 
@@ -114,14 +110,14 @@ public final class GetMessage {
             throw new MessageIdDoesNotBelongToChatIdException(path);
         }
 
-        Message message = queryMessage.getMessage(messageId);
-
-        if (message.getAttachmentId().isPresent()) {
-            Attachment attachment = queryAttachment.getAttachment(message.getAttachmentId().get());
-
-            return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, attachment, userId);
-        } 
+        Attachment attachment = queryMessage.getAttachmentFromMessageId(messageId);
         
-        return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, userId);
+        if (attachment.getAttachmentId() == 0) {
+            throw new MessageDoesNotContainAttachmentException(path);
+        }
+
+        byte[] blob = queryAttachment.getBlob(attachment.getAttachmentId());
+        
+        return SuccessResponseGenerator.getSuccessResponseForGetAttachment(attachment, blob);
     }
 }

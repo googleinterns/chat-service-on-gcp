@@ -1,8 +1,14 @@
 package dbaccessor.message;
 
 import entity.Attachment;
+import main.ApplicationVariable;
 
 import java.util.List;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.cloud.spanner.Statement.Builder;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,5 +71,15 @@ public final class AttachmentAccessor {
         List<Attachment> resultSet = spannerTemplate.query(Attachment.class, statement, null);
  
         return resultSet;
+    }
+
+    /**
+     * Returns Blob of Attachment for the given AttachmentId.
+     */
+    public byte[] getBlob(long attachmentId) {
+        Storage storage = StorageOptions.newBuilder().setProjectId(ApplicationVariable.GCP_PROJECT).build().getService();
+        Blob blob = storage.get(BlobId.of(ApplicationVariable.GCS_BUCKET, Long.toString(attachmentId)));
+
+        return blob.getContent();
     }
 }
