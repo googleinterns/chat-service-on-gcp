@@ -57,7 +57,7 @@ public final class GetChat {
      * Returns details of the requested Chat.
      */
     @GetMapping("/users/{userId}/chats/{chatId}")
-    public ImmutableMap<String, Object> getChat(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, HttpServletRequest request) {
+    public ImmutableMap<String, Map<String, Object>> getChat(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
         Map<String, Object> responseBody;
