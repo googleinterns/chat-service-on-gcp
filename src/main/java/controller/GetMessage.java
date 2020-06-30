@@ -117,7 +117,7 @@ public final class GetMessage {
         Message message = queryMessage.getMessage(messageId);
 
         if (message.getAttachmentId().isPresent()) {
-            Attachment attachment = queryAttachment.getAttachment(message.getAttachmentId().get());
+            Attachment attachment = queryAttachment.getAttachment(message.getAttachmentId().getAsLong());
 
             return SuccessResponseGenerator.getSuccessResponseForGetMessage(message, attachment, userId);
         } 

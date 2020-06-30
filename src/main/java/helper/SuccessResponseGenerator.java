@@ -68,7 +68,7 @@ public final class SuccessResponseGenerator {
     private static Map<String, Object> addAttachmentMetadataToResponseBody(Map<String, Object> responseBody, Attachment attachment) {
         responseBody.put("FileName", attachment.getFileName());
         responseBody.put("FileType", attachment.getFileType());
-        responseBody.put("FileSize", Long.toString(attachment.getFileSize()) + " B");
+        responseBody.put("FileSize", Long.toString(attachment.getFileSizeInBytes()) + " B");
 
         return responseBody;
     }
@@ -162,7 +162,7 @@ public final class SuccessResponseGenerator {
         
         for (Message message : copyOfMessages) {
             if (message.getAttachmentId().isPresent()) {
-                Attachment attachment = attachmentIdToAttachment.get(message.getAttachmentId().get());
+                Attachment attachment = attachmentIdToAttachment.get(message.getAttachmentId().getAsLong());
                 listOfMessagesBuilder.add(getMessageForResponseBody(userId, message, attachment));
             } else {
                 listOfMessagesBuilder.add(getMessageForResponseBody(userId, message));
