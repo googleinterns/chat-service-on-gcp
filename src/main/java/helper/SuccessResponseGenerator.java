@@ -45,31 +45,25 @@ public final class SuccessResponseGenerator {
      */
     public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetUser(User user) {
         ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
-                                                                .put("UserId", user.getUserId());
-                                                                .put("Username", user.getUsername());
-                                                                .put("CreationTs", user.getCreationTs());
-                                                                .build();
+                                                            .put("UserId", user.getUserId());
+                                                            .put("Username", user.getUsername());
+                                                            .put("CreationTs", user.getCreationTs());
+                                                            .build();
 
-        ImmutableMap<String, Map<String, Object>> responseBody = ImmutableMap.of("payload", response);
-
-        return responseBody;
+        return ImmutableMap.of("payload", responseBody);
     }
 
     /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetChat API.
      */
     public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetChat(Chat chat) {
-        Map<String, Object> response = new LinkedHashMap<String, Object>();
+        ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
+                                                            .put("ChatId", chat.getChatId());
+                                                            .put("LastSentMessageId", chat.getLastSentMessageId());
+                                                            .put("CreationTs", chat.getCreationTs());
+                                                            .build();
 
-        response.put("ChatId", chat.getChatId());
-        response.put("LastSentMessageId", chat.getLastSentMessageId());
-        response.put("CreationTs", chat.getCreationTs());
-
-        ImmutableMap<String, Map<String, Object>> responseBody = ImmutableMap.<String, Map<String, Object>> builder()
-                                                                            .put("payload", response)
-                                                                            .build();
-
-        return responseBody;
+        return ImmutableMap.of("payload", responseBody);
     }
 
     private static Map<String, Object> addAttachmentMetadataToResponseBody(Map<String, Object> responseBody, Attachment attachment) {
