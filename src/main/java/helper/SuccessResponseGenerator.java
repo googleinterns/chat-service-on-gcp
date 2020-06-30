@@ -62,7 +62,6 @@ public final class SuccessResponseGenerator {
                                                             .put("LastSentMessageId", chat.getLastSentMessageId())
                                                             .put("CreationTs", chat.getCreationTs())
                                                             .build();
-
         return ImmutableMap.of("payload", responseBody);
     }
 
@@ -80,7 +79,6 @@ public final class SuccessResponseGenerator {
         messageForResponseBody.put("MessageId", message.getMessageId());
         messageForResponseBody.put("ChatId", message.getChatId());
         messageForResponseBody.put("SentByCurrentUser", message.getSenderId() == userId);
-        messageForResponseBody.put("CreationTs", message.getCreationTs());
         messageForResponseBody.put("SentTs", message.getSentTs());
         messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
         messageForResponseBody.put("TextContent", message.getTextContent());

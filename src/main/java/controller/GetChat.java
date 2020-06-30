@@ -60,7 +60,6 @@ public final class GetChat {
     public ImmutableMap<String, Map<String, Object>> getChat(@PathVariable("userId") String userIdString, @PathVariable("chatId") String chatIdString, HttpServletRequest request) {
 
         String path = request.getRequestURI();
-        Map<String, Object> responseBody;
 
         long userId = Long.parseLong(userIdString);
         long chatId = Long.parseLong(chatIdString);
