@@ -139,19 +139,17 @@ public final class SuccessResponseGenerator {
      */
     public static ImmutableMap<String, ImmutableList<Map<String, Object>>> getSuccessResponseForListMessages(long userId, ImmutableList<Message> messages) {
 
-        List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
+        ImmutableList.Builder<Map<String, Object>> listOfMessagesBuilder = ImmutableList.builder();
         
         ImmutableList<Message> copyOfMessages = sortMessagesByCreationTs(messages);
         
         for (Message message : copyOfMessages) {
-            listOfMessages.add(getMessageForResponseBody(userId, message));
+            listOfMessagesBuilder.add(getMessageForResponseBody(userId, message));
         }
 
-        ImmutableList<Map<String, Object>> listOfMessagesImmutable = ImmutableList.<Map<String, Object>> builder()
-                                                                                    .addAll(listOfMessages)
-                                                                                    .build();
+        ImmutableList<Map<String, Object>> listOfMessages = listOfMessagesBuilder.build();
         
-        return getResponseBodyForListMessages(listOfMessagesImmutable);
+        return getResponseBodyForListMessages(listOfMessages);
     }
 
     /**
@@ -160,23 +158,21 @@ public final class SuccessResponseGenerator {
     public static ImmutableMap<String, ImmutableList<Map<String, Object>>> getSuccessResponseForListMessages(long userId, ImmutableList<Message> messages, 
     ImmutableMap<Long, Attachment> attachmentIdToAttachment) {
 
-        List<Map<String, Object>> listOfMessages = new ArrayList<Map<String, Object>>();
+        ImmutableList.Builder<Map<String, Object>> listOfMessagesBuilder = ImmutableList.builder();
         
         ImmutableList<Message> copyOfMessages = sortMessagesByCreationTs(messages);
         
         for (Message message : copyOfMessages) {
             if (message.getAttachmentId().isPresent()) {
                 Attachment attachment = attachmentIdToAttachment.get(message.getAttachmentId().get());
-                listOfMessages.add(getMessageForResponseBody(userId, message, attachment));
+                listOfMessagesBuilder.add(getMessageForResponseBody(userId, message, attachment));
             } else {
-                listOfMessages.add(getMessageForResponseBody(userId, message));
+                listOfMessagesBuilder.add(getMessageForResponseBody(userId, message));
             }
         }
 
-        ImmutableList<Map<String, Object>> listOfMessagesImmutable = ImmutableList.<Map<String, Object>> builder()
-                                                                                    .addAll(listOfMessages)
-                                                                                    .build();
+        ImmutableList<Map<String, Object>> listOfMessages = listOfMessagesBuilder.build();
         
-        return getResponseBodyForListMessages(listOfMessagesImmutable);
+        return getResponseBodyForListMessages(listOfMessages);
     }
 }
