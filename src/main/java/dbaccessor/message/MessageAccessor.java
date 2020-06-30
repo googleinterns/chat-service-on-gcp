@@ -256,10 +256,8 @@ public final class MessageAccessor {
     public Attachment getAttachmentFromMessageId(long messageId) {
         String sqlStatment = "SELECT Attachment.AttachmentID as AttachmentID, Attachment.FileName as FileName, Attachment.FileType as FileType, Attachment.FileSize as FileSize FROM Message LEFT OUTER JOIN Attachment ON Message.AttachmentID = Attachment.AttachmentID WHERE Message.MessageID = @messageId";
         Statement statement = Statement.newBuilder(sqlStatment).bind("messageId").to(messageId).build();
-        ImmutableList<Attachment> resultSet = ImmutableList.<Attachment>builder() 
-                                                            .addAll(spannerTemplate.query(Attachment.class, statement,  
-                                                                    new SpannerQueryOptions().setAllowPartialRead(true)))
-                                                            .build(); 
+        List<Attachment> resultSet = spannerTemplate.query(Attachment.class, statement, new SpannerQueryOptions().setAllowPartialRead(true));
+        
         return resultSet.get(0);
     }
 }
