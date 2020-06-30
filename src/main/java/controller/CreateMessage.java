@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Controller which responds to client requests to create (and send) a message in a chat.
@@ -94,7 +96,7 @@ public final class CreateMessage {
      * Returns MessageId of the sent Message.
      */
     @PostMapping("/users/{userId}/chats/{chatId}/messages")
-    public Map<String, Object> createMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") 
+    public ImmutableMap<String, Object> createMessage(@PathVariable("userId") String userIdString, @PathVariable("chatId") 
     String chatIdString, @RequestParam(value = "textContent", required = false) String textContent, 
     @RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) throws 
     IOException {
