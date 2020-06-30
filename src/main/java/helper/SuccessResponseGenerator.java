@@ -128,13 +128,10 @@ public final class SuccessResponseGenerator {
     }
 
     private static ImmutableList<Message> sortMessagesByCreationTs(ImmutableList<Message> messages) {
-        List<Message> copyOfMessages = new ArrayList<Message>(messages);
-
-        Collections.sort(copyOfMessages, Comparator.comparing(Message::getCreationTs));
-
-        return ImmutableList.<Message> builder()
-                            .addAll(copyOfMessages)
-                            .build();
+        return messages
+                .stream()
+                .sorted(Comparator.comparing(Message::getCreationTs))
+                .collect(ImmutableList.toImmutableList());
     }
 
     /**
