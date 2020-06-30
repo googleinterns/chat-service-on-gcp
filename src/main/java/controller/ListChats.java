@@ -163,16 +163,14 @@ public final class ListChats {
         }
 
         //Stores list of all details of each Chat of the User.
-        List<ImmutableMap<String, Object>> chatInfoOfChatsOfUser = new ArrayList<ImmutableMap<String, Object>>();
+        ImmutableList.Builder<ImmutableMap<String, Object>> chatInfoOfChatsOfUserBuilder = ImmutableList.builder();
 
         for (Chat chat : chatsOfUser) {
-            chatInfoOfChatsOfUser.add(getChatInfoOfChatInMap(chat, chatIdSecondUsernameMap.get(chat.getChatId())));
+            chatInfoOfChatsOfUserBuilder.add(getChatInfoOfChatInMap(chat, chatIdSecondUsernameMap.get(chat.getChatId())));
         }
 
-        ImmutableList<ImmutableMap<String, Object>> chatInfoOfChatsOfUserImmutable = ImmutableList.<ImmutableMap<String, Object>> builder()
-                                                                                                .addAll(chatInfoOfChatsOfUser)
-                                                                                                .build();
+        ImmutableList<ImmutableMap<String, Object>> chatInfoOfChatsOfUser = chatInfoOfChatsOfUserBuilder.build();
 
-        return SuccessResponseGenerator.getSuccessResponseForListChats(chatInfoOfChatsOfUserImmutable);
+        return SuccessResponseGenerator.getSuccessResponseForListChats(chatInfoOfChatsOfUser);
     }
 }
