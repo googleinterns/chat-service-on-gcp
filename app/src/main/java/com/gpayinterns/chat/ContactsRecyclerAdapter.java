@@ -60,7 +60,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         String lastMessageID = mUsers.get(position).lastMessageID;
 
         holder.mUsername.setText(name);
-        holder.mPicName.setText((Character.toString(name.charAt(0))).toUpperCase());
+        holder.mPicName.setText((Character.toString(name.charAt(0))).toUpperCase());  //to display first character of the name in the icon
         holder.mChatID = chatID;
         holder.mLastMessageID = lastMessageID;
 

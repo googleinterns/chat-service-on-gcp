@@ -40,7 +40,12 @@ import static com.gpayinterns.chat.ServerConstants.LOGIN;
 import static com.gpayinterns.chat.ServerConstants.USER_PASSWORD;
 import static com.gpayinterns.chat.ServerConstants.USER_USERNAME;
 
-
+/**
+ * LoginActivity gets launched when the user starts the application.
+ * Major functions performed by it are:
+ * 1. Check if the last user was already signed in, if yes then move to ViewContacts.
+ * 2. Let the user signIn by verifying the credentials provided.
+ */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
 {
     private EditText usernameEditText;
@@ -62,10 +67,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         catch (NullPointerException ignored)
         {
+            /*
+            A NullPointerException will occur
+            when there won't be any SupportActionBar present hence no need to hide it
+            */
         }
 
         setContentView(R.layout.activity_login);
-
 
         //Views
         usernameEditText = findViewById(R.id.input_email_id);
@@ -96,8 +104,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     {
         SharedPreferences mPrefs = getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
         currentUser = mPrefs.getString("currentUser","");
+        assert currentUser != null;
         if (!currentUser.equals(""))
         {
+            //autoLogin
             startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));
         }
     }
@@ -283,6 +293,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     {
         if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis())
         {
+            //exit the application
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

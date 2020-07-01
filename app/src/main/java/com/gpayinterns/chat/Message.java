@@ -1,6 +1,8 @@
 package com.gpayinterns.chat;
 
 
+import android.graphics.Bitmap;
+
 public class Message
 {
     public String messageID;
@@ -8,17 +10,19 @@ public class Message
     public boolean received;
     public String text;
     public String sendTime;
+    public Bitmap image;
 
     public Message()
     {
 
     }
-    public Message(String mMessageID,String mChatID, boolean mReceived, String mText, String mSendTime)
+    public Message(String mMessageID,String mChatID, boolean mReceived, String mText, String mSendTime, Bitmap mImage)
     {
         messageID = mMessageID;
         chatID = mChatID;
         received = mReceived;
         text = mText;
         sendTime = mSendTime;
+        image = mImage;
     }
 }
