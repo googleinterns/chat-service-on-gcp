@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,21 +24,26 @@ import android.widget.Toast;
 
 
 import com.android.volley.ClientError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Timer;
@@ -127,8 +134,9 @@ public class ViewMessageActivity extends AppCompatActivity
                 if( sendImage.getDrawable()!=null)
                 {
                     //TODO send image to server
+                    sendImageToServer();
                     addImageToScreen();
-                    removeImageFromEditText();
+//                    removeImageFromEditText();
                     hideSoftKeyboard();
                     return;
                 }
@@ -151,6 +159,81 @@ public class ViewMessageActivity extends AppCompatActivity
         });
     }
 
+    private void sendImageToServer()
+    {
+        ImageView sendImage = (ImageView) findViewById(R.id.send_image);
+        sendImage.invalidate();
+        BitmapDrawable drawable = (BitmapDrawable) sendImage.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+        uploadBitmap(bitmap);
+
+
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+//        byte[] byteArray = byteArrayOutputStream .toByteArray();
+//
+//        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+    }
+    private void uploadBitmap(final Bitmap bitmap)
+    {
+        String URL = BASE_URL + USERS
+                + "/" + currentUser + "/" + CHATS
+                + "/" + chatID + "/" + MESSAGES;
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, URL,
+                new Response.Listener<NetworkResponse>()
+                {
+                    @Override
+                    public void onResponse(NetworkResponse response)
+                    {
+                        String resultResponse = new String(response.data);
+                        try
+                        {
+                            JSONObject result = new JSONObject(resultResponse);
+                            String message = result.getString("message");
+                            Log.d("messageReceived",message);
+                        }
+                        catch (JSONException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = "Unknown error";
+                        if (networkResponse == null)
+                        {
+                            if (error.getClass().equals(TimeoutError.class))
+                            {
+                                errorMessage = "Request timeout";
+                            }
+                            else if (error.getClass().equals(NoConnectionError.class))
+                            {
+                                errorMessage = "Failed to connect server";
+                            }
+                        }
+                        Log.d("Error", errorMessage);
+                        error.printStackTrace();
+                    }
+                }) {
+            @Override
+            protected Map<String, DataPart> getByteData()
+            {
+                Map<String, DataPart> params = new HashMap<>();
+                long imageName = System.currentTimeMillis();
+                ImageView sendImage = (ImageView) findViewById(R.id.send_image);
+                params.put("file", new DataPart(imageName + ".png", AppHelper.getFileDataFromDrawable(getBaseContext(),sendImage.getDrawable()),"image/jpeg"));
+                return params;
+            }
+        };
+
+        Volley.newRequestQueue(this).add(volleyMultipartRequest);
+    }
     private void removeImageFromEditText()
     {
         ImageView sendImage = (ImageView) findViewById(R.id.send_image);
@@ -160,12 +243,10 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void addImageToScreen()
     {
+        List <Message> newMessage = new ArrayList<Message>();
         ImageView sendImage = (ImageView) findViewById(R.id.send_image);
-        sendImage.invalidate();
         BitmapDrawable drawable = (BitmapDrawable) sendImage.getDrawable();
         Bitmap bitmap = drawable.getBitmap();
-
-        List <Message> newMessage = new ArrayList<Message>();
         newMessage.add(new Message("0",chatID,false,"", Long.toString(System.currentTimeMillis()),bitmap));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
