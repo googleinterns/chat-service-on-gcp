@@ -19,21 +19,22 @@ def get_next_response_entry(api_response_object_qps, api_to_proportion_of_reques
     10. TotalQps
     """
 
-    api_name = api_response_object_qps[0]
+    response_entry = []
     response_object = api_response_object_qps[1]
     total_qps = api_response_object_qps[2]
     
-    response_time = response_object.elapsed
-    login_qps = total_qps * api_to_proportion_of_requests_of_api["login"]
-    view_user_qps = total_qps * api_to_proportion_of_requests_of_api["viewUser"]
-    list_chats_qps = total_qps * api_to_proportion_of_requests_of_api["listChats"]
-    list_messages_qps = total_qps * api_to_proportion_of_requests_of_api["listMessages"]
-    create_chat_qps = total_qps * api_to_proportion_of_requests_of_api["createChat"]
-    create_message_qps = total_qps * api_to_proportion_of_requests_of_api["createMessage"]
-    signup_qps = total_qps * api_to_proportion_of_requests_of_api["signup"]
+    # Adding API Name to the response entry
+    response_entry.append(api_response_object_qps[0])
 
-    response_entry = [api_name, response_time, login_qps, view_user_qps, 
-                    list_chats_qps, list_messages_qps, create_chat_qps, create_message_qps, signup_qps, total_qps]
+    #Adding Response Time to the response entry
+    response_entry.append(response_object.elapsed)
+
+    api_list = ["login", "viewUser", "listChats", "listMessages", "createChat", "createMessage", "signup"]
+
+    for api in api_list:
+        response_entry.append(total_qps * api_to_proportion_of_requests_of_api[api])
+    
+    response_entry.append(total_qps)
 
     return response_entry
 
