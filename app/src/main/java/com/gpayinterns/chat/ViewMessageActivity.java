@@ -81,7 +81,7 @@ public class ViewMessageActivity extends AppCompatActivity
     public static final String CONTACT_USERNAME = "CONTACT_USERNAME";
     public static final String LAST_MESSAGE_ID = "LAST_MESSAGE_ID";
     private static final String POLL = "SHORT_POLLING";
-    private static final int SELECT_PICTURE = 0;
+    private static final int SELECT_FILE = 0;
 
     private static boolean active=false;
 
@@ -101,8 +101,7 @@ public class ViewMessageActivity extends AppCompatActivity
     private Timer mTimer;
     private ProgressBar progressBar;
 
-    private String fileName;
-    private String mimeType;
+    private Uri fileUri;
 
     @Override
     protected void onPause()
@@ -211,6 +210,8 @@ public class ViewMessageActivity extends AppCompatActivity
             {
                 Map<String, DataPart> params = new HashMap<>();
                 ImageView sendImage = (ImageView) findViewById(R.id.send_image);
+                String fileName = getFileName(fileUri);
+                String mimeType = getMimeType(fileUri);
                 params.put("file", new DataPart(fileName , AppHelper.getFileDataFromDrawable(getBaseContext(),sendImage.getDrawable()),mimeType));
                 return params;
             }
@@ -239,10 +240,9 @@ public class ViewMessageActivity extends AppCompatActivity
         }
         messageIDSet.add(messageID);
         List <Message> newMessage = new ArrayList<Message>();
-        ImageView sendImage = (ImageView) findViewById(R.id.send_image);
-        BitmapDrawable drawable = (BitmapDrawable) sendImage.getDrawable();
+        BitmapDrawable drawable = (BitmapDrawable)((ImageView) findViewById(R.id.send_image)).getDrawable();
         Bitmap bitmap = drawable.getBitmap();
-        newMessage.add(new Message( messageID,chatID,false,"", Long.toString(System.currentTimeMillis()),bitmap));
+        newMessage.add(new Message( messageID,chatID,false,null, Long.toString(System.currentTimeMillis()),bitmap,fileUri,getFileName(fileUri),getMimeType(fileUri)));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
         removeImageFromEditText();
@@ -369,15 +369,14 @@ public class ViewMessageActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data!=null)
+        if(resultCode == RESULT_OK && requestCode == SELECT_FILE && data!=null)
         {
             Uri selectedImage = data.getData();
-            fileName = getFileName(selectedImage);
-            mimeType = getMimeType(selectedImage);
             Log.d("selectedImageUri", Objects.requireNonNull(selectedImage.getPath()));
             ImageView sendImage = (ImageView) findViewById(R.id.send_image);
             sendImage.setImageURI(selectedImage);
             messageEditText.setVisibility(View.INVISIBLE);
+            fileUri=selectedImage;
         }
     }
 
@@ -400,7 +399,7 @@ public class ViewMessageActivity extends AppCompatActivity
                     public void onResponse(JSONObject response)
                     {
                         Log.d("ResponseMessage: " , response.toString());
-                        if(swipeRefreshLayout.isRefreshing())
+                        if(swipeRefreshLayout!=null && swipeRefreshLayout.isRefreshing())
                         {
                             swipeRefreshLayout.setRefreshing(false);
                         }
@@ -625,18 +624,18 @@ public class ViewMessageActivity extends AppCompatActivity
         lastMessageID = messageID;
         findViewById(R.id.view_message_constraint_layout).requestFocus();
         List <Message> newMessage = new ArrayList<Message>();
-        newMessage.add(new Message(messageID,chatID,false,messageEditText.getText().toString(),"0",null));
+//        newMessage.add(new Message(messageID,chatID,false,messageEditText.getText().toString(),"0",null));
         Log.d("here",Integer.toString(newMessage.size()));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }
 
-    private void pickImage()
+    private void pickFile()
     {
         Intent intent = new Intent();
         intent.setType("*/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+        startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
     }
 
     private void hideSoftKeyboard()
@@ -655,11 +654,26 @@ public class ViewMessageActivity extends AppCompatActivity
         String messageID = message.getString("MessageId");
         String chatID = message.getString("ChatId");
         boolean received = !message.getBoolean("SentByCurrentUser");
-        String text = message.getString("TextContent");
-        JSONObject sendTime = message.getJSONObject("CreationTs");
+        JSONObject sendTime = message.getJSONObject("SentTs");
         String seconds = sendTime.getString("seconds");
+        String text = null;
+        String filename = null;
+        String mimetype = null;
 
-        return new Message(messageID,chatID,received,text,seconds+"000",null);
+        if(message.has("TextContent"))
+        {
+            text = message.getString("TextContent");
+        }
+        if(message.has("FileName"))
+        {
+            filename = message.getString("FileName");
+        }
+        if(message.has("FileType"))
+        {
+            mimetype = message.getString("FileType");
+        }
+        return new Message(messageID,chatID,received,text,
+                seconds+"000",null,null,filename,mimetype);
     }
 
     @Override
@@ -677,7 +691,7 @@ public class ViewMessageActivity extends AppCompatActivity
         switch (item.getItemId())
         {
             case R.id.menu_send_image:
-                pickImage();
+                pickFile();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

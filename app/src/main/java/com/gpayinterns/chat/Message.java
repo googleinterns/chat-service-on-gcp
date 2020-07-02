@@ -2,6 +2,7 @@ package com.gpayinterns.chat;
 
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 public class Message
 {
@@ -11,12 +12,17 @@ public class Message
     public String text;
     public String sendTime;
     public Bitmap image;
+    public Uri uri;
+    public String fileName;
+    public String mimeType;
 
     public Message()
     {
 
     }
-    public Message(String mMessageID,String mChatID, boolean mReceived, String mText, String mSendTime, Bitmap mImage)
+    public Message(String mMessageID,String mChatID, boolean mReceived,
+                   String mText, String mSendTime, Bitmap mImage,
+                   Uri mUri, String mFileName, String mMimeType)
     {
         messageID = mMessageID;
         chatID = mChatID;
@@ -24,5 +30,8 @@ public class Message
         text = mText;
         sendTime = mSendTime;
         image = mImage;
+        uri = mUri;
+        fileName = mFileName;
+        mimeType = mMimeType;
     }
 }

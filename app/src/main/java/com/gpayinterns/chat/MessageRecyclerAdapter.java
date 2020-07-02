@@ -31,6 +31,8 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     //mViewType 1: right side text
     //mViewType 2: left side image
     //mViewType 3: right side image
+    //mViewType 4: left side any richText except image
+    //mViewType 5: right side any richText except image
 
     @Override
     public int getItemViewType(int position)
@@ -46,8 +48,11 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
 
         if(mMessages.get(position).image!=null)//image
         {
-            Log.d("position","b"+position);
             mViewType += 2;
+        }
+        else if(mMessages.get(position).mimeType!=null)//richText
+        {
+            mViewType += 4;
         }
         return mViewType;
     }
@@ -79,6 +84,12 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                 break;
             case 3:
                 itemView = mLayoutInflater.inflate(R.layout.item_send_image_list,parent,false);
+                break;
+            case 4:
+                itemView = mLayoutInflater.inflate(R.layout.item_recieve_richtext_list,parent,false);
+                break;
+            case 5:
+                itemView = mLayoutInflater.inflate(R.layout.item_send_richtext_list,parent,false);
                 break;
             default:
                 itemView = null;
