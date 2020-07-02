@@ -70,6 +70,10 @@ public class VolleyController
     }
     public <T> void addToRequestQueue(Request<T> req)
     {
+        req.setRetryPolicy(new DefaultRetryPolicy(
+                100000,
+                0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         getRequestQueue().add(req);
     }
 

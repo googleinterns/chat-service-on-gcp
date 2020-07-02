@@ -223,7 +223,7 @@ public class ViewMessageActivity extends AppCompatActivity
             }
         };
 
-        Volley.newRequestQueue(this).add(volleyMultipartRequest);
+        VolleyController.getInstance(this).addToRequestQueue(volleyMultipartRequest);
     }
     private void removeImageFromEditText()
     {
@@ -266,14 +266,12 @@ public class ViewMessageActivity extends AppCompatActivity
                         try
                         {
                             result = new JSONObject(resultResponse);
-                        }
-                        catch (JSONException e)
-                        {
-                            e.printStackTrace();
-                        }
-                        try
-                        {
-                            String messageId = result.getString("message");
+                            String messageId = result.getString("MessageId");
+                            String message = result.getString("message");
+                            if(message.equals("Success"))
+                            {
+                                addMessageToScreen(messageId,messageText);
+                            }
                         }
                         catch (JSONException e)
                         {
@@ -318,7 +316,7 @@ public class ViewMessageActivity extends AppCompatActivity
             }
         };
 
-        Volley.newRequestQueue(this).add(volleyMultipartRequest);
+        VolleyController.getInstance(this).addToRequestQueue(volleyMultipartRequest);
     }
 
     private void getCurrentUser()
@@ -494,7 +492,6 @@ public class ViewMessageActivity extends AppCompatActivity
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {
-
                     @Override
                     public void onResponse(JSONObject response)
                     {
@@ -614,7 +611,7 @@ public class ViewMessageActivity extends AppCompatActivity
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
-    private void addMessageToScreen(String messageID)
+    private void addMessageToScreen(String messageID,String messageText)
     {
         if(messageIDSet.contains(messageID))
         {
@@ -624,8 +621,7 @@ public class ViewMessageActivity extends AppCompatActivity
         lastMessageID = messageID;
         findViewById(R.id.view_message_constraint_layout).requestFocus();
         List <Message> newMessage = new ArrayList<Message>();
-//        newMessage.add(new Message(messageID,chatID,false,messageEditText.getText().toString(),"0",null));
-        Log.d("here",Integer.toString(newMessage.size()));
+        newMessage.add(new Message(messageID,chatID,false,messageText,Long.toString(System.currentTimeMillis()),null,null,null,null,null));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }

@@ -11,15 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gpayinterns.chat.R;
 
+import java.io.File;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -178,7 +182,44 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
             }
             else if(mViewType==4 || mViewType==5)//richText
             {
+                Button downloadButton = (Button) itemView.findViewById(R.id.download_button);
+                Button viewButton = (Button) itemView.findViewById(R.id.view_button);
 
+                downloadButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        /**
+                         * TODO
+                         * download via getAttachment API
+                         * convert it into bitmap
+                         * set image in the message
+                         * store into device storage
+                         * set uriType in message
+                          **/
+                    }
+                });
+
+                viewButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        if(!uriExists(mMessageURI))
+                        {
+                            Toast.makeText(mContext, "File is not present in storage", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_VIEW);
+                            intent.setDataAndType(mMessageURI, mMimeType);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            mContext.startActivity(intent);
+                        }
+                    }
+                });
             }
         }
     }
@@ -218,5 +259,15 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     public static String convertDate(String dateInMilliseconds)
     {
         return "      "+DateFormat.format("hh:mm a", Long.parseLong(dateInMilliseconds)).toString();
+    }
+
+    private boolean uriExists(Uri uri)
+    {
+        if(uri == null)
+        {
+            return false;
+        }
+        File file = new File(Objects.requireNonNull(uri.getPath()));
+        return file.exists();
     }
 }
