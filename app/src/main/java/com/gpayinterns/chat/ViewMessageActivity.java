@@ -242,7 +242,7 @@ public class ViewMessageActivity extends AppCompatActivity
         List <Message> newMessage = new ArrayList<Message>();
         BitmapDrawable drawable = (BitmapDrawable)((ImageView) findViewById(R.id.send_image)).getDrawable();
         Bitmap bitmap = drawable.getBitmap();
-        newMessage.add(new Message( messageID,chatID,false,null, Long.toString(System.currentTimeMillis()),bitmap,fileUri,getFileName(fileUri),getMimeType(fileUri)));
+        newMessage.add(new Message( messageID,chatID,false,null, Long.toString(System.currentTimeMillis()),bitmap,fileUri,getFileName(fileUri),getMimeType(fileUri),"4 B"));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
         removeImageFromEditText();
@@ -659,6 +659,7 @@ public class ViewMessageActivity extends AppCompatActivity
         String text = null;
         String filename = null;
         String mimetype = null;
+        String filesize = null;
 
         if(message.has("TextContent"))
         {
@@ -672,8 +673,12 @@ public class ViewMessageActivity extends AppCompatActivity
         {
             mimetype = message.getString("FileType");
         }
+        if(message.has("FileSize"))
+        {
+            filesize = message.getString("FileSize");
+        }
         return new Message(messageID,chatID,received,text,
-                seconds+"000",null,null,filename,mimetype);
+                seconds+"000",null,null,filename,mimetype,filesize);
     }
 
     @Override

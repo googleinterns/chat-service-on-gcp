@@ -27,6 +27,7 @@
                 android:text="File: "
                 android:textColor="@android:color/white"/>
             <TextView
+                android:id="@+id/send_file_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="img1.jpg"
@@ -47,6 +48,7 @@
                 android:text="Size: "
                 android:textColor="@android:color/white"/>
             <TextView
+                android:id="@+id/send_file_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2.3 MB"

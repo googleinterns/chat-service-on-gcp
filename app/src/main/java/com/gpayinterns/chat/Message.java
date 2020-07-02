@@ -15,6 +15,7 @@ public class Message
     public Uri uri;
     public String fileName;
     public String mimeType;
+    public String fileSize;
 
     public Message()
     {
@@ -22,7 +23,7 @@ public class Message
     }
     public Message(String mMessageID,String mChatID, boolean mReceived,
                    String mText, String mSendTime, Bitmap mImage,
-                   Uri mUri, String mFileName, String mMimeType)
+                   Uri mUri, String mFileName, String mMimeType,String mFileSize)
     {
         messageID = mMessageID;
         chatID = mChatID;
@@ -33,5 +34,6 @@ public class Message
         uri = mUri;
         fileName = mFileName;
         mimeType = mMimeType;
+        fileSize = mFileSize;
     }
 }

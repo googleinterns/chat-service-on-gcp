@@ -1,17 +1,22 @@
 package com.gpayinterns.chat;
 
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gpayinterns.chat.R;
 
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -101,14 +106,21 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
-        Log.d("position","a"+position);
+        holder.mMessageID = mMessages.get(position).messageID;
+        holder.mMessageURI = mMessages.get(position).uri;
+        holder.mMimeType = mMessages.get(position).mimeType;
         if(mViewType<=1)//text
         {
             holder.mMessage.setText(mMessages.get(position).text);
         }
-        else//image
+        else if(mViewType<=3)//image
         {
             holder.mImage.setImageBitmap(mMessages.get(position).image);
+        }
+        else//richText
+        {
+            holder.mFileName.setText(mMessages.get(position).fileName);
+            holder.mFileSize.setText(mMessages.get(position).fileSize);
         }
         holder.mTime.setText(convertDate(mMessages.get(position).sendTime));
     }
@@ -125,6 +137,11 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         public final TextView mMessage;
         public final TextView mTime;
         public final ImageView mImage;
+        public final TextView mFileName;
+        public final TextView mFileSize;
+        public String mMessageID;
+        public Uri mMessageURI;
+        public String mMimeType;
         public ViewHolder(@NonNull View itemView)
         {
             super(itemView);
@@ -133,12 +150,35 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                 mMessage = (TextView) itemView.findViewById(R.id.receive_message_text);
                 mImage = (ImageView) itemView.findViewById(R.id.receive_message_image);
                 mTime = (TextView) itemView.findViewById(R.id.time_receive_message_text);
+                mFileName = (TextView) itemView.findViewById(R.id.receive_file_name);
+                mFileSize = (TextView) itemView.findViewById(R.id.receive_file_size);
             }
             else
             {
                 mMessage = (TextView) itemView.findViewById(R.id.send_message_text);
                 mImage = (ImageView) itemView.findViewById(R.id.send_message_image);
                 mTime = (TextView) itemView.findViewById(R.id.time_send_message_text);
+                mFileName = (TextView) itemView.findViewById(R.id.send_file_name);
+                mFileSize = (TextView) itemView.findViewById(R.id.send_file_size);
+            }
+            if(mViewType==2 || mViewType==3)//image
+            {
+                itemView.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setDataAndType(mMessageURI, mMimeType);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        mContext.startActivity(intent);
+                    }
+                });
+            }
+            else if(mViewType==4 || mViewType==5)//richText
+            {
+
             }
         }
     }
