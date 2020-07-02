@@ -79,7 +79,12 @@ public final class SuccessResponseGenerator {
         messageForResponseBody.put("SentByCurrentUser", message.getSenderId() == userId);
         messageForResponseBody.put("SentTs", message.getSentTs());
         messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
-        messageForResponseBody.put("TextContent", message.getTextContent());
+
+        String textContent = message.getTextContent();
+
+        if (textContent != null) {
+            messageForResponseBody.put("TextContent", textContent);
+        }
 
         return messageForResponseBody;
     }
