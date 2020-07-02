@@ -1,14 +1,17 @@
 package com.gpayinterns.chat;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.OpenableColumns;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -97,6 +101,9 @@ public class ViewMessageActivity extends AppCompatActivity
     private Timer mTimer;
     private ProgressBar progressBar;
 
+    private String fileName;
+    private String mimeType;
+
     @Override
     protected void onPause()
     {
@@ -133,10 +140,7 @@ public class ViewMessageActivity extends AppCompatActivity
                 ImageView sendImage = (ImageView) findViewById(R.id.send_image);
                 if( sendImage.getDrawable()!=null)
                 {
-                    //TODO send image to server
                     sendImageToServer();
-                    addImageToScreen();
-//                    removeImageFromEditText();
                     hideSoftKeyboard();
                     return;
                 }
@@ -161,25 +165,11 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void sendImageToServer()
     {
-        ImageView sendImage = (ImageView) findViewById(R.id.send_image);
-        sendImage.invalidate();
-        BitmapDrawable drawable = (BitmapDrawable) sendImage.getDrawable();
-        Bitmap bitmap = drawable.getBitmap();
-        uploadBitmap(bitmap);
-
-
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-//        byte[] byteArray = byteArrayOutputStream .toByteArray();
-//
-//        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-    }
-    private void uploadBitmap(final Bitmap bitmap)
-    {
         String URL = BASE_URL + USERS
                 + "/" + currentUser + "/" + CHATS
                 + "/" + chatID + "/" + MESSAGES;
+        Log.d("chatID",chatID);
+        Log.d("UserId",currentUser);
         VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, URL,
                 new Response.Listener<NetworkResponse>()
                 {
@@ -187,11 +177,14 @@ public class ViewMessageActivity extends AppCompatActivity
                     public void onResponse(NetworkResponse response)
                     {
                         String resultResponse = new String(response.data);
+                        Log.d("ServerResponse",resultResponse);
                         try
                         {
                             JSONObject result = new JSONObject(resultResponse);
                             String message = result.getString("message");
                             Log.d("messageReceived",message);
+                            addImageToScreen(result.getString("MessageId"));
+                            removeImageFromEditText();
                         }
                         catch (JSONException e)
                         {
@@ -225,10 +218,15 @@ public class ViewMessageActivity extends AppCompatActivity
             protected Map<String, DataPart> getByteData()
             {
                 Map<String, DataPart> params = new HashMap<>();
-                long imageName = System.currentTimeMillis();
                 ImageView sendImage = (ImageView) findViewById(R.id.send_image);
-                params.put("file", new DataPart(imageName + ".png", AppHelper.getFileDataFromDrawable(getBaseContext(),sendImage.getDrawable()),"image/jpeg"));
+                params.put("file", new DataPart(fileName , AppHelper.getFileDataFromDrawable(getBaseContext(),sendImage.getDrawable()),mimeType));
                 return params;
+            }
+
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
             }
         };
 
@@ -241,13 +239,18 @@ public class ViewMessageActivity extends AppCompatActivity
         messageEditText.setVisibility(View.VISIBLE);
     }
 
-    private void addImageToScreen()
+    private void addImageToScreen(String messageID)
     {
+        if(messageIDSet.contains(messageID))
+        {
+            return;
+        }
+        messageIDSet.add(messageID);
         List <Message> newMessage = new ArrayList<Message>();
         ImageView sendImage = (ImageView) findViewById(R.id.send_image);
         BitmapDrawable drawable = (BitmapDrawable) sendImage.getDrawable();
         Bitmap bitmap = drawable.getBitmap();
-        newMessage.add(new Message("0",chatID,false,"", Long.toString(System.currentTimeMillis()),bitmap));
+        newMessage.add(new Message( messageID,chatID,false,"", Long.toString(System.currentTimeMillis()),bitmap));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }
@@ -378,6 +381,9 @@ public class ViewMessageActivity extends AppCompatActivity
         if(resultCode == RESULT_OK && requestCode == SELECT_PICTURE && data!=null)
         {
             Uri selectedImage = data.getData();
+            fileName = getFileName(selectedImage);
+            mimeType = getMimeType(selectedImage);
+            Log.d("selectedImageUri", Objects.requireNonNull(selectedImage.getPath()));
             ImageView sendImage = (ImageView) findViewById(R.id.send_image);
             sendImage.setImageURI(selectedImage);
             messageEditText.setVisibility(View.INVISIBLE);
@@ -620,6 +626,10 @@ public class ViewMessageActivity extends AppCompatActivity
 
     private void addMessageToScreen(String messageID)
     {
+        if(messageIDSet.contains(messageID))
+        {
+            return ;
+        }
         messageIDSet.add(messageID);
         lastMessageID = messageID;
         findViewById(R.id.view_message_constraint_layout).requestFocus();
@@ -633,7 +643,7 @@ public class ViewMessageActivity extends AppCompatActivity
     private void pickImage()
     {
         Intent intent = new Intent();
-        intent.setType("image/*");
+        intent.setType("*/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
     }
@@ -681,5 +691,50 @@ public class ViewMessageActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public String getFileName(Uri uri)
+    {
+        String result = null;
+        if (uri.getScheme().equals("content"))
+        {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try
+            {
+                if (cursor != null && cursor.moveToFirst())
+                {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            }
+            finally
+            {
+                cursor.close();
+            }
+        }
+        if (result == null)
+        {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1)
+            {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+    public String getMimeType(Uri uri)
+    {
+        String mimeType = null;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT))
+        {
+            ContentResolver cr = getApplicationContext().getContentResolver();
+            mimeType = cr.getType(uri);
+        }
+        else
+        {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension.toLowerCase());
+        }
+        return mimeType;
     }
 }
