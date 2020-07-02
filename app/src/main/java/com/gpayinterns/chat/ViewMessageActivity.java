@@ -149,16 +149,9 @@ public class ViewMessageActivity extends AppCompatActivity
                     hideSoftKeyboard();
                     return;
                 }
-                try
-                {
-                    sendMessageToServer(messageText);
-                    messageEditText.setText("");
-                    hideSoftKeyboard();
-                }
-                catch (JSONException e)
-                {
-                    e.printStackTrace();
-                }
+                sendMessageToServer(messageText);
+                messageEditText.setText("");
+                hideSoftKeyboard();
             }
         });
     }
@@ -184,7 +177,6 @@ public class ViewMessageActivity extends AppCompatActivity
                             String message = result.getString("message");
                             Log.d("messageReceived",message);
                             addImageToScreen(result.getString("MessageId"));
-                            removeImageFromEditText();
                         }
                         catch (JSONException e)
                         {
@@ -253,81 +245,80 @@ public class ViewMessageActivity extends AppCompatActivity
         newMessage.add(new Message( messageID,chatID,false,"", Long.toString(System.currentTimeMillis()),bitmap));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
+        removeImageFromEditText();
     }
 
-    private void sendMessageToServer(String messageText) throws JSONException
+    private void sendMessageToServer(final String messageText)
     {
         String URL = BASE_URL + USERS
                 + "/" + currentUser + "/" + CHATS
                 + "/" + chatID + "/" + MESSAGES;
 
-        JSONObject jsonBody = new JSONObject();
-        Log.d("messageText sent to server: ",messageText);
-        jsonBody.put("contentType", "text");
-        jsonBody.put("textContent",messageText);
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, URL,
+                new Response.Listener<NetworkResponse>()
                 {
-
-
                     @Override
-                    public void onResponse(JSONObject response)
+                    public void onResponse(NetworkResponse response)
                     {
-                        Log.d("ResponseMessage: " , response.toString());
+                        String resultResponse = new String(response.data);
+                        Log.d("ServerResponse",resultResponse);
+                        JSONObject result = null;
                         try
                         {
-                            String message = response.getString("message");
-                            if(message.equals("Success"))
-                            {
-                                String lastMessageID = response.getString("MessageId");
-                            }
+                            result = new JSONObject(resultResponse);
                         }
                         catch (JSONException e)
                         {
-                            Toast.makeText(getApplicationContext(), "Parse Error", Toast.LENGTH_SHORT).show();
-                            Log.d("JsonError: ",e.toString());
+                            e.printStackTrace();
+                        }
+                        try
+                        {
+                            String messageId = result.getString("message");
+                        }
+                        catch (JSONException e)
+                        {
                             e.printStackTrace();
                         }
                     }
-                }, new Response.ErrorListener()
+                },
+                new Response.ErrorListener()
                 {
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Log.d("errorMessage",error.toString());
-                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = "Unknown error";
+                        if (networkResponse == null)
                         {
-                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
-                        }
-                        else if(error instanceof ClientError)
-                        {
-                            String responseBody = null;
-                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                            JSONObject data = null;
-                            try
+                            if (error.getClass().equals(TimeoutError.class))
                             {
-                                data = new JSONObject(responseBody);
+                                errorMessage = "Request timeout";
                             }
-                            catch (JSONException e)
+                            else if (error.getClass().equals(NoConnectionError.class))
                             {
-                                e.printStackTrace();
+                                errorMessage = "Failed to connect server";
                             }
-
-                            assert data != null;
-                            String message = data.optString("Message");
-                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         }
+                        Log.d("Error", errorMessage);
+                        error.printStackTrace();
                     }
-                })
-        {
+                }) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String> params = new HashMap<>();
+                params.put("textContent", messageText);
+                return params;
+            }
+
             @Override
             public Priority getPriority()
             {
                 return Priority.IMMEDIATE;
             }
         };
-        VolleyController.getInstance(this).addToRequestQueueWithRetry(jsonObjectRequest);
+
+        Volley.newRequestQueue(this).add(volleyMultipartRequest);
     }
 
     private void getCurrentUser()
