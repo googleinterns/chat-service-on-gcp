@@ -18,13 +18,14 @@ import users
 import sys
 import configparser
 import pandas as pd
+import numpy as np
 import concurrent.futures
 import time
 from datetime import datetime, timedelta
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-file_names = config['FILE NAMES']
+file_names = config['File Names']
 
 
 class ProcessInput:
@@ -107,10 +108,7 @@ class ProcessInput:
             5. createChat
             6. createMessage
         """
-        distribution = []
-        for weight in self.input_args[3:self.input_args_len - 1]:
-            distribution.append(weight / self.total_weight_without_signup)
-        return distribution
+        return (np.array(self.input_args[3:self.input_args_len - 1])/self.total_weight_without_signup).tolist()
 
 
 def get_all_users():
