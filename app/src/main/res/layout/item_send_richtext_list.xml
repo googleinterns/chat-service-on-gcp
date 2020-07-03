@@ -64,6 +64,14 @@
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp">
 
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:visibility="gone"
+                android:layout_width="22dp"
+                android:layout_height="wrap_content"
+                style="@android:style/Widget.Material.ProgressBar"
+                android:indeterminateOnly="true"
+                android:indeterminateTint="#FFFFFF" />
             <Button
                 android:id="@+id/download_button"
                 android:layout_width="wrap_content"

@@ -20,20 +20,7 @@ public class OpenHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        db.execSQL(DatabaseContract.userEntry.SQL_CREATE_TABLE);
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_TABLE);
-        db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_TABLE);
-
-        db.execSQL(DatabaseContract.userEntry.SQL_CREATE_INDEX1);
-
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_INDEX1);
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_INDEX2);
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_INDEX3);
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_INDEX4);
-
-        db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_INDEX1);
-        db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_INDEX2);
-        db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_INDEX3);
+        db.execSQL(DatabaseContract.BlobEntry.SQL_CREATE_TABLE);
     }
 
     @Override

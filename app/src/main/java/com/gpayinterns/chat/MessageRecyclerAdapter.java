@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.text.format.DateFormat;
 import android.util.Base64;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static androidx.core.content.FileProvider.getUriForFile;
 import static com.gpayinterns.chat.ServerConstants.BASE_URL;
 import static com.gpayinterns.chat.ServerConstants.CHATS;
 import static com.gpayinterns.chat.ServerConstants.END_MESSAGE;
@@ -55,6 +58,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     private final LayoutInflater mLayoutInflater;
     private List<Message> mMessages;
     private int mViewType;
+    private String mPath;
 
     //mViewType 0: left side text
     //mViewType 1: right side text
@@ -168,7 +172,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         public String mChatID;
         public Uri mMessageURI;
         public String mMimeType;
-        public ViewHolder(@NonNull View itemView)
+        public ViewHolder(@NonNull final View itemView)
         {
             super(itemView);
             if(mViewType%2==0)//received
@@ -212,15 +216,15 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                     @Override
                     public void onClick(View v)
                     {
-                        /**
-                         * TODO
-                         * 1. download via getAttachment API
-                         * 2. store into device storage
-                         * 3. store Uri info in SQLite
-                         **/
-                        if(!uriExists(mMessageURI))
+                        ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
+                        if(fileExists(mMessageURI,mMessageID))
                         {
-                            getAttachmentFromServer(mChatID, mMessageID,mFileName.getText().toString());
+                            Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            progressBar.setVisibility(View.VISIBLE);
+                            getAttachmentFromServer(mChatID, mMessageID,mFileName.getText().toString(),progressBar);
                         }
 
                     }
@@ -231,17 +235,21 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                     @Override
                     public void onClick(View v)
                     {
-                        if(!uriExists(mMessageURI))
+                        if(fileExists(mMessageURI,mMessageID))
                         {
-                            Toast.makeText(mContext, "File is not present in storage", Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
+                            if(mMessageURI == null)
+                            {
+                                mMessageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File (mPath));
+                            }
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_VIEW);
                             intent.setDataAndType(mMessageURI, mMimeType);
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             mContext.startActivity(intent);
+                        }
+                        else
+                        {
+                            Toast.makeText(mContext, "File not present in storage", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -286,17 +294,36 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         return "      "+DateFormat.format("hh:mm a", Long.parseLong(dateInMilliseconds)).toString();
     }
 
-    private boolean uriExists(Uri uri)
+    /**
+     *
+     * @param uri
+     * @param messageID
+     * @return true if either the Uri leads to a valid file or the path obtained from cache is valid, else false
+     */
+    private boolean fileExists(Uri uri, String messageID)
     {
+        String path = null;
         if(uri == null)
         {
-            return false;
+            OpenHelper dbOpenHelper = new OpenHelper(mContext);
+            path = DataManager.getFromDatabase(dbOpenHelper,messageID);
+            dbOpenHelper.close();
+            mPath = path;
+            if(path == null)
+            {
+                return false;
+            }
         }
-        File file = new File(Objects.requireNonNull(uri.getPath()));
+        else
+        {
+            path = uri.getPath();
+        }
+        assert path != null;
+        File file = new File(path);
         return file.exists();
     }
 
-    private void getAttachmentFromServer(String chatID, String messageID, final String fileName)
+    private void getAttachmentFromServer(String chatID, final String messageID, final String fileName, final ProgressBar progressBar)
     {
         SharedPreferences mPrefs= mContext.getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
         String currentUser = mPrefs.getString("currentUser","");
@@ -312,11 +339,12 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                     @Override
                     public void onResponse(JSONObject response)
                     {
+                        progressBar.setVisibility(View.GONE);
                         Log.d("ResponseMessage:" , response.toString());
                         try
                         {
                             String base64String = response.getString("Blob");
-                            storeFile(base64String,fileName);
+                            storeFile(messageID,base64String,fileName);
                         }
                         catch (JSONException | IOException e)
                         {
@@ -339,15 +367,32 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
             }
         };
 
-        VolleyController.getInstance(mContext).addToRequestQueueWithRetry(jsonObjectRequest);
+        VolleyController.getInstance(mContext).addToRequestQueue(jsonObjectRequest);
     }
 
-    private void storeFile(String base, String fileName) throws IOException
+    private void storeFile(String messageID,String base, String fileName) throws IOException
     {
         String filePath = mContext.getFilesDir().getAbsolutePath() + "/" + fileName;
         FileOutputStream fos = new FileOutputStream(filePath);
         fos.write(Base64.decode(base,Base64.NO_WRAP));
         fos.close();
+
+        new UpdateCache().execute(messageID,filePath);
         Log.d("path","file saved to:"+filePath);
+    }
+
+    class UpdateCache extends AsyncTask<String, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(String... strings)
+        {
+            String messageID = strings[0];
+            String filePath = strings[1];
+            OpenHelper dbOpenHelper = new OpenHelper(mContext);
+            DataManager.loadToDatabase(dbOpenHelper,messageID,filePath);
+            dbOpenHelper.close();
+            Log.d("database","written to DB");
+            return null;
+        }
     }
 }

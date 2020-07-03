@@ -124,6 +124,7 @@ public class ViewMessageActivity extends AppCompatActivity
         getCurrentUser();
         messageEditText=(EditText)findViewById(R.id.send_message_text);
         progressBar = (ProgressBar) findViewById(R.id.view_message_indeterminateBar);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.view_message_swipe_refresh);
 
         Objects.requireNonNull(getSupportActionBar()).setTitle(getIntent().getStringExtra(CONTACT_USERNAME));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
