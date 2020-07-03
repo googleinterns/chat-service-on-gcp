@@ -4,8 +4,11 @@ package com.gpayinterns.chat;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Environment;
 import android.text.format.DateFormat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,11 +19,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.gpayinterns.chat.R;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +38,16 @@ import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.gpayinterns.chat.Message;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import static com.gpayinterns.chat.ServerConstants.BASE_URL;
+import static com.gpayinterns.chat.ServerConstants.CHATS;
+import static com.gpayinterns.chat.ServerConstants.END_MESSAGE;
+import static com.gpayinterns.chat.ServerConstants.MESSAGES;
+import static com.gpayinterns.chat.ServerConstants.USERS;
 
 public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecyclerAdapter.ViewHolder>
 {
@@ -111,6 +131,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
         holder.mMessageID = mMessages.get(position).messageID;
+        holder.mChatID = mMessages.get(position).chatID;
         holder.mMessageURI = mMessages.get(position).uri;
         holder.mMimeType = mMessages.get(position).mimeType;
         if(mViewType<=1)//text
@@ -144,6 +165,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         public final TextView mFileName;
         public final TextView mFileSize;
         public String mMessageID;
+        public String mChatID;
         public Uri mMessageURI;
         public String mMimeType;
         public ViewHolder(@NonNull View itemView)
@@ -192,12 +214,15 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                     {
                         /**
                          * TODO
-                         * download via getAttachment API
-                         * convert it into bitmap
-                         * set image in the message
-                         * store into device storage
-                         * set uriType in message
-                          **/
+                         * 1. download via getAttachment API
+                         * 2. store into device storage
+                         * 3. store Uri info in SQLite
+                         **/
+                        if(!uriExists(mMessageURI))
+                        {
+                            getAttachmentFromServer(mChatID, mMessageID,mFileName.getText().toString());
+                        }
+
                     }
                 });
 
@@ -269,5 +294,60 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         }
         File file = new File(Objects.requireNonNull(uri.getPath()));
         return file.exists();
+    }
+
+    private void getAttachmentFromServer(String chatID, String messageID, final String fileName)
+    {
+        SharedPreferences mPrefs= mContext.getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
+        String currentUser = mPrefs.getString("currentUser","");
+
+        String URL = BASE_URL + USERS +
+                "/" + currentUser + "/" +
+                CHATS + "/" + chatID + "/" +
+                MESSAGES + "/" + messageID + "/attachments";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
+                {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        Log.d("ResponseMessage:" , response.toString());
+                        try
+                        {
+                            String base64String = response.getString("Blob");
+                            storeFile(base64String,fileName);
+                        }
+                        catch (JSONException | IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        // TODO: Handle error
+
+                    }
+                }){
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
+            }
+        };
+
+        VolleyController.getInstance(mContext).addToRequestQueueWithRetry(jsonObjectRequest);
+    }
+
+    private void storeFile(String base, String fileName) throws IOException
+    {
+        String filePath = mContext.getFilesDir().getAbsolutePath() + "/" + fileName;
+        FileOutputStream fos = new FileOutputStream(filePath);
+        fos.write(Base64.decode(base,Base64.NO_WRAP));
+        fos.close();
+        Log.d("path","file saved to:"+filePath);
     }
 }

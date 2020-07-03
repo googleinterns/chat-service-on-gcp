@@ -65,6 +65,7 @@
             android:layout_marginEnd="5dp">
 
             <Button
+                android:id="@+id/download_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#228B22"
@@ -74,6 +75,7 @@
                 android:drawableLeft="@drawable/baseline_cloud_download_white_18dp"/>
 
             <Button
+                android:id="@+id/view_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#228B22"
