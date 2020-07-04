@@ -54,7 +54,12 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -193,14 +198,13 @@ public class ViewMessageActivity extends AppCompatActivity
                             Log.d("messageReceived",message);
                             String messageID = result.getString("MessageId");
                             String mimeType = getMimeType(fileUri);
-                            String path = getRealPathFromURI(fileUri);
+                            String fileName = getFileName(fileUri);
 
-                            File f = new File(Objects.requireNonNull(fileUri.getPath()));
-                            String size = Long.toString(f.length());
-
+                            String path = ViewMessageActivity.this.getFilesDir().getAbsolutePath() + "/" + fileName;
+                            copyFileToLocalCache(fileUri.getPath(),path);
                             new UpdateCache().execute(messageID,path);
                         }
-                        catch (JSONException | URISyntaxException e)
+                        catch (JSONException e)
                         {
                             e.printStackTrace();
                         }
@@ -248,6 +252,36 @@ public class ViewMessageActivity extends AppCompatActivity
         };
 
         VolleyController.getInstance(this).addToRequestQueue(volleyMultipartRequest);
+    }
+
+    private void copyFileToLocalCache(String inputPath,String outputPath)
+    {
+        ContentResolver resolver = getApplicationContext()
+                .getContentResolver();
+        try (InputStream in = resolver.openInputStream(fileUri))
+        {
+            File dir = new File (outputPath);
+            if (!dir.exists())
+            {
+                dir.mkdirs();
+            }
+            OutputStream out = new FileOutputStream(outputPath);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1)
+            {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            // write the output file
+            out.flush();
+            out.close();
+            Log.d("database","files copied to desired location");
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void addImageToScreen(String messageID)
