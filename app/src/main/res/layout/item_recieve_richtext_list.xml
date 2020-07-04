@@ -25,7 +25,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="File: "
-                android:textColor="@android:color/white"/>
+                android:textColor="@android:color/white"
+                android:textStyle="bold"/>
             <TextView
                 android:id="@+id/receive_file_name"
                 android:layout_width="wrap_content"
@@ -46,7 +47,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Size: "
-                android:textColor="@android:color/white"/>
+                android:textColor="@android:color/white"
+                android:textStyle="bold"/>
             <TextView
                 android:id="@+id/receive_file_size"
                 android:layout_width="wrap_content"
@@ -64,6 +66,13 @@
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp">
 
+            <ImageView
+                android:id="@+id/done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_done_white_24dp"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
             <ProgressBar
                 android:id="@+id/progress_bar"
                 android:visibility="gone"

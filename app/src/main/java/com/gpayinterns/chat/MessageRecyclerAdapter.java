@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.text.format.DateFormat;
 import android.util.Base64;
@@ -36,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -217,6 +220,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                     public void onClick(View v)
                     {
                         ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
+                        ImageView done = (ImageView) itemView.findViewById(R.id.done);
                         if(fileExists(mMessageURI,mMessageID))
                         {
                             Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT).show();
@@ -224,7 +228,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                         else
                         {
                             progressBar.setVisibility(View.VISIBLE);
-                            getAttachmentFromServer(mChatID, mMessageID,mFileName.getText().toString(),progressBar);
+                            getAttachmentFromServer(mChatID, mMessageID,mFileName.getText().toString(),progressBar,done);
                         }
 
                     }
@@ -323,7 +327,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         return file.exists();
     }
 
-    private void getAttachmentFromServer(String chatID, final String messageID, final String fileName, final ProgressBar progressBar)
+    private void getAttachmentFromServer(String chatID, final String messageID, final String fileName, final ProgressBar progressBar,final ImageView done)
     {
         SharedPreferences mPrefs= mContext.getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
         String currentUser = mPrefs.getString("currentUser","");
@@ -345,6 +349,19 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                         {
                             String base64String = response.getString("Blob");
                             storeFile(messageID,base64String,fileName);
+                            done.setVisibility(View.VISIBLE);
+                            new CountDownTimer(2000, 1000)
+                            {
+                                @Override
+                                public void onTick(long millisUntilFinished)
+                                {
+                                }
+                                @Override
+                                public void onFinish()
+                                {
+                                    done.setVisibility(View.GONE);
+                                }
+                            }.start();
                         }
                         catch (JSONException | IOException e)
                         {

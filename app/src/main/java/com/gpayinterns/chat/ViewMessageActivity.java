@@ -1,29 +1,40 @@
 package com.gpayinterns.chat;
 
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -42,6 +53,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +71,7 @@ import java.util.TimerTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.PathUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -128,8 +144,12 @@ public class ViewMessageActivity extends AppCompatActivity
 
         Objects.requireNonNull(getSupportActionBar()).setTitle(getIntent().getStringExtra(CONTACT_USERNAME));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        fileUri = null;
 
         initializeDisplayContent();
+        chatID = getIntent().getStringExtra(CHAT_ID);
+        lastMessageID = getIntent().getStringExtra(LAST_MESSAGE_ID);
+
         final Button button = findViewById(R.id.send_message_button);
         button.setOnClickListener(new View.OnClickListener()
         {
@@ -137,13 +157,6 @@ public class ViewMessageActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 String messageText = messageEditText.getText().toString().trim();
-                ImageView sendImage = (ImageView) findViewById(R.id.send_image);
-                if( sendImage.getDrawable()!=null)
-                {
-                    sendImageToServer();
-                    hideSoftKeyboard();
-                    return;
-                }
                 if(messageText.equals(""))
                 {
                     hideSoftKeyboard();
@@ -156,7 +169,7 @@ public class ViewMessageActivity extends AppCompatActivity
         });
     }
 
-    private void sendImageToServer()
+    private void sendFileToServer()
     {
         String URL = BASE_URL + USERS
                 + "/" + currentUser + "/" + CHATS
@@ -176,9 +189,16 @@ public class ViewMessageActivity extends AppCompatActivity
                             JSONObject result = new JSONObject(resultResponse);
                             String message = result.getString("message");
                             Log.d("messageReceived",message);
-                            addImageToScreen(result.getString("MessageId"));
+                            String messageID = result.getString("MessageId");
+                            String mimeType = getMimeType(fileUri);
+                            String path = getRealPathFromURI(fileUri);
+
+                            File f = new File(Objects.requireNonNull(fileUri.getPath()));
+                            String size = Long.toString(f.length());
+
+                            new UpdateCache().execute(messageID,path);
                         }
-                        catch (JSONException e)
+                        catch (JSONException | URISyntaxException e)
                         {
                             e.printStackTrace();
                         }
@@ -207,13 +227,14 @@ public class ViewMessageActivity extends AppCompatActivity
                     }
                 }) {
             @Override
-            protected Map<String, DataPart> getByteData()
+            protected Map<String, DataPart> getByteData() throws IOException
             {
                 Map<String, DataPart> params = new HashMap<>();
-                ImageView sendImage = (ImageView) findViewById(R.id.send_image);
                 String fileName = getFileName(fileUri);
                 String mimeType = getMimeType(fileUri);
-                params.put("file", new DataPart(fileName , AppHelper.getFileDataFromDrawable(getBaseContext(),sendImage.getDrawable()),mimeType));
+                byte [] array = AppHelper.getBytes(ViewMessageActivity.this,fileUri);
+
+                params.put("file", new DataPart(fileName , array,mimeType));
                 return params;
             }
 
@@ -226,12 +247,6 @@ public class ViewMessageActivity extends AppCompatActivity
 
         VolleyController.getInstance(this).addToRequestQueue(volleyMultipartRequest);
     }
-    private void removeImageFromEditText()
-    {
-        ImageView sendImage = (ImageView) findViewById(R.id.send_image);
-        sendImage.setImageDrawable(null);
-        messageEditText.setVisibility(View.VISIBLE);
-    }
 
     private void addImageToScreen(String messageID)
     {
@@ -241,12 +256,18 @@ public class ViewMessageActivity extends AppCompatActivity
         }
         messageIDSet.add(messageID);
         List <Message> newMessage = new ArrayList<Message>();
-        BitmapDrawable drawable = (BitmapDrawable)((ImageView) findViewById(R.id.send_image)).getDrawable();
-        Bitmap bitmap = drawable.getBitmap();
+
+        //TODO get bitmap from Uri
+
+        Bitmap bitmap=null;
         newMessage.add(new Message( messageID,chatID,false,null, Long.toString(System.currentTimeMillis()),bitmap,fileUri,getFileName(fileUri),getMimeType(fileUri),"4 B"));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
-        removeImageFromEditText();
+    }
+
+    private void addFileToScreen(String messageID)
+    {
+        //TODO
     }
 
     private void sendMessageToServer(final String messageText)
@@ -370,12 +391,8 @@ public class ViewMessageActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK && requestCode == SELECT_FILE && data!=null)
         {
-            Uri selectedImage = data.getData();
-            Log.d("selectedImageUri", Objects.requireNonNull(selectedImage.getPath()));
-            ImageView sendImage = (ImageView) findViewById(R.id.send_image);
-            sendImage.setImageURI(selectedImage);
-            messageEditText.setVisibility(View.INVISIBLE);
-            fileUri=selectedImage;
+            fileUri = data.getData();
+            showFileDialog();
         }
     }
 
@@ -452,11 +469,6 @@ public class ViewMessageActivity extends AppCompatActivity
         active=true;
 
         findViewById(R.id.view_message_constraint_layout).requestFocus();
-        chatID = getIntent().getStringExtra(CHAT_ID);
-        lastMessageID = getIntent().getStringExtra(LAST_MESSAGE_ID);
-
-        messageIDSet.clear();
-        messages.clear();
 
         hideSoftKeyboard();
         firstReceiveMessageFromServer();
@@ -481,6 +493,15 @@ public class ViewMessageActivity extends AppCompatActivity
             }
         };
         mTimer.schedule(task, 0, 5000);//runs it every 5 seconds;
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+//        messageIDSet.clear();
+//        messages.clear();
+        Runtime.getRuntime().gc();
     }
 
     private void firstReceiveMessageFromServer()
@@ -692,7 +713,7 @@ public class ViewMessageActivity extends AppCompatActivity
         // Handle item selection
         switch (item.getItemId())
         {
-            case R.id.menu_send_image:
+            case R.id.menu_send_file:
                 pickFile();
                 return true;
             default:
@@ -743,5 +764,96 @@ public class ViewMessageActivity extends AppCompatActivity
             mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension.toLowerCase());
         }
         return mimeType;
+    }
+    class UpdateCache extends AsyncTask<String, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(String... strings)
+        {
+            String messageID = strings[0];
+            String filePath = strings[1];
+            OpenHelper dbOpenHelper = new OpenHelper(ViewMessageActivity.this);
+            DataManager.loadToDatabase(dbOpenHelper,messageID,filePath);
+            dbOpenHelper.close();
+            return null;
+        }
+    }
+    private String getRealPathFromURI(Uri uri) throws URISyntaxException
+    {
+
+        //TODO
+        return "";
+//        return new FileUtils(this).getPath(uri);
+    }
+
+    public void showFileDialog()
+    {
+        final Dialog builder = new Dialog(this, android.R.style.Theme_Light);
+        builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        Objects.requireNonNull(builder.getWindow()).setBackgroundDrawable(
+                new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        builder.setContentView(R.layout.dialog);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView= inflater.inflate(R.layout.dialog, null);
+        builder.setContentView(dialogView);
+
+        if(getMimeType(fileUri).startsWith("image"))
+        {
+            builder.getWindow().setBackgroundDrawableResource(android.R.color.black);
+            ImageView imageView = dialogView.findViewById(R.id.send_image);
+            imageView.setImageURI(fileUri);
+            imageView.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            builder.getWindow().setBackgroundDrawableResource(android.R.color.white);
+            TextView fileNameLabel = dialogView.findViewById(R.id.file_name_text_view);
+            TextView fileName = dialogView.findViewById(R.id.file_name);
+            TextView fileSizeLabel = dialogView.findViewById(R.id.file_size_text_view);
+            TextView fileSize = dialogView.findViewById(R.id.file_size);
+
+            fileNameLabel.setVisibility(View.VISIBLE);
+            fileName.setVisibility(View.VISIBLE);
+            fileSizeLabel.setVisibility(View.VISIBLE);
+            fileSize.setVisibility(View.VISIBLE);
+
+            File f = new File(Objects.requireNonNull(fileUri.getPath()));
+
+            fileName.setText(getFileName(fileUri));
+            fileSize.setText(Long.toString(f.length()));
+        }
+        Button sendButton = dialogView.findViewById(R.id.send_message_button);
+        Button closeButton = dialogView.findViewById(R.id.close_button);
+        sendButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                sendFileToServer();
+                builder.dismiss();
+            }
+        });
+        closeButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                builder.dismiss();
+            }
+        });
+        builder.setOnKeyListener(new Dialog.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event)
+            {
+                if (keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                    builder.dismiss();
+                }
+                return true;
+            }
+        });
+        builder.show();
     }
 }
