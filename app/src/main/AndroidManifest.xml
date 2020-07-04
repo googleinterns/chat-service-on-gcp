@@ -42,11 +42,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths"/>
         </provider>
-<!--        <provider-->
-<!--            android:name="com.gpayinterns.chat.ChatContentProvider"-->
-<!--            android:authorities="com.gpayinterns.chat.provider"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="true" />-->
     </application>
 
 </manifest>

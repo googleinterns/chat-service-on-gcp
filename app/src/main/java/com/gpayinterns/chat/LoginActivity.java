@@ -21,13 +21,6 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +47,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText usernameEditText;
     private EditText passwordEditText;
     private String currentUser;
-    private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_GOOGLE_SIGN_IN = 9001;
     private static final String TAG = "SignInActivity";
     private static final String EMAIL = "email";
@@ -83,25 +75,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         passwordEditText = findViewById(R.id.input_password);
         //Buttons
         findViewById(R.id.login_button).setOnClickListener(this);
-        findViewById(R.id.google_sign_in_button).setOnClickListener(this);
         findViewById(R.id.new_user_register).setOnClickListener(this);
         findViewById(R.id.forgot_password).setOnClickListener(this);
-
-        googleLogin();
     }
-
-    private void googleLogin()
-    {
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        SignInButton signInButton = findViewById(R.id.google_sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setColorScheme(SignInButton.COLOR_LIGHT);
-    }
-
 
     private void getCurrentUser()
     {
@@ -174,16 +150,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     e.printStackTrace();
                 }
                 break;
-            case R.id.google_sign_in_button:
-                signInWithGoogle();
-                break;
         }
-    }
-
-    private void signInWithGoogle()
-    {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
     }
 
     private void shakeLoginButton()
@@ -310,43 +277,5 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mBackPressed = System.currentTimeMillis();
 
-    }
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null)
-        {
-
-            //TODO login after sending tokenID to the backend server.
-            String Email = account.getDisplayName();
-            Log.d("userEmail: ",Email);
-        }
-    }
-
-    @Override
-    public void onActivityResult ( int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_GOOGLE_SIGN_IN)
-        {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-
-    private void handleSignInResult (Task < GoogleSignInAccount > completedTask)
-    {
-        try
-        {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            Log.d("LoginActivity", "Signed In with Google");
-        }
-        catch (ApiException e)
-        {
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-        }
     }
 }

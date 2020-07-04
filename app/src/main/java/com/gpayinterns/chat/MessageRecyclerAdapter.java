@@ -139,7 +139,6 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     {
         holder.mMessageID = mMessages.get(position).messageID;
         holder.mChatID = mMessages.get(position).chatID;
-        holder.mMessageURI = mMessages.get(position).uri;
         holder.mMimeType = mMessages.get(position).mimeType;
         if(mViewType<=1)//text
         {
@@ -173,7 +172,6 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         public final TextView mFileSize;
         public String mMessageID;
         public String mChatID;
-        public Uri mMessageURI;
         public String mMimeType;
         public ViewHolder(@NonNull final View itemView)
         {
@@ -201,9 +199,11 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                     @Override
                     public void onClick(View v)
                     {
+                        fileExists(mMessageID);
+                        Uri messageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File (mPath));;
                         Intent intent = new Intent();
                         intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(mMessageURI, mMimeType);
+                        intent.setDataAndType(messageURI, mMimeType);
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         mContext.startActivity(intent);
                     }
@@ -221,7 +221,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                     {
                         ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
                         ImageView done = (ImageView) itemView.findViewById(R.id.done);
-                        if(fileExists(mMessageURI,mMessageID))
+                        if(fileExists(mMessageID))
                         {
                             Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT).show();
                         }
@@ -239,15 +239,12 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                     @Override
                     public void onClick(View v)
                     {
-                        if(fileExists(mMessageURI,mMessageID))
+                        if(fileExists(mMessageID))
                         {
-                            if(mMessageURI == null)
-                            {
-                                mMessageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File (mPath));
-                            }
+                            Uri messageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File (mPath));
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_VIEW);
-                            intent.setDataAndType(mMessageURI, mMimeType);
+                            intent.setDataAndType(messageURI, mMimeType);
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             mContext.startActivity(intent);
                         }
@@ -300,29 +297,20 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
 
     /**
      *
-     * @param uri
      * @param messageID
      * @return true if either the Uri leads to a valid file or the path obtained from cache is valid, else false
      */
-    private boolean fileExists(Uri uri, String messageID)
+    private boolean fileExists(String messageID)
     {
         String path = null;
-        if(uri == null)
+        OpenHelper dbOpenHelper = new OpenHelper(mContext);
+        path = DataManager.getFromDatabase(dbOpenHelper,messageID);
+        dbOpenHelper.close();
+        if(path == null)
         {
-            OpenHelper dbOpenHelper = new OpenHelper(mContext);
-            path = DataManager.getFromDatabase(dbOpenHelper,messageID);
-            dbOpenHelper.close();
-            mPath = path;
-            if(path == null)
-            {
-                return false;
-            }
+            return false;
         }
-        else
-        {
-            path = uri.getPath();
-        }
-        assert path != null;
+        mPath = path;
         File file = new File(path);
         return file.exists();
     }
@@ -394,22 +382,13 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         fos.write(Base64.decode(base,Base64.NO_WRAP));
         fos.close();
 
-        new UpdateCache().execute(messageID,filePath);
+        updateCache(messageID,filePath);
         Log.d("path","file saved to:"+filePath);
     }
-
-    class UpdateCache extends AsyncTask<String, Void, Void>
+    private void updateCache(String messageID, String filePath)
     {
-        @Override
-        protected Void doInBackground(String... strings)
-        {
-            String messageID = strings[0];
-            String filePath = strings[1];
-            OpenHelper dbOpenHelper = new OpenHelper(mContext);
-            DataManager.loadToDatabase(dbOpenHelper,messageID,filePath);
-            dbOpenHelper.close();
-            Log.d("database","written to DB");
-            return null;
-        }
+        OpenHelper dbOpenHelper = new OpenHelper(mContext);
+        DataManager.loadToDatabase(dbOpenHelper,messageID,filePath);
+        dbOpenHelper.close();
     }
 }

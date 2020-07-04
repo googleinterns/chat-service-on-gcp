@@ -71,6 +71,8 @@ import java.util.TimerTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.PathUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -260,7 +262,7 @@ public class ViewMessageActivity extends AppCompatActivity
         //TODO get bitmap from Uri
 
         Bitmap bitmap=null;
-        newMessage.add(new Message( messageID,chatID,false,null, Long.toString(System.currentTimeMillis()),bitmap,fileUri,getFileName(fileUri),getMimeType(fileUri),"4 B"));
+        newMessage.add(new Message( messageID,chatID,false,null, Long.toString(System.currentTimeMillis()),bitmap,getFileName(fileUri),getMimeType(fileUri),"4 B"));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }
@@ -643,7 +645,7 @@ public class ViewMessageActivity extends AppCompatActivity
         lastMessageID = messageID;
         findViewById(R.id.view_message_constraint_layout).requestFocus();
         List <Message> newMessage = new ArrayList<Message>();
-        newMessage.add(new Message(messageID,chatID,false,messageText,Long.toString(System.currentTimeMillis()),null,null,null,null,null));
+        newMessage.add(new Message(messageID,chatID,false,messageText,Long.toString(System.currentTimeMillis()),null,null,null,null));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }
@@ -696,7 +698,7 @@ public class ViewMessageActivity extends AppCompatActivity
             filesize = message.getString("FileSize");
         }
         return new Message(messageID,chatID,received,text,
-                seconds+"000",null,null,filename,mimetype,filesize);
+                seconds+"000",null,filename,mimetype,filesize);
     }
 
     @Override
@@ -807,7 +809,12 @@ public class ViewMessageActivity extends AppCompatActivity
         }
         else
         {
-            builder.getWindow().setBackgroundDrawableResource(android.R.color.white);
+            builder.getWindow().setBackgroundDrawableResource(android.R.color.black);
+            ConstraintLayout constraintLayout = dialogView.findViewById(R.id.send_rich_text_constraint_layout);
+            constraintLayout.setBackground(ContextCompat.getDrawable(dialogView.getContext(),R.drawable.image_border));
+            Button closeButton = dialogView.findViewById(R.id.close_button);
+            closeButton.setBackgroundResource(R.drawable.baseline_close_black_24dp);
+
             TextView fileNameLabel = dialogView.findViewById(R.id.file_name_text_view);
             TextView fileName = dialogView.findViewById(R.id.file_name);
             TextView fileSizeLabel = dialogView.findViewById(R.id.file_size_text_view);
