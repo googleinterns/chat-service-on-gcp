@@ -1,5 +1,7 @@
 package com.gpayinterns.chat;
 
+import android.util.Log;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -223,8 +225,9 @@ public class VolleyMultipartRequest extends Request<NetworkResponse>
         ByteArrayInputStream fileInputStream = new ByteArrayInputStream(dataFile.getContent());
         int bytesAvailable = fileInputStream.available();
 
-        int maxBufferSize = 1024 * 1024;
+        int maxBufferSize = 1024 * 1024 * 25;
         int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+        Log.d("database",Integer.toString(bufferSize) + " "+Integer.toString(maxBufferSize) +" "+Integer.toString(bytesAvailable));
         byte[] buffer = new byte[bufferSize];
 
         int bytesRead = fileInputStream.read(buffer, 0, bufferSize);

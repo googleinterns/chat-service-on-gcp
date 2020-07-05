@@ -220,8 +220,6 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
                 {
-
-
                     @Override
                     public void onResponse(JSONObject response)
                     {

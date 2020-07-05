@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
@@ -200,9 +203,9 @@ public class ViewMessageActivity extends AppCompatActivity
                             String mimeType = getMimeType(fileUri);
                             String fileName = getFileName(fileUri);
 
-                            String path = ViewMessageActivity.this.getFilesDir().getAbsolutePath() + "/" + fileName;
-                            copyFileToLocalCache(fileUri.getPath(),path);
-                            new UpdateCache().execute(messageID,path);
+                            String outputPath = ViewMessageActivity.this.getFilesDir().getAbsolutePath() + "/" + fileName;
+//                            copyFileToLocalCache(outputPath);
+//                            new UpdateCache().execute(messageID,outputPath);
                         }
                         catch (JSONException e)
                         {
@@ -254,8 +257,10 @@ public class ViewMessageActivity extends AppCompatActivity
         VolleyController.getInstance(this).addToRequestQueue(volleyMultipartRequest);
     }
 
-    private void copyFileToLocalCache(String inputPath,String outputPath)
+    private void copyFileToLocalCache(String outputPath)
     {
+        File source = new File(fileUri.getPath());
+
         ContentResolver resolver = getApplicationContext()
                 .getContentResolver();
         try (InputStream in = resolver.openInputStream(fileUri))
@@ -428,7 +433,14 @@ public class ViewMessageActivity extends AppCompatActivity
         if(resultCode == RESULT_OK && requestCode == SELECT_FILE && data!=null)
         {
             fileUri = data.getData();
-            showFileDialog();
+            try
+            {
+                showFileDialog();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -535,8 +547,6 @@ public class ViewMessageActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
-//        messageIDSet.clear();
-//        messages.clear();
         Runtime.getRuntime().gc();
     }
 
@@ -814,16 +824,8 @@ public class ViewMessageActivity extends AppCompatActivity
             return null;
         }
     }
-    private String getRealPathFromURI(Uri uri) throws URISyntaxException
-    {
 
-        //TODO
-        return "";
-//        return new FileUtils(this).getPath(uri);
-    }
-
-    public void showFileDialog()
-    {
+    public void showFileDialog() throws IOException {
         final Dialog builder = new Dialog(this, android.R.style.Theme_Light);
         builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
         Objects.requireNonNull(builder.getWindow()).setBackgroundDrawable(
@@ -833,22 +835,15 @@ public class ViewMessageActivity extends AppCompatActivity
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView= inflater.inflate(R.layout.dialog, null);
         builder.setContentView(dialogView);
-
+        builder.getWindow().setBackgroundDrawableResource(android.R.color.black);
         if(getMimeType(fileUri).startsWith("image"))
         {
-            builder.getWindow().setBackgroundDrawableResource(android.R.color.black);
             ImageView imageView = dialogView.findViewById(R.id.send_image);
             imageView.setImageURI(fileUri);
             imageView.setVisibility(View.VISIBLE);
         }
         else
         {
-            builder.getWindow().setBackgroundDrawableResource(android.R.color.black);
-            ConstraintLayout constraintLayout = dialogView.findViewById(R.id.send_rich_text_constraint_layout);
-            constraintLayout.setBackground(ContextCompat.getDrawable(dialogView.getContext(),R.drawable.image_border));
-            Button closeButton = dialogView.findViewById(R.id.close_button);
-            closeButton.setBackgroundResource(R.drawable.baseline_close_black_24dp);
-
             TextView fileNameLabel = dialogView.findViewById(R.id.file_name_text_view);
             TextView fileName = dialogView.findViewById(R.id.file_name);
             TextView fileSizeLabel = dialogView.findViewById(R.id.file_size_text_view);
@@ -859,10 +854,13 @@ public class ViewMessageActivity extends AppCompatActivity
             fileSizeLabel.setVisibility(View.VISIBLE);
             fileSize.setVisibility(View.VISIBLE);
 
-            File f = new File(Objects.requireNonNull(fileUri.getPath()));
+            AssetFileDescriptor afd = getContentResolver().openAssetFileDescriptor(fileUri,"r");
+            assert afd != null;
+            long size = afd.getLength();
+            afd.close();
 
             fileName.setText(getFileName(fileUri));
-            fileSize.setText(Long.toString(f.length()));
+            fileSize.setText(Long.toString(size) + " bytes");
         }
         Button sendButton = dialogView.findViewById(R.id.send_message_button);
         Button closeButton = dialogView.findViewById(R.id.close_button);

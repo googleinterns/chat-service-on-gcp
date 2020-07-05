@@ -8,11 +8,12 @@
         android:id="@+id/send_rich_text_constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
-        android:backgroundTint="#FFFFFF">
+        android:backgroundTint="#000000"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        >
 
         <Button
             android:id="@+id/close_button"
@@ -22,55 +23,85 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/file_name_text_view"
+        <RelativeLayout
+            android:id="@+id/file_details_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/close_button"
+            android:padding="10dp"
+            android:background="@drawable/image_border"
+            android:paddingBottom="5dp">
+        <TextView
+            android:id="@+id/file_name_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Name:"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:visibility="gone"
-            android:textSize="30sp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_alignParentStart="true"
+            android:textColor="#000000"
+            android:paddingStart="5dp"/>
+
         <TextView
             android:id="@+id/file_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="image.png"
+            android:textSize="30sp"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/file_name_text_view"
-            android:text="image.png"
-            android:visibility="gone"
-            android:textSize="30sp"/>
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/file_name_text_view"
+            android:textColor="#000000"
+            android:paddingStart="5dp"/>
+
         <TextView
             android:id="@+id/file_size_text_view"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/file_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Size:"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:visibility="gone"
-            android:textSize="30sp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/file_name"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/file_name"
+            android:textColor="#000000"
+            android:paddingStart="5dp"/>
+
         <TextView
             android:id="@+id/file_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="40 Kb"
+            android:textSize="30sp"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/file_size_text_view"
-            android:text="40 Kb"
-            android:visibility="gone"
-            android:textSize="30sp"/>
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/file_size_text_view"
+            android:textColor="#000000"
+            android:paddingStart="5dp"/>
+        </RelativeLayout>
+
         <ImageView
             android:id="@+id/send_image"
             android:layout_width="300dp"
             android:layout_height="300dp"
-            android:scaleType="fitXY"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/file_size"
             android:background="@drawable/image_border"
-            android:visibility="gone"/>
+            android:scaleType="fitXY"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/file_details_layout" />
+
         <Button
             android:id="@+id/send_message_button"
             android:layout_width="wrap_content"
@@ -79,7 +110,6 @@
             android:background="@drawable/bg_button"
             android:text="@string/send"
             android:textColor="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/send_message_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/send_image" />
 
