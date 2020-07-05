@@ -5,6 +5,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
@@ -41,6 +44,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import com.gpayinterns.chat.Message;
 
@@ -65,10 +69,8 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
 
     //mViewType 0: left side text
     //mViewType 1: right side text
-    //mViewType 2: left side image
-    //mViewType 3: right side image
-    //mViewType 4: left side any richText except image
-    //mViewType 5: right side any richText except image
+    //mViewType 2: left side richText
+    //mViewType 3: right side richText
 
     @Override
     public int getItemViewType(int position)
@@ -82,13 +84,9 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
             mViewType = 1;
         }
 
-        if(mMessages.get(position).image!=null)//image
+        if(mMessages.get(position).mimeType!=null)//richText
         {
             mViewType += 2;
-        }
-        else if(mMessages.get(position).mimeType!=null)//richText
-        {
-            mViewType += 4;
         }
         return mViewType;
     }
@@ -116,15 +114,9 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                 itemView = mLayoutInflater.inflate(R.layout.item_send_message_list,parent,false);
                 break;
             case 2:
-                itemView = mLayoutInflater.inflate(R.layout.item_recieve_image_list,parent,false);
-                break;
-            case 3:
-                itemView = mLayoutInflater.inflate(R.layout.item_send_image_list,parent,false);
-                break;
-            case 4:
                 itemView = mLayoutInflater.inflate(R.layout.item_recieve_richtext_list,parent,false);
                 break;
-            case 5:
+            case 3:
                 itemView = mLayoutInflater.inflate(R.layout.item_send_richtext_list,parent,false);
                 break;
             default:
@@ -144,14 +136,18 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         {
             holder.mMessage.setText(mMessages.get(position).text);
         }
-        else if(mViewType<=3)//image
+        else //richText
         {
-            holder.mImage.setImageBitmap(mMessages.get(position).image);
-        }
-        else//richText
-        {
-            holder.mFileName.setText(mMessages.get(position).fileName);
-            holder.mFileSize.setText(mMessages.get(position).fileSize);
+            Bitmap image = mMessages.get(position).image;
+            if(image != null)
+            {
+                holder.mImage.setImageBitmap(mMessages.get(position).image);
+            }
+            else
+            {
+                holder.mFileName.setText(mMessages.get(position).fileName);
+                holder.mFileSize.setText(mMessages.get(position).fileSize);
+            }
         }
         holder.mTime.setText(convertDate(mMessages.get(position).sendTime));
     }
@@ -192,68 +188,78 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                 mFileName = (TextView) itemView.findViewById(R.id.send_file_name);
                 mFileSize = (TextView) itemView.findViewById(R.id.send_file_size);
             }
-            if(mViewType==2 || mViewType==3)//image
+            if(mViewType==2 || mViewType==3)//richText
             {
-                itemView.setOnClickListener(new View.OnClickListener()
+                if(((BitmapDrawable)mImage.getDrawable()) != null)
                 {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        fileExists(mMessageID);
-                        Uri messageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File (mPath));;
-                        Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(messageURI, mMimeType);
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        mContext.startActivity(intent);
-                    }
-                });
-            }
-            else if(mViewType==4 || mViewType==5)//richText
-            {
-                Button downloadButton = (Button) itemView.findViewById(R.id.download_button);
-                Button viewButton = (Button) itemView.findViewById(R.id.view_button);
+                    mImage.getLayoutParams().width = 200;
+                    mImage.getLayoutParams().height = 200;
 
-                downloadButton.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
+                    ConstraintLayout constraintLayout = (ConstraintLayout) itemView.findViewById(R.id.file_details_constraint_layout);
+                    constraintLayout.setVisibility(View.GONE);
+                    itemView.setOnClickListener(new View.OnClickListener()
                     {
-                        ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
-                        ImageView done = (ImageView) itemView.findViewById(R.id.done);
-                        if(fileExists(mMessageID))
+                        @Override
+                        public void onClick(View v)
                         {
-                            Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
-                            progressBar.setVisibility(View.VISIBLE);
-                            getAttachmentFromServer(mChatID, mMessageID,mFileName.getText().toString(),progressBar,done);
-                        }
-
-                    }
-                });
-
-                viewButton.setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        if(fileExists(mMessageID))
-                        {
-                            Uri messageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File (mPath));
+                            fileExists(mMessageID);
+                            Uri messageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File(mPath));
                             Intent intent = new Intent();
                             intent.setAction(Intent.ACTION_VIEW);
                             intent.setDataAndType(messageURI, mMimeType);
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             mContext.startActivity(intent);
                         }
-                        else
+                    });
+                }
+                else
+                {
+                    Button downloadButton = (Button) itemView.findViewById(R.id.download_button);
+                    Button viewButton = (Button) itemView.findViewById(R.id.view_button);
+
+                    downloadButton.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
                         {
-                            Toast.makeText(mContext, "File not present in storage", Toast.LENGTH_SHORT).show();
+                            ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
+                            ImageView done = (ImageView) itemView.findViewById(R.id.done);
+                            if(fileExists(mMessageID))
+                            {
+                                Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT).show();
+                            }
+                            else
+                            {
+                                progressBar.setVisibility(View.VISIBLE);
+                                ConstraintLayout imageConstraintLayout = itemView.findViewById(R.id.image_constraint_layout);;
+                                ConstraintLayout fileConstraintLayout = itemView.findViewById(R.id.file_details_constraint_layout);
+                                getAttachmentFromServer(mChatID, mMimeType,mMessageID,mFileName.getText().toString()
+                                        ,progressBar,done,imageConstraintLayout, fileConstraintLayout,mImage);
+                            }
                         }
-                    }
-                });
+                    });
+
+                    viewButton.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            if(fileExists(mMessageID))
+                            {
+                                Uri messageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File (mPath));
+                                Intent intent = new Intent();
+                                intent.setAction(Intent.ACTION_VIEW);
+                                intent.setDataAndType(messageURI, mMimeType);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                mContext.startActivity(intent);
+                            }
+                            else
+                            {
+                                Toast.makeText(mContext, "File not present in storage", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
             }
         }
     }
@@ -315,7 +321,10 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         return file.exists();
     }
 
-    private void getAttachmentFromServer(String chatID, final String messageID, final String fileName, final ProgressBar progressBar,final ImageView done)
+    private void getAttachmentFromServer(String chatID, final String mimeType, final String messageID, final String fileName,
+                                         final ProgressBar progressBar, final ImageView done,
+                                         final ConstraintLayout imageConstraintLayout,
+                                         final ConstraintLayout fileConstraintLayout, final ImageView imageView)
     {
         SharedPreferences mPrefs= mContext.getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
         String currentUser = mPrefs.getString("currentUser","");
@@ -336,7 +345,35 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                         try
                         {
                             String base64String = response.getString("Blob");
+                            String fileType = response.getString("FileType");
                             storeFile(messageID,base64String,fileName);
+                            if(fileType.startsWith("image"))//downloaded attachment is an image
+                            {
+                                byte[] decodedString = Base64.decode(base64String, Base64.DEFAULT);
+                                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                fileConstraintLayout.setVisibility(View.GONE);
+                                imageView.setImageBitmap(decodedByte);
+                                imageView.getLayoutParams().width = 500;
+                                imageView.getLayoutParams().height = 500;
+                                imageView.setOnClickListener(new View.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(View v)
+                                    {
+                                        fileExists(messageID);
+                                        Uri messageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File(mPath));
+                                        Intent intent = new Intent();
+                                        intent.setAction(Intent.ACTION_VIEW);
+                                        intent.setDataAndType(messageURI, mimeType);
+                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        mContext.startActivity(intent);
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                imageConstraintLayout.setVisibility(View.GONE);
+                            }
                             done.setVisibility(View.VISIBLE);
                             new CountDownTimer(2000, 1000)
                             {
