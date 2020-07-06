@@ -189,4 +189,25 @@ public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username
         Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).bind("listOfChatIdOfUser").toInt64Array(listOfChatIdOfUser).build();
         return ImmutableList.copyOf(spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true)));
     }
+
+    /**
+     * Given the userId of a user A and a string mobileNoPrefix, returns all users such that either of the following is true:
+     *  1. There is a Chat between user A and this user and the mobile number of this user starts with the string mobileNoPrefix.
+     *  2. MobileNo of this user is equal to mobileNoPrefix.
+     */
+    public ImmutableList<User> getUsersByMobileNumber(long userId, String mobileNoPrefix) {
+        String sqlStatement = "SELECT * from User where MobileNo LIKE @mobileNoPrefix AND " +
+                "UserID IN (SELECT UserID FROM UserChat WHERE UserID != @userId AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userId)) " +
+                "UNION DISTINCT SELECT * FROM User@{FORCE_INDEX=UsersByMobileNo} WHERE MobileNo=@mobileNo";
+        Statement statement = Statement
+                .newBuilder(sqlStatement)
+                .bind("userId")
+                .to(userId)
+                .bind("mobileNoPrefix")
+                .to(mobileNoPrefix + "%")
+                .bind("mobileNo")
+                .to(mobileNoPrefix)
+                .build();
+        return ImmutableList.copyOf(spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)));
+    }
 }

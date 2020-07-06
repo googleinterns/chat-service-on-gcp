@@ -1,28 +1,21 @@
 package controller;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import entity.User;
 import dbaccessor.user.UserAccessor;
+import exceptions.*;
 import googlesignin.GoogleAuthenticator;
 import googlesignin.GoogleUser;
 import helper.*;
-import exceptions.UserRequiredFieldMissingException;
-import exceptions.UserAlreadyExistsException;
-import exceptions.InvalidLoginException;
-import exceptions.UserNotFoundException;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -108,26 +101,32 @@ public class UserAPI {
     }
 
     @GetMapping("/viewUser")
-    public Map<String, Object> viewUser(@RequestParam(value = "username", required = true) String username, HttpServletRequest request) {
+    public ImmutableMap<String, Object> viewUser(@RequestParam(value = "username", required = true) String username, HttpServletRequest request) {
         String path = request.getRequestURI();
         User user = userAccessor.getUser(username);
         if(user == null) {
             throw new UserNotFoundException(path);
         }
-        Map<String, Object> response = new HashMap<>();
-        response.put("UserID", user.getUserId());
-        response.put("Username", username);
-        response.put("EmailID", user.getEmailId());
-        response.put("MobileNo", user.getMobileNumber());
-        if(user.getPicture() != null) {
-            response.put("Picture", user.getPicture());
-        }
-        return response;
+        return SuccessResponseGenerator.getSuccessResponseForViewUser(user);
     }
 
     @GetMapping("/googleSignIn")
     public long googleSignIn(@RequestParam(value = "authCode", required = true) String authCode) throws IOException {
         GoogleUser googleUser = googleAuthenticator.getGoogleUser(authCode);
         return googleUser.getOrCreateUser();
+    }
+
+    @GetMapping("/getUsersByMobileNumber/{userId}")
+    ImmutableMap<String, ImmutableList<ImmutableMap<String, Object>>> getUsersByMobileNumber(
+            @PathVariable("userId") String userIdString,
+            @RequestParam(value = "mobileNoPrefix", required = true) String mobileNoPrefix,
+            HttpServletRequest request) {
+        String path = request.getRequestURI();
+        long userId = Long.parseLong(userIdString);
+        if (!userAccessor.checkIfUserIdExists(userId)) {
+            throw new UserIdDoesNotExistException(path);
+        }
+        ImmutableList<User> users = userAccessor.getUsersByMobileNumber(userId, mobileNoPrefix);
+        return SuccessResponseGenerator.getSuccessResponseForGetUsersByMobileNumber(users);
     }
 }
