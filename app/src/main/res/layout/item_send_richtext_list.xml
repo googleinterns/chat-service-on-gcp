@@ -12,34 +12,6 @@
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp">
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/image_constraint_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:visibility="visible">
-            <ImageView
-                android:id="@+id/send_message_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_gravity="end"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:scaleType="centerInside"
-                android:cropToPadding="true"
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/file_details_constraint_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="visible">
         <LinearLayout
             android:id="@+id/file_name_linear_layout"
             android:layout_width="wrap_content"
@@ -85,6 +57,7 @@
                 android:textColor="@android:color/white"/>
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/buttons_linear_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
@@ -128,7 +101,6 @@
                 android:textColor="@android:color/white"
                 android:drawableLeft="@drawable/baseline_folder_open_white_18dp"/>
         </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
         <ProgressBar
             android:id="@+id/message_progressbar"
             android:layout_marginStart="5dp"
@@ -167,7 +139,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintTop_toBottomOf="@id/file_details_constraint_layout"
+            app:layout_constraintTop_toBottomOf="@id/buttons_linear_layout"
             app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

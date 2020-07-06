@@ -11,7 +11,6 @@ public class Message
     public boolean received;
     public String text;
     public String sendTime;
-    public Bitmap image;
     public String fileName;
     public String mimeType;
     public String fileSize;
@@ -21,15 +20,14 @@ public class Message
 
     }
     public Message(String mMessageID,String mChatID, boolean mReceived,
-                   String mText, String mSendTime, Bitmap mImage,
-                   String mFileName, String mMimeType,String mFileSize)
+                   String mText, String mSendTime, String mFileName,
+                   String mMimeType,String mFileSize)
     {
         messageID = mMessageID;
         chatID = mChatID;
         received = mReceived;
         text = mText;
         sendTime = mSendTime;
-        image = mImage;
         fileName = mFileName;
         mimeType = mMimeType;
         fileSize = mFileSize;

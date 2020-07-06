@@ -300,8 +300,7 @@ public class ViewMessageActivity extends AppCompatActivity
 
         //TODO get bitmap from Uri
 
-        Bitmap bitmap=null;
-        newMessage.add(new Message( messageID,chatID,false,null, Long.toString(System.currentTimeMillis()),bitmap,getFileName(fileUri),getMimeType(fileUri),"4 B"));
+        newMessage.add(new Message( messageID,chatID,false,null, Long.toString(System.currentTimeMillis()),getFileName(fileUri),getMimeType(fileUri),"4 B"));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }
@@ -689,7 +688,7 @@ public class ViewMessageActivity extends AppCompatActivity
         lastMessageID = messageID;
         findViewById(R.id.view_message_constraint_layout).requestFocus();
         List <Message> newMessage = new ArrayList<Message>();
-        newMessage.add(new Message(messageID,chatID,false,messageText,Long.toString(System.currentTimeMillis()),null,null,null,null));
+        newMessage.add(new Message(messageID,chatID,false,messageText,Long.toString(System.currentTimeMillis()),null,null,null));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }
@@ -742,7 +741,7 @@ public class ViewMessageActivity extends AppCompatActivity
             filesize = message.getString("FileSize");
         }
         return new Message(messageID,chatID,received,text,
-                seconds+"000",null,filename,mimetype,filesize);
+                seconds+"000",filename,mimetype,filesize);
     }
 
     @Override
