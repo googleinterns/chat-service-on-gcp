@@ -54,6 +54,41 @@ public final class SuccessResponseGenerator {
     }
 
     /**
+     * Renders the User details in a Map to return a successful HTTP response for all client requests to the viewUser API.
+     * User Details include:
+     * <ul>
+     *     <li>UserID</li>
+     *     <li>Username</li>
+     *     <li>EmailID</li>
+     *     <li>MobileNo</li>
+     *     <li>Picture</li> (Optional)
+     * </ul>
+     */
+    public static ImmutableMap<String, Object> getSuccessResponseForViewUser(User user) {
+        ImmutableMap.Builder<String, Object> responseBuilder = ImmutableMap.builder();
+        responseBuilder.put("UserID", user.getUserId());
+        responseBuilder.put("Username", user.getUsername());
+        responseBuilder.put("EmailID", user.getEmailId());
+        responseBuilder.put("MobileNo", user.getMobileNumber());
+        String picture = user.getPicture();
+        if(picture != null && picture.length() > 0) {
+            responseBuilder.put("Picture", picture);
+        }
+        return responseBuilder.build();
+    }
+
+    /**
+     * Renders all Users in a Map to return a successful HTTP response for all client requests to the getUsersByMobileNumbers API.
+     */
+    public static ImmutableMap<String, ImmutableList<ImmutableMap<String, Object>>> getSuccessResponseForGetUsersByMobileNumber(ImmutableList<User> users) {
+        ImmutableList.Builder<ImmutableMap<String, Object>> responseBuilder = ImmutableList.builder();
+        for(User user: users) {
+            responseBuilder.add(getSuccessResponseForViewUser(user));
+        }
+        return ImmutableMap.of("Users", responseBuilder.build());
+    }
+
+    /**
      * Renders the given parameters in a Map to return a successful HTTP response for all client requests to the GetChat API.
      */
     public static ImmutableMap<String, Map<String, Object>> getSuccessResponseForGetChat(Chat chat) {
