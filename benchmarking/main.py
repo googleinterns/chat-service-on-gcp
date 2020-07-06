@@ -15,6 +15,7 @@ It collects the list of tuples returned by the simulate method of users and
 sends this to write_output module.
 """
 import users
+from write_output import write_output
 import sys
 import configparser
 import pandas as pd
@@ -110,6 +111,14 @@ class ProcessInput:
         """
         return (np.array(self.input_args[3:self.input_args_len - 1])/self.total_weight_without_signup).tolist()
 
+    def get_api_weights_dict(self):
+        """
+        Returns a dictionary with API names as keys and weight proportion of APIs as values.
+        """
+        api_names = ["login", "viewUser", "listChats", "listMessages", "createChat", "createMessage", "signup"]
+        api_weights_dict = {api_names[i]: self.input_args[i + 3]/self.total_weight for i in range(len(api_names))}
+        return api_weights_dict
+
 
 def get_all_users():
     """
@@ -168,24 +177,27 @@ multi_qps_increase_rate = process_input.get_multi_qps_increase_rate()
 all_users = get_all_users()
 all_chats = get_all_chats()
 get_multi_user_instances.user_index = 0
-end_time = datetime.now() + timedelta(minutes=duration)
+# end_time is 1 minute more than the duration for getting responses of requests sent in the last minute
+end_time = datetime.now() + timedelta(minutes=duration+1)
 users.User.end_time = end_time
 users.MultiUser.user_details = all_users
 users.MultiUser.chat_details = all_chats
 users.MultiUser.distribution = process_input.get_api_distribution_without_signup()
 results = []
+total_iterations = duration
+completed_iterations = 0
 with concurrent.futures.ThreadPoolExecutor(max_workers=max_qps) as executor:
     signup_instances = get_signup_user_instances(initial_signup_instances_count)
     multi_instances = get_multi_user_instances(initial_multi_instances_count)
     futures = {executor.submit(_.simulate) for _ in signup_instances}
     futures.update({executor.submit(_.simulate) for _ in multi_instances})
-    while datetime.now() < end_time:
+    while completed_iterations < total_iterations:
         time.sleep(60)
         signup_instances = get_signup_user_instances(signup_qps_increase_rate)
         multi_instances = get_multi_user_instances(multi_qps_increase_rate)
         futures.update({executor.submit(_.simulate) for _ in signup_instances})
         futures.update({executor.submit(_.simulate) for _ in multi_instances})
+        completed_iterations += 1
     for future in concurrent.futures.as_completed(futures):
         results.extend(future.result())
-# change this after the write_output module is completed.
-print(results)
+write_output(results, process_input.get_api_weights_dict())

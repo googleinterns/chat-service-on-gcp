@@ -26,8 +26,8 @@ def get_next_response_entry(api_response_object_qps, api_to_proportion_of_reques
     # Adding API Name to the response entry
     response_entry.append(api_response_object_qps[0])
 
-    #Adding Response Time to the response entry
-    response_entry.append(response_object.elapsed)
+    # Adding Response Time to the response entry
+    response_entry.append(response_object.elapsed.total_seconds())
 
     api_list = ["login", "viewUser", "listChats", "listMessages", "createChat", "createMessage", "signup"]
 
@@ -56,10 +56,9 @@ def write_output(api_response_objects_qps, api_to_proportion_of_requests_of_api)
     9. SignupQps
     10. TotalQps
     """
-
     CSV_FILE_NAME = "ResponseEntry.csv"
-    CSV_COLUMN_NAMES = ["ApiName", "ResponseTime", "LoginQps", "ViewUserQps", "ListChatsQps", 
-                "ListMessagesQps", "CreateChatQps", "CreateMessageQps", "SignupQps", "TotalQps"]
+    CSV_COLUMN_NAMES = ["API Name", "ResponseTime", "login QPS", "viewUser QPS", "listChats QPS",
+                        "listMessages QPS", "createChat QPS", "createMessage QPS", "signup QPS", "Total QPS"]
 
     response_entries = []
 
