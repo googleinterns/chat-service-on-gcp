@@ -1,0 +1,16 @@
+from internal_node import InternalNode
+from parameter import Parameter
+import csv
+
+class DatasetGenerator:
+
+    def __init__(self):
+        self.root_node = InternalNode(depth_in_tree = 0, parameter_to_value = {})
+        data = self.root_node.create_child_nodes()
+
+        with open(Parameter.DATASET_FILE_NAME, 'w') as csv_file:  
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(["Metadata", "Data"])
+            csv_writer.writerows(data)
+
+datasetGenerator = DatasetGenerator()
