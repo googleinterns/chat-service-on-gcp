@@ -3,9 +3,7 @@ package com.gpayinterns.chat;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -25,8 +23,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,7 +45,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private String currentUser;
 
     /**
-     * @active variable is used to check whether the LoginActivity is active or not.
+     * active variable is used to check whether the LoginActivity is active or not.
      * It's necessary as the Asynchronous login requests might try to
      * update the view when the activity is no longer active, causing the application to crash
      */
@@ -93,12 +89,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //autoLogin
             startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));
         }
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
     }
 
     @Override
@@ -235,21 +225,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         }
                         else if(error instanceof ClientError)
                         {
-                            String responseBody = null;
-                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                            JSONObject data = null;
-                            try
-                            {
-                                data = new JSONObject(responseBody);
-                            }
-                            catch (JSONException e)
-                            {
-                                e.printStackTrace();
-                            }
-
-                            assert data != null;
-                            String message = data.optString("message");
-
                             shakeLoginButton();
                             Toast.makeText(getBaseContext(), "Invalid Credentials", Toast.LENGTH_SHORT).show();
                             usernameEditText.setText("");
@@ -285,8 +260,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         {
             Toast.makeText(getBaseContext(), "Tap back once again to exit the application", Toast.LENGTH_SHORT).show();
         }
-
         mBackPressed = System.currentTimeMillis();
-
     }
 }

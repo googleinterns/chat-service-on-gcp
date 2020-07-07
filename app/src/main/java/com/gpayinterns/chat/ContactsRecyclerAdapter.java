@@ -136,8 +136,9 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         this.notifyDataSetChanged();
     }
 
-
-
+    /**
+     * This helps to filter the contacts on the basis of the phoneNum provided
+     */
     @Override
     public Filter getFilter()
     {
@@ -148,9 +149,10 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             {
                 FilterResults results = new FilterResults();
                 final List <User> filteredResult = new ArrayList<>();
-                final CountDownLatch latch = new CountDownLatch(1);
                 if(!constraint.toString().isEmpty())
                 {
+                    final CountDownLatch latch = new CountDownLatch(1);
+
                     String URL = BASE_URL + GET_USERS_MOBILE
                             +"/" + mCurrentUser + "/?" + MOBILE_PREFIX + "=" + constraint.toString();
                     Log.d("URL",URL);
@@ -193,19 +195,18 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                         }
                     };
                     VolleyController.getInstance(mContext).addToRequestQueueWithRetry(jsonObjectRequest);
+                    try
+                    {
+                        latch.await();//wait until response has been received
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 else
                 {
                     filteredResult.addAll(mUsers);
-                }
-
-                try
-                {
-                    latch.await();
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
                 }
                 results.values = filteredResult;
                 return results;
@@ -221,6 +222,9 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         };
     }
 
+    /**
+     * @return    a random color
+     */
     int getRandomColor()
     {
         int r = 0;

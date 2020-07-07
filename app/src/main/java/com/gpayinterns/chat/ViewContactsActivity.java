@@ -56,7 +56,6 @@ public class ViewContactsActivity extends AppCompatActivity
 
     private String currentUser;
     RecyclerView recyclerContacts;
-
     ProgressBar progressBar;
 
     @Override
@@ -84,6 +83,9 @@ public class ViewContactsActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * loads all chats with whom the current user has had a conversation earlier.
+     */
     private void loadChatsFromServer()
     {
         Log.d("currentUser sent to server:",currentUser);
@@ -108,11 +110,13 @@ public class ViewContactsActivity extends AppCompatActivity
                                 String chatID = chat.getString("ChatId");
                                 String lastMessageID = chat.getString("LastSentMessageId");
 
-                                Log.d("here",username);
                                 contacts.add(new User(username,chatID,lastMessageID));
                             }
-                            progressBar.setVisibility(View.GONE);
-                            contactsRecyclerAdapter.updateContactsList(contacts);
+                            if(active)
+                            {
+                                progressBar.setVisibility(View.GONE);
+                                contactsRecyclerAdapter.updateContactsList(contacts);
+                            }
                         }
                         catch (JSONException e)
                         {
@@ -138,6 +142,9 @@ public class ViewContactsActivity extends AppCompatActivity
     }
 
 
+    /**
+     * A method to get the currentUser stored in Shared Preferences & log out if no user found.
+     */
     private void getCurrentUser()
     {
         SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
@@ -148,6 +155,9 @@ public class ViewContactsActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * sets up the recyclerView for displaying contacts
+     */
     private void initializeDisplayContent()
     {
         recyclerContacts = (RecyclerView) findViewById(R.id.contacts_recyclerView);
@@ -171,6 +181,7 @@ public class ViewContactsActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
+        Runtime.getRuntime().gc();// free heap memory by destroying unreachable objects
     }
 
     @Override
@@ -204,6 +215,9 @@ public class ViewContactsActivity extends AppCompatActivity
 
     }
 
+    /**
+     * exits the application
+     */
     private void exit()
     {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -306,6 +320,9 @@ public class ViewContactsActivity extends AppCompatActivity
         startActivity(new Intent(this,LoginActivity.class));
     }
 
+    /**
+     * show a dialog window for confirmation when the user opts to logout.
+     */
     private void showDialogWindow()
     {
         final AlertDialog dialog = new AlertDialog.Builder(this)

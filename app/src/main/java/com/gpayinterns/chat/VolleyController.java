@@ -74,6 +74,7 @@ public class VolleyController
                 100000,
                 0,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        //set a timeout of 100 seconds with 0 retries.
         getRequestQueue().add(req);
     }
 

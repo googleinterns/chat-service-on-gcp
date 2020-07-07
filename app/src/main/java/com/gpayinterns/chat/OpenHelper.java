@@ -20,7 +20,7 @@ public class OpenHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        db.execSQL(DatabaseContract.BlobEntry.SQL_CREATE_TABLE);
+        db.execSQL(DatabaseContract.BlobEntry.SQL_CREATE_TABLE);//creates the DB if not already created
     }
 
     @Override

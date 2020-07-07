@@ -7,20 +7,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -28,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
@@ -36,12 +28,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.android.volley.ClientError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
@@ -49,23 +39,16 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,9 +62,6 @@ import java.util.TimerTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.PathUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -125,18 +105,21 @@ public class ViewMessageActivity extends AppCompatActivity
     private String lastMessageID;
     private String username;
 
-    private Timer mTimer;
+    private Timer mTimer;// helps to send requests for newer messages periodically
     private ProgressBar progressBar;
 
-    private Uri fileUri;
+    private Uri fileUri;//stores the uri of the file received upon selection from file explorer
 
     @Override
     protected void onPause()
     {
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         if(mTimer != null)
+        {
+            //stop sending requests to receive new messages
             mTimer.cancel();
-        VolleyController.getInstance(this).getRequestQueue().cancelAll(POLL);
+        }
+        VolleyController.getInstance(this).getRequestQueue().cancelAll(POLL);//cancel all previous volley requests
         active=false;
         super.onPause();
     }
@@ -161,10 +144,12 @@ public class ViewMessageActivity extends AppCompatActivity
         initializeDisplayContent();
         chatID = getIntent().getStringExtra(CHAT_ID);
         lastMessageID = getIntent().getStringExtra(LAST_MESSAGE_ID);
-        if(chatID == null)
+        if(chatID == null)//i.e this activity was launched using search by phoneNum
         {
-            // 1. load chatID from createChat
-            // 2. get lastmessageID from getChat
+            // Since there isn't any chatID and lastMessageID received from the previous activity,
+            // these details have to be fetched from the server
+            // 1. get chatID using createChat
+            // 2. get lastMessageID using getChat
             try
             {
                 loadChatIDFromServer();
@@ -194,6 +179,9 @@ public class ViewMessageActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * This method sends a richText which is referenced by fileUri
+     */
     private void sendFileToServer()
     {
         String URL = BASE_URL + USERS
@@ -218,11 +206,17 @@ public class ViewMessageActivity extends AppCompatActivity
                             String mimeType = getMimeType(fileUri);
                             String fileName = getFileName(fileUri);
 
+                            AssetFileDescriptor afd = getContentResolver().openAssetFileDescriptor(fileUri,"r");
+                            assert afd != null;
+                            long size = afd.getLength();
+                            afd.close();
+
+                            addFileToScreen(messageID,fileName,mimeType,size+" bytes");
                             String outputPath = ViewMessageActivity.this.getFilesDir().getAbsolutePath() + "/" + fileName;
 //                            copyFileToLocalCache(outputPath);
 //                            new UpdateCache().execute(messageID,outputPath);
                         }
-                        catch (JSONException e)
+                        catch (JSONException | IOException e)
                         {
                             e.printStackTrace();
                         }
@@ -258,6 +252,10 @@ public class ViewMessageActivity extends AppCompatActivity
         VolleyController.getInstance(this).addToRequestQueue(volleyMultipartRequest);
     }
 
+    /**
+     * The file referenced by fileUri will be stored at the path provided as the argument
+     * @param outputPath path where the file will be stored
+     */
     private void copyFileToLocalCache(String outputPath)
     {
         File source = new File(fileUri.getPath());
@@ -267,6 +265,7 @@ public class ViewMessageActivity extends AppCompatActivity
         try (InputStream in = resolver.openInputStream(fileUri))
         {
             File dir = new File (outputPath);
+            //create a new directory if outputPath doesn't exist
             if (!dir.exists())
             {
                 dir.mkdirs();
@@ -290,27 +289,25 @@ public class ViewMessageActivity extends AppCompatActivity
         }
     }
 
-    private void addImageToScreen(String messageID)
+    private void addFileToScreen(String messageID,String fileName,String mimeType,String fileSize)
     {
         if(messageIDSet.contains(messageID))
         {
-            return;
+            return ;
         }
         messageIDSet.add(messageID);
+        lastMessageID = messageID;
+        findViewById(R.id.view_message_constraint_layout).requestFocus();
         List <Message> newMessage = new ArrayList<Message>();
-
-        //TODO get bitmap from Uri
-
-        newMessage.add(new Message( messageID,chatID,false,null, Long.toString(System.currentTimeMillis()),getFileName(fileUri),getMimeType(fileUri),"4 B"));
+        newMessage.add(new Message(messageID,chatID,false,null,Long.toString(System.currentTimeMillis()),fileName,mimeType,fileSize));
         messageRecyclerAdapter.addMessages(newMessage);
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }
 
-    private void addFileToScreen(String messageID)
-    {
-        //TODO
-    }
-
+    /**
+     * This method helps to send a text message to the server
+     * @param messageText the text message to be sent
+     */
     private void sendMessageToServer(final String messageText)
     {
         String URL = BASE_URL + USERS
@@ -374,24 +371,10 @@ public class ViewMessageActivity extends AppCompatActivity
         currentUser = mPrefs.getString("currentUser","");
     }
 
-    public class LinearLayoutManagerWrapper extends LinearLayoutManager
-    {
-        public LinearLayoutManagerWrapper(Context context)
-        {
-            super(context);
-        }
-
-        @Override
-        public boolean supportsPredictiveItemAnimations()
-        {
-            return false;
-        }
-    }
-
     private void initializeDisplayContent()
     {
         recyclerMessages = (RecyclerView) findViewById(R.id.message_recyclerView);
-        messageLayoutManager = new LinearLayoutManagerWrapper(this);
+        messageLayoutManager = new LinearLayoutManager(this);
         messageRecyclerAdapter = new MessageRecyclerAdapter(this,messages,currentUser);
         messageLayoutManager.setStackFromEnd(true);
         recyclerMessages.setLayoutManager(messageLayoutManager);
@@ -421,6 +404,7 @@ public class ViewMessageActivity extends AppCompatActivity
             fileUri = data.getData();
             try
             {
+                //show the dialog to send the file
                 showFileDialog();
             }
             catch (IOException e)
@@ -430,6 +414,9 @@ public class ViewMessageActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * This method gets called when the user hits the top of the view (to facilitate pagination)
+     */
     private void receivePreviousMessagesFromServer()
     {
         if(messages.isEmpty())
@@ -525,16 +512,20 @@ public class ViewMessageActivity extends AppCompatActivity
                 });
             }
         };
-        mTimer.schedule(task, 0, 5000);//runs it every 5 seconds;
+        mTimer.schedule(task, 0, 5000);//request for new messages every 5 seconds;
     }
 
     @Override
     protected void onDestroy()
     {
         super.onDestroy();
-        Runtime.getRuntime().gc();
+        Runtime.getRuntime().gc();// free heap memory by destroying unreachable objects
     }
 
+    /**
+     * receive messages for the first time when the activity launches
+     * i.e messages before lastMessageID
+     */
     private void firstReceiveMessageFromServer()
     {
         String URL = BASE_URL + USERS +
@@ -596,6 +587,10 @@ public class ViewMessageActivity extends AppCompatActivity
         VolleyController.getInstance(this).addToRequestQueueWithRetry(jsonObjectRequest);
     }
 
+    /**
+     * 1. fetch messages after lastMessageID
+     * 2. update lastMessageID if newer messages found
+     */
     private void receiveMessageFromServer()
     {
         Log.d("currentUser",currentUser);
@@ -609,7 +604,6 @@ public class ViewMessageActivity extends AppCompatActivity
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {
-
                     @Override
                     public void onResponse(JSONObject response)
                     {
@@ -662,6 +656,11 @@ public class ViewMessageActivity extends AppCompatActivity
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
+    /**
+     * As soon as a response is received from the server this method is called to display the message on the screen
+     * @param messageID messageID returned from the server corresponding to the sent message
+     * @param messageText
+     */
     private void addMessageToScreen(String messageID,String messageText)
     {
         if(messageIDSet.contains(messageID))
@@ -677,6 +676,9 @@ public class ViewMessageActivity extends AppCompatActivity
         recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
     }
 
+    /**
+     * launches the file explorer to pick any file to send.
+     */
     private void pickFile()
     {
         Intent intent = new Intent();
@@ -696,6 +698,12 @@ public class ViewMessageActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * This method parses the jsonObject and extracts all the required parameters to build a message object.
+     * @param message jsonObject received from the server
+     * @return
+     * @throws JSONException
+     */
     private Message jsonToMessage(JSONObject message) throws JSONException
     {
         String messageID = message.getString("MessageId");
@@ -779,6 +787,12 @@ public class ViewMessageActivity extends AppCompatActivity
         }
         return result;
     }
+
+    /**
+     * returns the mimeType of the uri provided
+     * @param uri
+     * @return
+     */
     public String getMimeType(Uri uri)
     {
         String mimeType = null;
@@ -808,6 +822,10 @@ public class ViewMessageActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * After selection of a file from the file explorer this dialog is shown to send richText.
+     * @throws IOException
+     */
     public void showFileDialog() throws IOException
     {
         final Dialog builder = new Dialog(this, android.R.style.Theme_Light);
@@ -820,7 +838,7 @@ public class ViewMessageActivity extends AppCompatActivity
         View dialogView= inflater.inflate(R.layout.dialog, null);
         builder.setContentView(dialogView);
         builder.getWindow().setBackgroundDrawableResource(android.R.color.black);
-        if(getMimeType(fileUri).startsWith("image"))
+        if(getMimeType(fileUri).startsWith("image"))//file is an image
         {
             ImageView imageView = dialogView.findViewById(R.id.send_image);
             imageView.setImageURI(fileUri);

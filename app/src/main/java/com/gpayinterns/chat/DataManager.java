@@ -11,10 +11,9 @@ import com.gpayinterns.chat.DatabaseContract.BlobEntry;
 public class DataManager
 {
     /**
-     *
-     * @param dbHelper
-     * @param messageID
-     * @return path corresponding to messageID
+     * @param dbHelper  the openhelper instance initialized in the activity to access the db
+     * @param messageID the messageID whose path is to be know from the db
+     * @return          path corresponding to messageID
      */
     public static String getFromDatabase(OpenHelper dbHelper,String messageID)
     {
@@ -39,6 +38,12 @@ public class DataManager
         return path;
     }
 
+    /**
+     *
+     * @param dbHelper   the openhelper instance initialized in the activity to access the db
+     * @param messageID  the messageID whose path is to be stored into the db
+     * @param path       the path which is to be stored in the db
+     */
     public static void loadToDatabase(OpenHelper dbHelper,String messageID,String path)
     {
         SQLiteDatabase db=dbHelper.getWritableDatabase();
