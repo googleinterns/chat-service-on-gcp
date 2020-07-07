@@ -47,10 +47,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText usernameEditText;
     private EditText passwordEditText;
     private String currentUser;
-    private static final int RC_GOOGLE_SIGN_IN = 9001;
-    private static final String TAG = "SignInActivity";
-    private static final String EMAIL = "email";
 
+    /**
+     * @active variable is used to check whether the LoginActivity is active or not.
+     * It's necessary as the Asynchronous login requests might try to
+     * update the view when the activity is no longer active, causing the application to crash
+     */
     private boolean active;
 
     @Override
@@ -206,15 +208,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         try
                         {
                             String message = response.getString("message");
-                            if(message.equals("Success"))
+                            if(message.equals("Success") && active)
                             {
-                                if(active)
-                                {
-                                    currentUser = response.getString("UserId");
-                                    setCurrentUser();
-                                    Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));
-                                }
+                                currentUser = response.getString("UserId");
+                                setCurrentUser();
+                                Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));
                             }
                         }
                         catch (JSONException e)

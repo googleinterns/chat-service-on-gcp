@@ -109,7 +109,7 @@ public class ViewMessageActivity extends AppCompatActivity
     private static final String POLL = "SHORT_POLLING";
     private static final int SELECT_FILE = 0;
 
-    private static boolean active=false;
+    private static boolean active = false;
 
     private List<Message> messages = new ArrayList<Message>();
     Set<String> messageIDSet = new HashSet<String>();//This helps to prevent duplicate messages.
@@ -880,8 +880,6 @@ public class ViewMessageActivity extends AppCompatActivity
         builder.show();
     }
 
-    //TODO 1. load chatID from createChat
-    //TODO 2. get lastmessageID from getChat
     private void loadChatIDFromServer() throws JSONException
     {
         String URL = BASE_URL + USERS + "/"

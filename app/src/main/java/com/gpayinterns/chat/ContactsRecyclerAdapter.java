@@ -148,7 +148,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             {
                 FilterResults results = new FilterResults();
                 final List <User> filteredResult = new ArrayList<>();
-                final boolean[] free = {false};
+                final boolean[] responseReceived = {false};
                 if(!constraint.toString().isEmpty())
                 {
                     String URL = BASE_URL + GET_USERS_MOBILE
@@ -160,7 +160,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                                 @Override
                                 public void onResponse(JSONObject response)
                                 {
-                                    free[0] = true;
+                                    responseReceived[0] = true;
                                     Log.d("ResponseMessage: " , response.toString());
                                     try
                                     {
@@ -183,7 +183,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                                 @Override
                                 public void onErrorResponse(VolleyError error)
                                 {
-                                    free[0] = true;
+                                    responseReceived[0] = true;
                                 }
                             }){
                         @Override
@@ -197,12 +197,13 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                 }
                 else
                 {
-                    free[0]=true;
+                    responseReceived[0]=true;
                     filteredResult.addAll(mUsers);
                 }
                 long entryTime = System.currentTimeMillis();
-                while(!free[0] && System.currentTimeMillis()-entryTime<=9000)//wait for maximum 9 seconds
+                while(!responseReceived[0] && System.currentTimeMillis()-entryTime<=9000)//wait for maximum 9 seconds
                 {
+                    //put thread to sleep for 200ms until list of usernames is received from the server
                     try
                     {
                         Thread.sleep(200);
@@ -225,7 +226,6 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             }
         };
     }
-
 
     int getRandomColor()
     {
