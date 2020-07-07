@@ -29,27 +29,27 @@ MOBILE_NUMBER_LENGTH = int(user_constants['MOBILE_NUMBER_LENGTH'])
 EMAIL_DOMAIN = user_constants['EMAIL_DOMAIN']
 
 
-def login_request(username, password):
-    return requests.post(BASE_URL + 'login',
-                         json={
-                             "Username": username,
-                             "Password": password,
-                         })
-
-
-def view_user_request(username):
-    return requests.get(BASE_URL + 'viewUser',
-                        params={
-                            "username": username,
+def login_request(session, username, password):
+    return session.post(BASE_URL + 'login',
+                        json={
+                            "Username": username,
+                            "Password": password,
                         })
 
 
-def list_chats_request(user_id):
-    return requests.get(BASE_URL + 'users/' + str(user_id) + '/chats')
+def view_user_request(session, username):
+    return session.get(BASE_URL + 'viewUser',
+                       params={
+                           "username": username,
+                       })
 
 
-def list_messages_request(user_id, chat_id):
-    return requests.get(
+def list_chats_request(session, user_id):
+    return session.get(BASE_URL + 'users/' + str(user_id) + '/chats')
+
+
+def list_messages_request(session, user_id, chat_id):
+    return session.get(
         BASE_URL +
         'users/' +
         str(user_id) +
@@ -59,27 +59,27 @@ def list_messages_request(user_id, chat_id):
     )
 
 
-def create_chat_request(user_id, username):
-    return requests.post(BASE_URL + 'users/' + str(user_id) + '/chats',
-                         json={"username": username})
+def create_chat_request(session, user_id, username):
+    return session.post(BASE_URL + 'users/' + str(user_id) + '/chats',
+                        json={"username": username})
 
 
-def create_message_request(user_id, chat_id):
-    return requests.post(BASE_URL + 'users/' + str(user_id) + '/chats/' + str(chat_id) + '/messages',
-                         params={
-                             "textContent": "Hello friend",
-                         })
+def create_message_request(session, user_id, chat_id):
+    return session.post(BASE_URL + 'users/' + str(user_id) + '/chats/' + str(chat_id) + '/messages',
+                        params={
+                            "textContent": "Hello friend",
+                        })
 
 
-def signup_request():
+def signup_request(session):
     username = random_string.alpha_numeric_variable_length(USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH)
     email = username + EMAIL_DOMAIN
     mobile_no = random_string.numeric_fixed_length(MOBILE_NUMBER_LENGTH)
     password = random_string.alpha_numeric_fixed_length(PASSWORD_LENGTH)
-    return requests.post(SIGNUP_URL,
-                         json={
-                             "Username": username,
-                             "EmailID": email,
-                             "MobileNo": mobile_no,
-                             "Password": password,
-                         })
+    return session.post(SIGNUP_URL,
+                        json={
+                            "Username": username,
+                            "EmailID": email,
+                            "MobileNo": mobile_no,
+                            "Password": password,
+                        })
