@@ -26,6 +26,7 @@ import com.gpayinterns.chat.R;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -52,7 +53,6 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
 
     private List<User> mUsers;
     private String mCurrentUser;
-
 
     public ContactsRecyclerAdapter(Context context, List <User> users, String currentUser)
     {
@@ -148,7 +148,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             {
                 FilterResults results = new FilterResults();
                 final List <User> filteredResult = new ArrayList<>();
-                final boolean[] responseReceived = {false};
+                final CountDownLatch latch = new CountDownLatch(1);
                 if(!constraint.toString().isEmpty())
                 {
                     String URL = BASE_URL + GET_USERS_MOBILE
@@ -160,7 +160,6 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                                 @Override
                                 public void onResponse(JSONObject response)
                                 {
-                                    responseReceived[0] = true;
                                     Log.d("ResponseMessage: " , response.toString());
                                     try
                                     {
@@ -177,13 +176,14 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                                     {
                                         e.printStackTrace();
                                     }
+                                    latch.countDown();
                                 }
                             }, new Response.ErrorListener()
                             {
                                 @Override
                                 public void onErrorResponse(VolleyError error)
                                 {
-                                    responseReceived[0] = true;
+                                    latch.countDown();
                                 }
                             }){
                         @Override
@@ -192,26 +192,20 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                             return Priority.IMMEDIATE;
                         }
                     };
-
                     VolleyController.getInstance(mContext).addToRequestQueueWithRetry(jsonObjectRequest);
                 }
                 else
                 {
-                    responseReceived[0]=true;
                     filteredResult.addAll(mUsers);
                 }
-                long entryTime = System.currentTimeMillis();
-                while(!responseReceived[0] && System.currentTimeMillis()-entryTime<=9000)//wait for maximum 9 seconds
+
+                try
                 {
-                    //put thread to sleep for 200ms until list of usernames is received from the server
-                    try
-                    {
-                        Thread.sleep(200);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
+                    latch.await();
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
                 }
                 results.values = filteredResult;
                 return results;
