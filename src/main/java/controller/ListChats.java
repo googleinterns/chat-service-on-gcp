@@ -14,18 +14,18 @@ import exceptions.UserIdMissingFromRequestURLPathException;
 
 import java.util.Map;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import javax.servlet.http.HttpServletRequest;  
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import com.google.cloud.Timestamp;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -53,9 +53,9 @@ public final class ListChats {
     private UniqueIdGenerator uniqueIdGenerator;
 
     /**
-     * Encapsulation for ChatId and Username of one of the Users engaged in that Chat. 
+     * Encapsulation for ChatId, Username and MobileNo of one of the Users engaged in that Chat.
      */
-    public static final class UsernameChatId {
+    public static final class UsernameMobileNoChatId {
 
         @Column(name = "Username")
         private String username;
@@ -63,11 +63,19 @@ public final class ListChats {
         @Column(name = "ChatID")
         private long chatId;
 
-        public UsernameChatId() {}
+        @Column(name = "MobileNo")
+        private String mobileNo;
 
-        public UsernameChatId(String username, long chatId) {
+        public UsernameMobileNoChatId() {}
+
+        public UsernameMobileNoChatId(String username, String mobileNo, long chatId) {
+            this.mobileNo = mobileNo;
             this.username = username;
             this.chatId = chatId;
+        }
+
+        public String getMobileNo() {
+            return this.mobileNo;
         }
 
         public String getUsername() {
@@ -88,11 +96,12 @@ public final class ListChats {
      * <li> LastSentMessageId </li>
      * </ol>
      */
-    ImmutableMap<String, Object> getChatInfoOfChatInMap(Chat chat, String usernameOfSecondUser) {
+    ImmutableMap<String, Object> getChatInfoOfChatInMap(Chat chat, Pair<String, String> secondUser) {
         
         ImmutableMap<String, Object> chatInfoOfChatInMap = ImmutableMap.<String, Object> builder()
                                                                         .put("ChatId", chat.getChatId())
-                                                                        .put("Username", usernameOfSecondUser)
+                                                                        .put("Username", secondUser.getFirst())
+                                                                        .put("MobileNo", secondUser.getSecond())
                                                                         .put("LastSentMessageId", chat.getLastSentMessageId())
                                                                         .build();
 
@@ -155,13 +164,13 @@ public final class ListChats {
         
         Collections.sort(chatsOfUser, Comparator.comparing(Chat::getLastSentTime).reversed());
 
-        ImmutableList<UsernameChatId> usernameChatIdForSecondUsers = queryUser.getUsernameChatIdForSecondUsers(userId, listOfChatId);
+        ImmutableList<UsernameMobileNoChatId> usernameMobileNoChatIdForSecondUsers = queryUser.getUsernameMobileNoChatIdForSecondUsers(userId, listOfChatId);
 
         //Stores username of the other User against ChatId for each Chat of the User.
-        Map<Long, String> chatIdSecondUsernameMap = new LinkedHashMap<Long, String>();
+        Map<Long, Pair<String, String>> chatIdSecondUsernameMap = new LinkedHashMap<Long, Pair<String, String>>();
 
-        for (UsernameChatId usernameChatId : usernameChatIdForSecondUsers) {
-            chatIdSecondUsernameMap.put(usernameChatId.getChatId(), usernameChatId.getUsername());
+        for (UsernameMobileNoChatId usernameMobileNoChatId : usernameMobileNoChatIdForSecondUsers) {
+            chatIdSecondUsernameMap.put(usernameMobileNoChatId.getChatId(), Pair.of(usernameMobileNoChatId.getUsername(), usernameMobileNoChatId.getMobileNo()));
         }
 
         //Stores list of all details of each Chat of the User.
