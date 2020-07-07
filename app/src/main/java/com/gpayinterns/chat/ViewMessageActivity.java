@@ -123,6 +123,7 @@ public class ViewMessageActivity extends AppCompatActivity
     private String currentUser;
     private String chatID;
     private String lastMessageID;
+    private String username;
 
     private Timer mTimer;
     private ProgressBar progressBar;
@@ -152,13 +153,27 @@ public class ViewMessageActivity extends AppCompatActivity
         progressBar = (ProgressBar) findViewById(R.id.view_message_indeterminateBar);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.view_message_swipe_refresh);
 
-        Objects.requireNonNull(getSupportActionBar()).setTitle(getIntent().getStringExtra(CONTACT_USERNAME));
+        username = getIntent().getStringExtra(CONTACT_USERNAME);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(username);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         fileUri = null;
 
         initializeDisplayContent();
         chatID = getIntent().getStringExtra(CHAT_ID);
         lastMessageID = getIntent().getStringExtra(LAST_MESSAGE_ID);
+        if(chatID == null)
+        {
+            // 1. load chatID from createChat
+            // 2. get lastmessageID from getChat
+            try
+            {
+                loadChatIDFromServer();
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
 
         final Button button = findViewById(R.id.send_message_button);
         button.setOnClickListener(new View.OnClickListener()
@@ -405,7 +420,7 @@ public class ViewMessageActivity extends AppCompatActivity
     {
         recyclerMessages = (RecyclerView) findViewById(R.id.message_recyclerView);
         messageLayoutManager = new LinearLayoutManagerWrapper(this);
-        messageRecyclerAdapter = new MessageRecyclerAdapter(this,messages);
+        messageRecyclerAdapter = new MessageRecyclerAdapter(this,messages,currentUser);
         messageLayoutManager.setStackFromEnd(true);
         recyclerMessages.setLayoutManager(messageLayoutManager);
         recyclerMessages.setAdapter(messageRecyclerAdapter);
@@ -583,8 +598,8 @@ public class ViewMessageActivity extends AppCompatActivity
                                 lastMessageID = newMessages.get(newMessages.size()-1).messageID;
                                 messageRecyclerAdapter.addMessages(newMessages);
                                 recyclerMessages.smoothScrollToPosition(recyclerMessages.getAdapter().getItemCount()-1);
-                                progressBar.setVisibility(View.GONE);
                             }
+                            progressBar.setVisibility(View.GONE);
                             ReceiveMessagePeriodically();
                         }
                         catch (JSONException e)
@@ -824,7 +839,8 @@ public class ViewMessageActivity extends AppCompatActivity
         }
     }
 
-    public void showFileDialog() throws IOException {
+    public void showFileDialog() throws IOException
+    {
         final Dialog builder = new Dialog(this, android.R.style.Theme_Light);
         builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
         Objects.requireNonNull(builder.getWindow()).setBackgroundDrawable(
@@ -893,5 +909,146 @@ public class ViewMessageActivity extends AppCompatActivity
             }
         });
         builder.show();
+    }
+
+    //TODO 1. load chatID from createChat
+    //TODO 2. get lastmessageID from getChat
+    private void loadChatIDFromServer() throws JSONException
+    {
+        String URL = BASE_URL + USERS + "/"
+                + currentUser + "/" + CHATS;
+
+        JSONObject jsonBody = new JSONObject();
+        Log.d("username sent to server: ",username);
+        jsonBody.put("username",username);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
+                {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        Log.d("ResponseMessage: " , response.toString());
+
+                        try
+                        {
+                            String message = response.getString("message");
+                            if(message.equals("Success"))
+                            {
+                                chatID = response.getString("ChatId");
+                                getLastMessageID(chatID);
+                            }
+                        }
+                        catch (JSONException e)
+                        {
+                            Toast.makeText(getApplicationContext(), "Parse Error", Toast.LENGTH_SHORT).show();
+                            Log.d("JsonError: ",e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        Log.d("errorMessage",error.toString());
+                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
+                        {
+                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
+                        }
+                        else if(error instanceof ClientError)
+                        {
+                            String responseBody = null;
+                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = null;
+                            try
+                            {
+                                data = new JSONObject(responseBody);
+                            }
+                            catch (JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            assert data != null;
+                            String message = data.optString("message");
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                            messages.clear();
+                            messageRecyclerAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }) {
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
+            }
+        };
+        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void getLastMessageID(String chatID)
+    {
+        String URL = BASE_URL + USERS + "/"
+                + currentUser + "/" + CHATS + "/" + chatID;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
+                {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        Log.d("ResponseMessage: " , response.toString());
+                        try
+                        {
+                            lastMessageID = (response.getJSONObject("payload")).getString("LastSentMessageId");
+                            firstReceiveMessageFromServer();
+                        }
+                        catch (JSONException e)
+                        {
+                            Toast.makeText(getApplicationContext(), "Parse Error", Toast.LENGTH_SHORT).show();
+                            Log.d("JsonError: ",e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        Log.d("errorMessage",error.toString());
+                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
+                        {
+                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
+                        }
+                        else if(error instanceof ClientError)
+                        {
+                            String responseBody = null;
+                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                            JSONObject data = null;
+                            try
+                            {
+                                data = new JSONObject(responseBody);
+                            }
+                            catch (JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            assert data != null;
+                            String message = data.optString("message");
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                            messages.clear();
+                            messageRecyclerAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }) {
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
+            }
+        };
+        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 }

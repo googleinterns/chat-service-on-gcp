@@ -51,6 +51,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private static final String TAG = "SignInActivity";
     private static final String EMAIL = "email";
 
+    private boolean active;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -69,7 +71,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
         setContentView(R.layout.activity_login);
-
+        getCurrentUser();
         //Views
         usernameEditText = findViewById(R.id.input_email_id);
         passwordEditText = findViewById(R.id.input_password);
@@ -100,7 +102,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onResume()
     {
-        getCurrentUser();
+        active = true;
         super.onResume();
     }
 
@@ -175,7 +177,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPreferences.Editor mEditor = mPrefs.edit();
         mEditor.putString("currentUser", currentUser).apply();
     }
-    
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        active = false;
+    }
+
     private void authenticateFromServer() throws JSONException
     {
         String userName = usernameEditText.getText().toString();
@@ -199,10 +208,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             String message = response.getString("message");
                             if(message.equals("Success"))
                             {
-                                currentUser = response.getString("UserId");
-                                setCurrentUser();
-                                Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(LoginActivity.this,ViewContactsActivity.class));
+                                if(active)
+                                {
+                                    currentUser = response.getString("UserId");
+                                    setCurrentUser();
+                                    Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));
+                                }
                             }
                         }
                         catch (JSONException e)

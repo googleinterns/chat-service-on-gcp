@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,6 +68,7 @@ public class ViewContactsActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.view_contacts_toolbar);
         setSupportActionBar(toolbar);
 
+        getCurrentUser();
         progressBar = (ProgressBar) findViewById(R.id.view_contacts_indeterminateBar);
 
         initializeDisplayContent();
@@ -150,7 +152,7 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         recyclerContacts = (RecyclerView) findViewById(R.id.contacts_recyclerView);
         contactLayoutManager = new LinearLayoutManager(this);
-        contactsRecyclerAdapter = new ContactsRecyclerAdapter(this,users);
+        contactsRecyclerAdapter = new ContactsRecyclerAdapter(this,users,currentUser);
         recyclerContacts.addItemDecoration(new DividerItemDecoration(recyclerContacts.getContext(), DividerItemDecoration.VERTICAL));
         recyclerContacts.setLayoutManager(contactLayoutManager);
         recyclerContacts.setAdapter(contactsRecyclerAdapter);
@@ -162,8 +164,6 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         super.onResume();
         active=true;
-        getCurrentUser();
-        Log.d("currentUser",currentUser);
         loadChatsFromServer();
     }
 
@@ -222,14 +222,16 @@ public class ViewContactsActivity extends AppCompatActivity
 
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
+            public boolean onMenuItemActionExpand(MenuItem item)
+            {
                 searchView.setFocusable(true);
                 searchView.requestFocus();
                 return true;
             }
 
             @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
+            public boolean onMenuItemActionCollapse(MenuItem item)
+            {
                 searchView.setQuery("",false);
                 fab.setVisibility(View.VISIBLE);
                 hideSoftKeyboard();
@@ -242,6 +244,7 @@ public class ViewContactsActivity extends AppCompatActivity
             @Override
             public boolean onClose()
             {
+                progressBar.setVisibility(View.GONE);
                 searchView.setQuery("",false);
                 fab.setVisibility(View.VISIBLE);
                 loadChatsFromServer();
@@ -255,13 +258,25 @@ public class ViewContactsActivity extends AppCompatActivity
                     public boolean onQueryTextSubmit(String query)
                     {
                         contactsRecyclerAdapter.getFilter().filter(query.toLowerCase());
+                        new CountDownTimer(2000, 1000)
+                        {
+                            @Override
+                            public void onTick(long millisUntilFinished)
+                            {
+                            }
+                            @Override
+                            public void onFinish()
+                            {
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        }.start();
                         return true;
                     }
 
                     @Override
                     public boolean onQueryTextChange(String newText)
                     {
-                        contactsRecyclerAdapter.getFilter().filter(newText.toLowerCase());
+                        progressBar.setVisibility(View.VISIBLE);
                         return true;
                     }
                 }

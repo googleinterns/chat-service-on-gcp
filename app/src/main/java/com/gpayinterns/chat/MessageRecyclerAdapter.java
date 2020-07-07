@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     private final LayoutInflater mLayoutInflater;
     private List<Message> mMessages;
     private int mViewType;
+    String currentUser;
 
     //mViewType 0: left side text
     //mViewType 1: right side text
@@ -92,11 +94,12 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         return mViewType;
     }
 
-    public MessageRecyclerAdapter(Context Context, List <Message> messages)
+    public MessageRecyclerAdapter(Context Context, List <Message> messages, String mCurrentUser)
     {
         mContext = Context;
         mMessages = messages;
         mLayoutInflater = LayoutInflater.from(mContext);
+        currentUser = mCurrentUser;
     }
 
     @NonNull
@@ -194,7 +197,9 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                         ImageView done = (ImageView) itemView.findViewById(R.id.done);
                         if (fileExists(getPath(mMessageID)))
                         {
-                            Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT).show();
+                            Toast toast = Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+                            toast.show();
                         }
                         else
                         {
@@ -224,7 +229,9 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                         }
                         else
                         {
-                            Toast.makeText(mContext, "File not present in storage", Toast.LENGTH_SHORT).show();
+                            Toast toast = Toast.makeText(mContext, "File not present in cache.\nDownload it.", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+                            toast.show();
                         }
                     }
                 });
@@ -296,8 +303,6 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     private void getAttachmentFromServer(String chatID, final String messageID, final String fileName,
                                          final ProgressBar progressBar, final ImageView done)
     {
-        SharedPreferences mPrefs= mContext.getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
-        String currentUser = mPrefs.getString("currentUser","");
 
         String URL = BASE_URL + USERS +
                 "/" + currentUser + "/" +
