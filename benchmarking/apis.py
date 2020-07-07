@@ -65,17 +65,10 @@ def create_chat_request(user_id, username):
 
 
 def create_message_request(user_id, chat_id):
-    random_number = random.randint(0, 1)  # for choosing between text and content rich message
-    if random_number == 0:
-        files = {
-            "textContent": "Hello friend",
-        }
-    else:
-        files = {
-            "file": open('message_file.txt', 'r')
-        }
     return requests.post(BASE_URL + 'users/' + str(user_id) + '/chats/' + str(chat_id) + '/messages',
-                         files=files)
+                         params={
+                             "textContent": "Hello friend",
+                         })
 
 
 def signup_request():
