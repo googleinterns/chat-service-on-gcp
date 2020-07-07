@@ -1,23 +1,65 @@
 package com.gpayinterns.chat;
 
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.CountDownTimer;
+import android.os.Environment;
+import android.os.Handler;
 import android.text.format.DateFormat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.gpayinterns.chat.R;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.view.menu.MenuView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import com.gpayinterns.chat.Message;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import static androidx.core.content.FileProvider.getUriForFile;
+import static com.gpayinterns.chat.ServerConstants.BASE_URL;
+import static com.gpayinterns.chat.ServerConstants.CHATS;
+import static com.gpayinterns.chat.ServerConstants.END_MESSAGE;
+import static com.gpayinterns.chat.ServerConstants.MESSAGES;
+import static com.gpayinterns.chat.ServerConstants.USERS;
 
 public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecyclerAdapter.ViewHolder>
 {
@@ -28,6 +70,8 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
 
     //mViewType 0: left side text
     //mViewType 1: right side text
+    //mViewType 2: left side richText
+    //mViewType 3: right side richText
 
     @Override
     public int getItemViewType(int position)
@@ -40,6 +84,11 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         {
             mViewType = 1;
         }
+
+        if(mMessages.get(position).mimeType!=null)//richText
+        {
+            mViewType += 2;
+        }
         return mViewType;
     }
 
@@ -50,28 +99,47 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         mLayoutInflater = LayoutInflater.from(mContext);
     }
 
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-
         View itemView;
-        if(viewType==0)
+        switch(viewType)
         {
-            itemView = mLayoutInflater.inflate(R.layout.item_recieve_message_list,parent,false);
+            case 0:
+                itemView = mLayoutInflater.inflate(R.layout.item_recieve_message_list,parent,false);
+                break;
+            case 1:
+                itemView = mLayoutInflater.inflate(R.layout.item_send_message_list,parent,false);
+                break;
+            case 2:
+                itemView = mLayoutInflater.inflate(R.layout.item_recieve_richtext_list,parent,false);
+                break;
+            case 3:
+                itemView = mLayoutInflater.inflate(R.layout.item_send_richtext_list,parent,false);
+                break;
+            default:
+                itemView = null;
         }
-        else
-        {
-            itemView = mLayoutInflater.inflate(R.layout.item_send_message_list,parent,false);
-        }
+        assert itemView != null;
         return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
-        holder.mMessage.setText(mMessages.get(position).text);
+        holder.mMessageID = mMessages.get(position).messageID;
+        holder.mChatID = mMessages.get(position).chatID;
+        holder.mMimeType = mMessages.get(position).mimeType;
+        if(mViewType<=1)//text
+        {
+            holder.mMessage.setText(mMessages.get(position).text);
+        }
+        else //richText
+        {
+            holder.mFileName.setText(mMessages.get(position).fileName);
+            holder.mFileSize.setText(mMessages.get(position).fileSize);
+        }
         holder.mTime.setText(convertDate(mMessages.get(position).sendTime));
     }
 
@@ -86,18 +154,80 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
     {
         public final TextView mMessage;
         public final TextView mTime;
-        public ViewHolder(@NonNull View itemView)
+        public final TextView mFileName;
+        public final TextView mFileSize;
+        public final Button mDownloadButton;
+        public final Button mViewButton;
+        public String mMessageID;
+        public String mChatID;
+        public String mMimeType;
+
+        public ViewHolder(@NonNull final View itemView)
         {
             super(itemView);
-            if(mViewType==0)
+
+            mDownloadButton = (Button) itemView.findViewById(R.id.download_button);
+            mViewButton = (Button) itemView.findViewById(R.id.view_button);
+            if(mViewType%2==0)//received
             {
                 mMessage = (TextView) itemView.findViewById(R.id.receive_message_text);
                 mTime = (TextView) itemView.findViewById(R.id.time_receive_message_text);
+                mFileName = (TextView) itemView.findViewById(R.id.receive_file_name);
+                mFileSize = (TextView) itemView.findViewById(R.id.receive_file_size);
             }
             else
             {
                 mMessage = (TextView) itemView.findViewById(R.id.send_message_text);
                 mTime = (TextView) itemView.findViewById(R.id.time_send_message_text);
+                mFileName = (TextView) itemView.findViewById(R.id.send_file_name);
+                mFileSize = (TextView) itemView.findViewById(R.id.send_file_size);
+            }
+
+            if(mDownloadButton!=null)
+            {
+                mDownloadButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        ProgressBar progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
+                        ImageView done = (ImageView) itemView.findViewById(R.id.done);
+                        if (fileExists(getPath(mMessageID)))
+                        {
+                            Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            progressBar.setVisibility(View.VISIBLE);
+                            getAttachmentFromServer(mChatID, mMessageID, mFileName.getText().toString(), progressBar, done);
+                        }
+                    }
+                });
+            }
+
+            if(mViewButton!=null)
+            {
+                mViewButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        String path = getPath(mMessageID);
+                        if(fileExists(path))
+                        {
+                            Uri messageURI = getUriForFile(mContext, "com.gpayinterns.fileprovider", new File (path));
+                            Intent intent = new Intent();
+                            intent.setAction(Intent.ACTION_VIEW);
+                            intent.setDataAndType(messageURI,mMimeType);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            mContext.startActivity(intent);
+                        }
+                        else
+                        {
+                            Toast.makeText(mContext, "File not present in storage", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         }
     }
@@ -136,6 +266,109 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
 
     public static String convertDate(String dateInMilliseconds)
     {
-        return "      "+DateFormat.format("hh:mm", Long.parseLong(dateInMilliseconds)).toString();
+        return "      "+DateFormat.format("hh:mm a", Long.parseLong(dateInMilliseconds)).toString();
+    }
+
+    /**
+     *
+     * @param path
+     * @return true if either the Uri leads to a valid file or the path obtained from cache is valid, else false
+     */
+    private boolean fileExists(String path)
+    {
+        if(path == null)
+        {
+            return false;
+        }
+        File file = new File(path);
+        return file.exists();
+    }
+
+    private String getPath(String messageID)
+    {
+        String path = null;
+        OpenHelper dbOpenHelper = new OpenHelper(mContext);
+        path = DataManager.getFromDatabase(dbOpenHelper,messageID);
+        dbOpenHelper.close();
+        return path;
+    }
+
+    private void getAttachmentFromServer(String chatID, final String messageID, final String fileName,
+                                         final ProgressBar progressBar, final ImageView done)
+    {
+        SharedPreferences mPrefs= mContext.getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
+        String currentUser = mPrefs.getString("currentUser","");
+
+        String URL = BASE_URL + USERS +
+                "/" + currentUser + "/" +
+                CHATS + "/" + chatID + "/" +
+                MESSAGES + "/" + messageID + "/attachments";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
+                {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        progressBar.setVisibility(View.GONE);
+                        Log.d("ResponseMessage:" , response.toString());
+                        try
+                        {
+                            String base64String = response.getString("Blob");
+                            String fileType = response.getString("FileType");
+                            storeFile(messageID,base64String,fileName);
+                            done.setVisibility(View.VISIBLE);
+                            new CountDownTimer(2000, 1000)
+                            {
+                                @Override
+                                public void onTick(long millisUntilFinished)
+                                {
+                                }
+                                @Override
+                                public void onFinish()
+                                {
+                                    done.setVisibility(View.GONE);
+                                }
+                            }.start();
+                        }
+                        catch (JSONException | IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error)
+                    {
+                        // TODO: Handle error
+
+                    }
+                }){
+            @Override
+            public Priority getPriority()
+            {
+                return Priority.IMMEDIATE;
+            }
+        };
+
+        VolleyController.getInstance(mContext).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void storeFile(String messageID,String base, String fileName) throws IOException
+    {
+        String filePath = mContext.getFilesDir().getAbsolutePath() + "/" + fileName;
+        FileOutputStream fos = new FileOutputStream(filePath);
+        fos.write(Base64.decode(base,Base64.NO_WRAP));
+        fos.close();
+
+        updateCache(messageID,filePath);
+        Log.d("path","file saved to:"+filePath);
+    }
+    private void updateCache(String messageID, String filePath)
+    {
+        OpenHelper dbOpenHelper = new OpenHelper(mContext);
+        DataManager.loadToDatabase(dbOpenHelper,messageID,filePath);
+        dbOpenHelper.close();
     }
 }
