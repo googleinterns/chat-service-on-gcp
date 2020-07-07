@@ -233,21 +233,7 @@ public class ViewMessageActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        NetworkResponse networkResponse = error.networkResponse;
-                        String errorMessage = "Unknown error";
-                        if (networkResponse == null)
-                        {
-                            if (error.getClass().equals(TimeoutError.class))
-                            {
-                                errorMessage = "Request timeout";
-                            }
-                            else if (error.getClass().equals(NoConnectionError.class))
-                            {
-                                errorMessage = "Failed to connect server";
-                            }
-                        }
-                        Log.d("Error", errorMessage);
-                        error.printStackTrace();
+                        handleError(error);
                     }
                 }) {
             @Override
@@ -361,21 +347,7 @@ public class ViewMessageActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        NetworkResponse networkResponse = error.networkResponse;
-                        String errorMessage = "Unknown error";
-                        if (networkResponse == null)
-                        {
-                            if (error.getClass().equals(TimeoutError.class))
-                            {
-                                errorMessage = "Request timeout";
-                            }
-                            else if (error.getClass().equals(NoConnectionError.class))
-                            {
-                                errorMessage = "Failed to connect server";
-                            }
-                        }
-                        Log.d("Error", errorMessage);
-                        error.printStackTrace();
+                        handleError(error);
                     }
                 }) {
             @Override
@@ -510,8 +482,7 @@ public class ViewMessageActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        // TODO: Handle error
-
+                        handleError(error);
                     }
                 }){
             @Override
@@ -612,8 +583,7 @@ public class ViewMessageActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        // TODO: Handle error
-
+                        handleError(error);
                     }
                 }){
             @Override
@@ -679,8 +649,7 @@ public class ViewMessageActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        // TODO: Handle error
-
+                        handleError(error);
                     }
                 }){
             @Override
@@ -951,31 +920,7 @@ public class ViewMessageActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Log.d("errorMessage",error.toString());
-                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
-                        {
-                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
-                        }
-                        else if(error instanceof ClientError)
-                        {
-                            String responseBody = null;
-                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                            JSONObject data = null;
-                            try
-                            {
-                                data = new JSONObject(responseBody);
-                            }
-                            catch (JSONException e)
-                            {
-                                e.printStackTrace();
-                            }
-
-                            assert data != null;
-                            String message = data.optString("message");
-                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                            messages.clear();
-                            messageRecyclerAdapter.notifyDataSetChanged();
-                        }
+                        handleError(error);
                     }
                 }) {
             @Override
@@ -1016,31 +961,7 @@ public class ViewMessageActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Log.d("errorMessage",error.toString());
-                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
-                        {
-                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
-                        }
-                        else if(error instanceof ClientError)
-                        {
-                            String responseBody = null;
-                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                            JSONObject data = null;
-                            try
-                            {
-                                data = new JSONObject(responseBody);
-                            }
-                            catch (JSONException e)
-                            {
-                                e.printStackTrace();
-                            }
-
-                            assert data != null;
-                            String message = data.optString("message");
-                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                            messages.clear();
-                            messageRecyclerAdapter.notifyDataSetChanged();
-                        }
+                        handleError(error);
                     }
                 }) {
             @Override
@@ -1050,5 +971,23 @@ public class ViewMessageActivity extends AppCompatActivity
             }
         };
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
+    }
+    private void handleError(VolleyError error)
+    {
+        NetworkResponse networkResponse = error.networkResponse;
+        String errorMessage = "Unknown error";
+        if (networkResponse == null)
+        {
+            if (error.getClass().equals(TimeoutError.class))
+            {
+                errorMessage = "Request timeout";
+            }
+            else if (error.getClass().equals(NoConnectionError.class))
+            {
+                errorMessage = "Failed to connect server";
+            }
+        }
+        Log.d("Error", errorMessage);
+        error.printStackTrace();
     }
 }
