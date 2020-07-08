@@ -1,6 +1,12 @@
 from internal_node import InternalNode
-from parameter import Parameter
+import configparser
 import csv
+import ast
+
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+DATASET_FILE_NAME = ast.literal_eval(config["DatasetGenerator"]["DATASET_FILE_NAME"])
 
 class DatasetGenerator:
 
@@ -8,7 +14,7 @@ class DatasetGenerator:
         self.root_node = InternalNode(depth_in_tree = 0, parameter_to_value = {})
         data = self.root_node.create_child_nodes()
 
-        with open(Parameter.DATASET_FILE_NAME, 'w') as csv_file:  
+        with open(DATASET_FILE_NAME, 'w') as csv_file:  
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(["Metadata", "Data"])
             csv_writer.writerows(data)

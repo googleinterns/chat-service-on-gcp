@@ -1,14 +1,18 @@
-from parameter import Parameter
 import os
 import csv
 import random
 import string
 import numpy as np
 import uuid
-from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import as_completed
-import time
+import configparser
 import threading
+import ast
+from concurrent.futures import ThreadPoolExecutor
+
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+DURATION_SECONDS = ast.literal_eval(config["LeafNode"]["DURATION_SECONDS"])
 
 class LeafNode:
     """Represents the leaf nodes of the threaded tree.
@@ -24,7 +28,6 @@ class LeafNode:
    
     def __init__(self, parameter_to_value):
         """Initializes Leaf Node with parameter_to_value."""
-
         self.parameter_to_value = parameter_to_value.copy() 
         
     def __get_qps(self):
@@ -180,7 +183,7 @@ class LeafNode:
         
         message_content_all_batches = []
 
-        for batch_number in range(0, Parameter.DURATION_SECONDS):
+        for batch_number in range(0, DURATION_SECONDS):
             message_content_for_batch = []
             message_content_for_batch.extend(self.__generate_message_content_without_file(message_count["without_file"]))
             message_content_for_batch.extend(self.__generate_message_content_with_file_without_text(message_count["with_file"]["without_text"]))

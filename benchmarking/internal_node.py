@@ -1,7 +1,16 @@
-from parameter import Parameter
 from leaf_node import LeafNode
+import configparser
+import ast
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
+
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+PARAMETER_COUNT = ast.literal_eval(config["InternalNode"]["PARAMETER_COUNT"])
+PARAMETER_HIERARCHY = ast.literal_eval(config["InternalNode"]["PARAMETER_HIERARCHY"])
+PARAMETER_EXTREMA = ast.literal_eval(config["InternalNode"]["PARAMETER_EXTREMA"])
+PARAMETER_STEP_SIZE = ast.literal_eval(config["InternalNode"]["PARAMETER_STEP_SIZE"])
 
 class InternalNode:
     """Represents the internal nodes of the threaded tree.
@@ -67,7 +76,7 @@ class InternalNode:
         """Retrieves information of the parameter next in the hierarchy w.r.t. the current node.
 
         The parameter next in the hierarchy is the parameter at index = depth_in_tree 
-        in the list HIERARCHY of the parameter.Parameter class. 
+        in the PARAMETER_HIERARCHY. 
 
         Returns:
             A dictionary mapping info of the next parameter next in hierarchy
@@ -92,43 +101,43 @@ class InternalNode:
 
         for _info in info:
             if _info == "name":
-                next_parameter_info[_info] = Parameter.HIERARCHY[self.depth_in_tree]
+                next_parameter_info[_info] = PARAMETER_HIERARCHY[self.depth_in_tree]
             elif _info == "min":
                 if next_parameter_info["name"] == "std_dev_length_of_text_with_file":
                     next_parameter_info[_info] = min(
                                                     self.parameter_to_value["mean_length_of_text_with_file"], 
-                                                    Parameter.EXTREMA[next_parameter_info["name"]]["min"]
+                                                    PARAMETER_EXTREMA[next_parameter_info["name"]]["min"]
                                                     )
                 elif next_parameter_info["name"] == "std_dev_file_size":
                     next_parameter_info[_info] = min(
                                                     self.parameter_to_value["mean_file_size"] - 1,
-                                                    Parameter.EXTREMA[next_parameter_info["name"]]["min"]
+                                                    PARAMETER_EXTREMA[next_parameter_info["name"]]["min"]
                                                     )
                 else:
-                    next_parameter_info[_info] = Parameter.EXTREMA[next_parameter_info["name"]]["min"]
+                    next_parameter_info[_info] = PARAMETER_EXTREMA[next_parameter_info["name"]]["min"]
             elif _info == "max":
                 if next_parameter_info["name"] == "std_dev_length_of_text":
                     next_parameter_info[_info] = min(
                                                     self.parameter_to_value["mean_length_of_text"] - 1, 
-                                                    Parameter.EXTREMA[next_parameter_info["name"]]["max"]
+                                                    PARAMETER_EXTREMA[next_parameter_info["name"]]["max"]
                                                     )
                 elif next_parameter_info["name"] == "std_dev_length_of_text_with_file":
                     next_parameter_info[_info] = min(
                                                     self.parameter_to_value["mean_length_of_text_with_file"], 
-                                                    Parameter.EXTREMA[next_parameter_info["name"]]["max"]
+                                                    PARAMETER_EXTREMA[next_parameter_info["name"]]["max"]
                                                     )
                 elif next_parameter_info["name"] == "std_dev_file_size":
                     next_parameter_info[_info] = min(
                                                     self.parameter_to_value["mean_file_size"] - 1, 
                                                     25 - self.parameter_to_value["mean_file_size"],
-                                                    Parameter.EXTREMA[next_parameter_info["name"]]["max"]
+                                                    PARAMETER_EXTREMA[next_parameter_info["name"]]["max"]
                                                     )
                 else:
-                    next_parameter_info[_info] = Parameter.EXTREMA[next_parameter_info["name"]]["max"]
+                    next_parameter_info[_info] = PARAMETER_EXTREMA[next_parameter_info["name"]]["max"]
             elif _info == "range":
                 next_parameter_info[_info] = next_parameter_info["max"] - next_parameter_info["min"]
             else:
-                next_parameter_info[_info] = Parameter.STEP_SIZE[next_parameter_info["name"]]
+                next_parameter_info[_info] = PARAMETER_STEP_SIZE[next_parameter_info["name"]]
         
         # Sets the range to the lowest multiple of its step size greater than its current value 
         # If the range of values of next_parameter is not a multiple of step_size
@@ -148,7 +157,7 @@ class InternalNode:
                 depth_of_tree = total number of parameters to vary - 1.
             False: Otherwise. 
         """
-        return self.depth_in_tree == Parameter.COUNT - 1
+        return self.depth_in_tree == PARAMETER_COUNT - 1
 
     def create_child_nodes(self):
         """Creates child thread nodes of current node."""
