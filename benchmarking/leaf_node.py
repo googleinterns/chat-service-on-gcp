@@ -95,12 +95,14 @@ class LeafNode:
 
         for count in range(0, message_count):
             message_content = {}
-            message_content["textContent"] = self.__sample_normal_length_of_text_generate_random_text(
+            message_content["data"] = {}
+            message_content["files"] = {}
+            message_content["data"]["textContent"] = self.__sample_normal_length_of_text_generate_random_text(
                                                     mean_length_of_text_with_file, 
                                                     std_dev_length_of_text_with_file
                                                     )
             file_name, file_content = self.__sample_normal_file_size_generate_random_file_content(mean_file_size, std_dev_file_size)
-            message_content["file"] = (file_name, file_content)
+            message_content["files"]["file"] = (file_name, file_content, "application/octet-stream")
             
             message_content_with_file_with_text.append(message_content)
 
@@ -113,8 +115,9 @@ class LeafNode:
 
         for count in range(0, message_count):
             message_content = {}
+            message_content["files"] = {}
             file_name, file_content = self.__sample_normal_file_size_generate_random_file_content(mean_file_size, std_dev_file_size)
-            message_content["file"] = (file_name, file_content)
+            message_content["files"]["file"] = (file_name, file_content, "application/octet-stream")
             
             message_content_with_file_without_text.append(message_content)
 
@@ -127,7 +130,8 @@ class LeafNode:
 
         for count in range(0, message_count):
             message_content = {}
-            message_content["textContent"] = self.__sample_normal_length_of_text_generate_random_text(
+            message_content["data"] = {}
+            message_content["data"]["textContent"] = self.__sample_normal_length_of_text_generate_random_text(
                                                         mean_length_of_text, 
                                                         std_dev_length_of_text
                                                         )
