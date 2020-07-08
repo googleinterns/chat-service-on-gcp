@@ -118,7 +118,7 @@ public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username
      * If no such user exists, returns -1
      */
     public long login(String username, String password) {
-        String sqlStatment = "SELECT UserID from User WHERE Username=@username AND Password=@password";
+        String sqlStatment = "SELECT UserID from User@{FORCE_INDEX=UsersByUsernamePassword} WHERE Username=@username AND Password=@password";
         Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("username")
                                 .to(username)
@@ -137,7 +137,7 @@ public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username
      * If no such user exists, returns null
      */
     public User getUser(String username) {
-        String sqlStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User WHERE Username=@Username";
+        String sqlStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User@{FORCE_INDEX=UsersByUsernamePassword} WHERE Username=@Username";
         Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("Username")
                                 .to(username)
