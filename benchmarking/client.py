@@ -8,27 +8,30 @@ class Client:
         self.api_endpoint = api_endpoint
         self.request_type = request_type
         self.request_body = request_body
+        self.response = None
 
     def send_request(self):
-        if self.request_type == "POST":
+        if self.request_type == "GET":
+            self.response = requests.get(url = self.api_endpoint)
+        elif self.request_type == "POST":
             if "data" in self.request_body and "files" in self.request_body:
-                response = requests.post(
-                            url = self.api_endpoint, 
-                            data = self.request_body["data"],
-                            files = self.request_body["files"]
-                            )
+                self.response = requests.post(
+                                            url = self.api_endpoint, 
+                                            data = self.request_body["data"],
+                                            files = self.request_body["files"]
+                                            )
             elif "data" in self.request_body:
-                response = requests.post(
-                        url = self.api_endpoint, 
-                        data = self.request_body["data"]
-                        )
+                self.response = requests.post(
+                                            url = self.api_endpoint, 
+                                            data = self.request_body["data"]
+                                            )
             else:
-                response = requests.post(
-                        url = self.api_endpoint, 
-                        files = self.request_body["files"]
-                        )
+                self.response = requests.post(
+                                            url = self.api_endpoint, 
+                                            files = self.request_body["files"]
+                                            )
             
-            return response
+        return self.response
 
     @staticmethod
     def call_send_request(client):
