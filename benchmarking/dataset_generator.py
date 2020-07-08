@@ -1,12 +1,11 @@
 from internal_node import InternalNode
 import configparser
 import csv
-import ast
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 
-DATASET_FILE_NAME = ast.literal_eval(config["DatasetGenerator"]["DATASET_FILE_NAME"])
+DATASET_FILE_NAME = config["DatasetGenerator"]["DATASET_FILE_NAME"]
 
 class DatasetGenerator:
 
