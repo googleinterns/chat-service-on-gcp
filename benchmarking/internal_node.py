@@ -130,9 +130,12 @@ class InternalNode:
             else:
                 next_parameter_info[_info] = Parameter.STEP_SIZE[next_parameter_info["name"]]
         
-        # Sets the range to the nearest multiple of its step size
+        # Sets the range to the lowest multiple of its step size greater than its current value 
+        # If the range of values of next_parameter is not a multiple of step_size
         if next_parameter_info["range"] % next_parameter_info["step_size"]:
+            # Increment max value of next_parameter with the amount by which current range is less [than the lowest multiple of step_size greater than it]
             next_parameter_info["max"] += next_parameter_info["step_size"] - next_parameter_info["range"] % next_parameter_info["step_size"]
+            # Update the value of range
             next_parameter_info["range"] = next_parameter_info["max"] - next_parameter_info["min"]
 
         return next_parameter_info
