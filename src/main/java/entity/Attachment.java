@@ -45,7 +45,7 @@ public final class Attachment {
     public Attachment(long attachmentId, MultipartFile file) {
         this.attachmentId = attachmentId;
         this.fileName = file.getOriginalFilename();
-        this.fileType = file.getContentType();
+        this.fileType = fileName.split("\\.")[1];
         this.fileSizeInBytes = file.getSize();
         this.file = file;
     }
