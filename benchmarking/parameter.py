@@ -5,8 +5,6 @@ class Parameter:
     DURATION_SECONDS = 2
 
     DATASET_FILE_NAME = "MessageContentDataset.csv"
-
-    DIRECTORY = "./generated_files/"
     
     HIERARCHY = [
         "qps", 

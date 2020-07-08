@@ -51,7 +51,7 @@ class LeafNode:
     def __get_std_dev_file_size(self):
         return self.parameter_to_value["std_dev_file_size"]
 
-    def __sample_normal_file_size_generate_random_binary_file(self, mean_file_size, std_dev_file_size):
+    def __sample_normal_file_size_generate_random_file_content(self, mean_file_size, std_dev_file_size):
         file_size = min(25, 
                         round(np.random.normal(
                                 loc = mean_file_size, 
@@ -59,19 +59,13 @@ class LeafNode:
                                 )
                             )
                         )
-        file_name = os.path.join(
-                        Parameter.DIRECTORY, 
-                        "{}_{}_{}_".format(
+        file_name = "{}_{}_{}_".format(
                                     file_size, 
                                     mean_file_size, 
                                     std_dev_file_size
-                                    )
-                            + str(uuid.uuid4())
-                        )
-        with open('%s'%file_name, 'wb') as fout:
-            fout.write(os.urandom(file_size))
+                                    ) + str(uuid.uuid4()) + ".bin"
 
-        return file_name
+        return file_name, os.urandom(file_size)
 
     def __sample_normal_length_of_text_generate_random_text(self, mean_length_of_text, std_dev_length_of_text):
         length_of_text = round(np.random.normal(
@@ -102,8 +96,8 @@ class LeafNode:
                                                     mean_length_of_text_with_file, 
                                                     std_dev_length_of_text_with_file
                                                     )
-            file_name = self.__sample_normal_file_size_generate_random_binary_file(mean_file_size, std_dev_file_size)
-            message_content["file"] = open(file_name, 'r')
+            file_name, file_content = self.__sample_normal_file_size_generate_random_file_content(mean_file_size, std_dev_file_size)
+            message_content["file"] = (file_name, file_content)
             
             message_content_with_file_with_text.append(message_content)
 
@@ -116,8 +110,8 @@ class LeafNode:
 
         for count in range(0, message_count):
             message_content = {}
-            file_name = self.__sample_normal_file_size_generate_random_binary_file(mean_file_size, std_dev_file_size)
-            message_content["file"] = open(file_name, 'r')
+            file_name, file_content = self.__sample_normal_file_size_generate_random_file_content(mean_file_size, std_dev_file_size)
+            message_content["file"] = (file_name, file_content)
             
             message_content_with_file_without_text.append(message_content)
 
