@@ -50,4 +50,15 @@ CREATE TABLE UserChat (
   CONSTRAINT FK_UserChatUser FOREIGN KEY(UserID) REFERENCES User(UserID),
 ) PRIMARY KEY(UserID, ChatID)
 
+CREATE NULL_FILTERED INDEX UsersByMobileNo
+ON User (
+    MobileNo
+)
+
+CREATE INDEX UsersByUsernamePassword
+ON User (
+    Username,
+    Password
+)
+
 ALTER TABLE Chat ADD CONSTRAINT FK_Message FOREIGN KEY(LastSentMessageID) REFERENCES Message(MessageID);
