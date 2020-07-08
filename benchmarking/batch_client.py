@@ -19,7 +19,7 @@ class BatchClient:
     def __store_responses_in_file(self, response_entry_all_batches):
         with open(self.response_file_name, 'w') as csv_file:  
             csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(["Metadata", "Responses"])
+            csv_writer.writerow(["Metadata", "Responses", "Latency"])
             csv_writer.writerows(response_entry_all_batches)
 
     def __create_post_clients(self, count, request_body_list):
@@ -56,6 +56,7 @@ class BatchClient:
             batch_metadata = ast.literal_eval(request_body_df["Metadata"][batch_id])
             batch_data = ast.literal_eval(request_body_df["Data"][batch_id])
             response_entry_batch = []
+            latency_entry_batch = []
 
             for sub_batch_id in range(0, len(batch_data)):
                 client_count = batch_metadata["qps"]
@@ -72,13 +73,12 @@ class BatchClient:
                 response_entry_sub_batch = []
 
                 for response in responses:
-                    responseBody = response.json()
-                    responseBody["Latency"] = response.elapsed.total_seconds()
-                    response_entry_sub_batch.append(responseBody)
+                    latency_entry_batch.append(response.elapsed.total_seconds())
+                    response_entry_sub_batch.append(response.json())
 
                 response_entry_batch.append(response_entry_sub_batch)
                 
-            response_entry_all_batches.append([batch_metadata, response_entry_batch])
+            response_entry_all_batches.append([batch_metadata, response_entry_batch, latency_entry_batch])
 
         self.__store_responses_in_file(response_entry_all_batches)
                         
