@@ -36,3 +36,5 @@ Thumbs.db
 gradlew.bat
 gradlew
 
+*.pyc
+__pycache__

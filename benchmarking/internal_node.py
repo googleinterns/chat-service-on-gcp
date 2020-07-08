@@ -145,10 +145,7 @@ class InternalNode:
                 depth_of_tree = total number of parameters to vary - 1.
             False: Otherwise. 
         """
-        if self.depth_in_tree == Parameter.COUNT - 1: 
-            return True
-
-        return False
+        return self.depth_in_tree == Parameter.COUNT - 1
 
     def create_child_nodes(self):
         """Creates child thread nodes of current node."""
