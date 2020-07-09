@@ -211,7 +211,7 @@ public class ViewMessageActivity extends AppCompatActivity
                             long size = afd.getLength();
                             afd.close();
 
-                            addFileToScreen(messageID,fileName,mimeType,size+" bytes");
+                            addFileToScreen(messageID,fileName,mimeType,size+" B");
                             String outputPath = ViewMessageActivity.this.getFilesDir().getAbsolutePath() + "/" + fileName;
 //                            copyFileToLocalCache(outputPath);
 //                            new UpdateCache().execute(messageID,outputPath);
@@ -533,6 +533,12 @@ public class ViewMessageActivity extends AppCompatActivity
                 CHATS + "/" + chatID + "/" +
                 MESSAGES + "?" + END_MESSAGE + "=" + lastMessageID;
 
+        if(lastMessageID==null)
+        {
+           URL = BASE_URL + USERS +
+                   "/" + currentUser + "/" +
+                   CHATS + "/" + chatID + "/" + MESSAGES;
+        }
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
                 {
@@ -593,13 +599,16 @@ public class ViewMessageActivity extends AppCompatActivity
      */
     private void receiveMessageFromServer()
     {
-        Log.d("currentUser",currentUser);
-        Log.d("chatID:",chatID);
-        Log.d("lastMessageID:",lastMessageID);
         String URL = BASE_URL + USERS +
                 "/" + currentUser + "/" + CHATS +
                 "/" + chatID + "/" + MESSAGES + "?" +
                 START_MESSAGE + "=" + lastMessageID;
+        if(lastMessageID == null)
+        {
+            URL = BASE_URL + USERS +
+                    "/" + currentUser + "/" + CHATS +
+                    "/" + chatID + "/" + MESSAGES;
+        }
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()

@@ -109,8 +109,9 @@ public class ViewContactsActivity extends AppCompatActivity
                                 String username = chat.getString("Username");
                                 String chatID = chat.getString("ChatId");
                                 String lastMessageID = chat.getString("LastSentMessageId");
-
-                                contacts.add(new User(username,chatID,lastMessageID));
+                                String phoneNum = chat.getString("MobileNo");
+ 
+                                contacts.add(new User(username,chatID,lastMessageID,phoneNum));
                             }
                             if(active)
                             {

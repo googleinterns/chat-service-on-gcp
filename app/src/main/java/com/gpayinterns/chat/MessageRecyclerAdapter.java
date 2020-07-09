@@ -368,6 +368,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                         {
                             String base64String = response.getString("Blob");
                             String fileType = response.getString("FileType");
+                            Log.d("base64",base64String);
                             storeFile(messageID,base64String,fileName);
                             done.setVisibility(View.VISIBLE);
                             new CountDownTimer(2000, 1000)

@@ -62,7 +62,6 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         mCurrentUser = currentUser;
     }
 
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
@@ -80,9 +79,11 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         String name = mUsers.get(position).username;
         String chatID = mUsers.get(position).chatID;
         String lastMessageID = mUsers.get(position).lastMessageID;
+        String phoneNum = mUsers.get(position).phoneNum;
 
         holder.mUsername.setText(name);
         holder.mPicName.setText((Character.toString(name.charAt(0))).toUpperCase());  //to display first character of the name in the icon
+        holder.mPhoneNum.setText(phoneNum);
         holder.mChatID = chatID;
         holder.mLastMessageID = lastMessageID;
 
@@ -102,6 +103,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         public final TextView mUsername;
         public final TextView mPicName;
         public final RelativeLayout mContactIcon;
+        public final TextView mPhoneNum;
         public String mChatID;
         public String mLastMessageID;
         public ViewHolder(@NonNull View itemView)
@@ -110,6 +112,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             mUsername = (TextView) itemView.findViewById(R.id.contact_name);
             mPicName = (TextView) itemView.findViewById(R.id.tvWeekDayFirstLetter);
             mContactIcon = (RelativeLayout) itemView.findViewById(R.id.rlWeekDay);
+            mPhoneNum = (TextView) itemView.findViewById(R.id.view_contact_phone_num);
 
             itemView.setOnClickListener(new View.OnClickListener()
             {
@@ -171,7 +174,8 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                                             JSONObject chat = (JSONObject) chats.get(i);
 
                                             String username = chat.getString("Username");
-                                            filteredResult.add(new User(username,null,null));
+                                            String phoneNum = chat.getString("MobileNo");
+                                            filteredResult.add(new User(username,null,null,phoneNum));
                                         }
                                     }
                                     catch (JSONException e)
