@@ -1,3 +1,11 @@
+"""Contains the BatchClientDriverForGetAttachment class.
+
+Creates a BatchClientDriverForGetAttachment object.
+Instantiates this object's BatchClient variable with getAttachment
+related parameters. Calls the BatchClient method to send requests 
+and store responses for the getAttachment API.
+"""
+
 from batch_client import BatchClient
 from csv_file_writer import CsvFileWriter
 import configparser

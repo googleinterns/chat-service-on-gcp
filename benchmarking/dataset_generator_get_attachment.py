@@ -1,3 +1,11 @@
+"""Contains the DatasetGeneratorForGetAttachment class.
+
+Creates a DatasetGeneratorForGetAttachment object. 
+Reads the Response file of CreateMessage and 
+generates the dataset containing URL suffixes 
+for making calls to the getAttachment API.
+"""
+
 import configparser
 import ast 
 import pandas as pd 

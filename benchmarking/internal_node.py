@@ -1,3 +1,5 @@
+"""Contains the InternalNode class."""
+
 from leaf_node import LeafNode
 import configparser
 import ast

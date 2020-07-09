@@ -1,3 +1,12 @@
+"""Contains the StatisticalAnalyst class.
+
+Instantiates statistical analysts for the 
+createMessage and getAttachment responses' 
+latency. Reads the latency from their Response 
+files and calculates the required percentile 
+values. Stores them in a CSV.
+"""
+
 import ast
 import csv
 import pandas as pd

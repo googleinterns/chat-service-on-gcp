@@ -1,3 +1,11 @@
+"""Contains the BatchClientDriverForCreateMessage class.
+
+Creates a BatchClientDriverForCreateMessage object.
+Instantiates this object's BatchClient variable with createMessage
+related parameters. Calls the BatchClient method to send requests 
+and store responses for the createMessage API.
+"""
+
 from batch_client import BatchClient
 import configparser
 

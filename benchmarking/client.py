@@ -1,3 +1,5 @@
+"""Contains the Client class."""
+
 import requests
 import logging
 

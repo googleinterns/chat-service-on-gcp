@@ -1,3 +1,5 @@
+"""Contains the BatchClient class."""
+
 from client import Client
 import pandas as pd
 import ast

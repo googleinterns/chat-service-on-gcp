@@ -1,3 +1,5 @@
+"""Contains the LeafNode class."""
+
 import os
 import csv
 import random

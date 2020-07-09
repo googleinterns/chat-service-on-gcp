@@ -1,3 +1,11 @@
+"""Contains the DatasetGeneratorForCreateMessage class.
+
+Creates a DatasetGeneratorForCreateMessage object.
+Instantiates this object's InternalNode variable. 
+Begins the generation of dataset containing message
+content for making calls to the createMessage API.
+"""
+
 from internal_node import InternalNode
 import configparser
 from csv_file_writer import CsvFileWriter 

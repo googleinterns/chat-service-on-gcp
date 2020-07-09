@@ -1,3 +1,5 @@
+"""Contains the CsvFileWriter class."""
+
 import csv
 
 class CsvFileWriter:
