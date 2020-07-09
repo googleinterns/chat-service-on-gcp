@@ -10,6 +10,8 @@ public final class ServerConstants
     public static final String MESSAGES = "messages";
     public static final String START_MESSAGE = "startMessageId";
     public static final String END_MESSAGE = "endMessageId";
+    public static final String GET_USERS_MOBILE = "getUsersByMobileNumber";
+    public static final String MOBILE_PREFIX = "mobileNoPrefix";
 
     public static final String USER_USERNAME = "Username";
     public static final String USER_EMAIL = "EmailID";

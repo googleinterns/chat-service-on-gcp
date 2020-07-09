@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,16 +64,23 @@ import static com.gpayinterns.chat.ServerConstants.USERS;
 
 public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecyclerAdapter.ViewHolder>
 {
-    private final Context mContext;
+    private final Context mContext;//stores the context of ViewMessageActivity
     private final LayoutInflater mLayoutInflater;
-    private List<Message> mMessages;
+    private List<Message> mMessages;//stores all messages which are displayed in the view.
     private int mViewType;
+    String currentUser;
 
     //mViewType 0: left side text
     //mViewType 1: right side text
     //mViewType 2: left side richText
     //mViewType 3: right side richText
 
+    /**
+     * This method
+     *
+     * @param position
+     * @return         viewType according to the position
+     */
     @Override
     public int getItemViewType(int position)
     {
@@ -92,11 +100,18 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         return mViewType;
     }
 
-    public MessageRecyclerAdapter(Context Context, List <Message> messages)
+    /**
+     *
+     * @param Context      context of ViewMessageActivity
+     * @param messages     list of messages corresponding to the chatID
+     * @param mCurrentUser userID of the user who is logged in
+     */
+    public MessageRecyclerAdapter(Context Context, List <Message> messages, String mCurrentUser)
     {
         mContext = Context;
         mMessages = messages;
         mLayoutInflater = LayoutInflater.from(mContext);
+        currentUser = mCurrentUser;
     }
 
     @NonNull
@@ -183,6 +198,11 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                 mFileSize = (TextView) itemView.findViewById(R.id.send_file_size);
             }
 
+            /*
+             * when download button is clicked it checks for the existence of path in the cache.
+             * If it already exists, it doesn't download it again.
+             * else getAttachmentFromServer() is called to download it.
+             */
             if(mDownloadButton!=null)
             {
                 mDownloadButton.setOnClickListener(new View.OnClickListener()
@@ -194,7 +214,9 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                         ImageView done = (ImageView) itemView.findViewById(R.id.done);
                         if (fileExists(getPath(mMessageID)))
                         {
-                            Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT).show();
+                            Toast toast = Toast.makeText(mContext, "File is already downloaded", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+                            toast.show();
                         }
                         else
                         {
@@ -205,6 +227,11 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                 });
             }
 
+            /*
+             * Upon clicking the view button, the path stored in the cache is checked for validity.
+             * if it is valid, the file is shown to the user.
+             * else the user is asked to download the file once again.
+             */
             if(mViewButton!=null)
             {
                 mViewButton.setOnClickListener(new View.OnClickListener()
@@ -224,7 +251,9 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                         }
                         else
                         {
-                            Toast.makeText(mContext, "File not present in storage", Toast.LENGTH_SHORT).show();
+                            Toast toast = Toast.makeText(mContext, "File not present in cache.\nDownload it.", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER_HORIZONTAL, 0, 0);
+                            toast.show();
                         }
                     }
                 });
@@ -232,9 +261,15 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         }
     }
 
+    /**
+     * Adds the messages present in newMessages to the list mMessages
+     * @param newMessages  list of messages which is to be added to the back of the list 'mMessages'.
+     */
     public void addMessages(List<Message> newMessages)
     {
         int positionStart = mMessages.size();
+
+        //this if-else block is necessary as notifyItemRangeInserted() causes errors when the range is of length 1.
         if(newMessages.size()>1)
         {
             mMessages.addAll(newMessages);
@@ -247,8 +282,15 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         }
     }
 
+    /**
+     * messages present in newMessages is added to the beginning of mMessages,
+     * this method is used when the user scrolls up & hits the end.
+     *
+     * @param newMessages  list of messages which is to be added to the front of the list 'mMessages'.
+     */
     public void addMessagesToFront(List<Message> newMessages)
     {
+        //this if-else block is necessary as notifyItemRangeInserted() causes errors when the range is of length 1.
         if(newMessages.size()>1)
         {
             for(int i=newMessages.size()-1;i>=0;i--)
@@ -266,13 +308,13 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
 
     public static String convertDate(String dateInMilliseconds)
     {
+        // 6 extra spaces are added just for formatting purposes
         return "      "+DateFormat.format("hh:mm a", Long.parseLong(dateInMilliseconds)).toString();
     }
 
     /**
-     *
-     * @param path
-     * @return true if either the Uri leads to a valid file or the path obtained from cache is valid, else false
+     * @param path         the path which is to be checked for validity
+     * @return             true if the path obtained is valid, else false
      */
     private boolean fileExists(String path)
     {
@@ -284,6 +326,10 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         return file.exists();
     }
 
+    /**
+     * @param messageID    messageID corresponding to which the path stored has to be returned
+     * @return             the path in phone storage corresponding to the attachment.
+     */
     private String getPath(String messageID)
     {
         String path = null;
@@ -293,11 +339,17 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         return path;
     }
 
+    /**
+     *
+     * @param chatID       the chatID between which the message was exchanged
+     * @param messageID    messageID corresponding to the attachment
+     * @param fileName     name of the file
+     * @param progressBar  this progressbar helps the user to see that the file is being downloaded
+     * @param done         this image gets displayed for a couple of seconds when the file is downloaded.
+     */
     private void getAttachmentFromServer(String chatID, final String messageID, final String fileName,
                                          final ProgressBar progressBar, final ImageView done)
     {
-        SharedPreferences mPrefs= mContext.getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
-        String currentUser = mPrefs.getString("currentUser","");
 
         String URL = BASE_URL + USERS +
                 "/" + currentUser + "/" +
@@ -316,6 +368,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
                         {
                             String base64String = response.getString("Blob");
                             String fileType = response.getString("FileType");
+                            Log.d("base64",base64String);
                             storeFile(messageID,base64String,fileName);
                             done.setVisibility(View.VISIBLE);
                             new CountDownTimer(2000, 1000)
@@ -355,6 +408,14 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         VolleyController.getInstance(mContext).addToRequestQueue(jsonObjectRequest);
     }
 
+    /**
+     * This method helps store the file into the phone storage.
+     *
+     * @param messageID    messageID of the message whose file is to be stored
+     * @param base         the file which is to br stored in a base64 format received from server
+     * @param fileName     the name of the file
+     * @throws IOException
+     */
     private void storeFile(String messageID,String base, String fileName) throws IOException
     {
         String filePath = mContext.getFilesDir().getAbsolutePath() + "/" + fileName;
@@ -365,6 +426,14 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter <MessageRecycle
         updateCache(messageID,filePath);
         Log.d("path","file saved to:"+filePath);
     }
+
+    /**
+     * This method stores (messageID,path) in an SQLite DB, so that the data is persistent
+     * and only uninstalling the application can lead to its deletion.
+     *
+     * @param messageID    messageID of the message whose file is to be stored
+     * @param filePath     the path where the file has been stored
+     */
     private void updateCache(String messageID, String filePath)
     {
         OpenHelper dbOpenHelper = new OpenHelper(mContext);

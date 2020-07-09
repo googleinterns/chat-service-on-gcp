@@ -5,24 +5,45 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.gpayinterns.chat.R;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.gpayinterns.chat.User;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import static com.gpayinterns.chat.ServerConstants.BASE_URL;
+import static com.gpayinterns.chat.ServerConstants.CHATS;
+import static com.gpayinterns.chat.ServerConstants.GET_USERS_MOBILE;
+import static com.gpayinterns.chat.ServerConstants.MOBILE_PREFIX;
+import static com.gpayinterns.chat.ServerConstants.USERS;
 
 public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyclerAdapter.ViewHolder>
     implements Filterable
@@ -31,15 +52,15 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
     private final LayoutInflater mLayoutInflater;
 
     private List<User> mUsers;
+    private String mCurrentUser;
 
-
-    public ContactsRecyclerAdapter(Context context, List <User> users)
+    public ContactsRecyclerAdapter(Context context, List <User> users, String currentUser)
     {
         mContext = context;
         mUsers = users;
         mLayoutInflater = LayoutInflater.from(mContext);
+        mCurrentUser = currentUser;
     }
-
 
     @NonNull
     @Override
@@ -58,9 +79,11 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         String name = mUsers.get(position).username;
         String chatID = mUsers.get(position).chatID;
         String lastMessageID = mUsers.get(position).lastMessageID;
+        String phoneNum = mUsers.get(position).phoneNum;
 
         holder.mUsername.setText(name);
         holder.mPicName.setText((Character.toString(name.charAt(0))).toUpperCase());  //to display first character of the name in the icon
+        holder.mPhoneNum.setText(phoneNum);
         holder.mChatID = chatID;
         holder.mLastMessageID = lastMessageID;
 
@@ -80,6 +103,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         public final TextView mUsername;
         public final TextView mPicName;
         public final RelativeLayout mContactIcon;
+        public final TextView mPhoneNum;
         public String mChatID;
         public String mLastMessageID;
         public ViewHolder(@NonNull View itemView)
@@ -88,6 +112,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             mUsername = (TextView) itemView.findViewById(R.id.contact_name);
             mPicName = (TextView) itemView.findViewById(R.id.tvWeekDayFirstLetter);
             mContactIcon = (RelativeLayout) itemView.findViewById(R.id.rlWeekDay);
+            mPhoneNum = (TextView) itemView.findViewById(R.id.view_contact_phone_num);
 
             itemView.setOnClickListener(new View.OnClickListener()
             {
@@ -96,9 +121,9 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
                 {
                     Intent intent = new Intent(mContext,ViewMessageActivity.class);
 
-                    intent.putExtra(ViewMessageActivity.CHAT_ID,mChatID);
-                    intent.putExtra(ViewMessageActivity.CONTACT_USERNAME,mUsername.getText().toString());
-                    intent.putExtra(ViewMessageActivity.LAST_MESSAGE_ID,mLastMessageID);
+                    intent.putExtra(ViewMessageActivity.CHAT_ID, mChatID);
+                    intent.putExtra(ViewMessageActivity.CONTACT_USERNAME, mUsername.getText().toString());
+                    intent.putExtra(ViewMessageActivity.LAST_MESSAGE_ID, mLastMessageID);
 
                     mContext.startActivity(intent);
                 }
@@ -114,8 +139,9 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
         this.notifyDataSetChanged();
     }
 
-
-
+    /**
+     * This helps to filter the contacts on the basis of the phoneNum provided
+     */
     @Override
     public Filter getFilter()
     {
@@ -125,17 +151,66 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             protected FilterResults performFiltering(CharSequence constraint)
             {
                 FilterResults results = new FilterResults();
-                List <User> filteredResult = new ArrayList<>();
-                if(constraint.length()>0 && !(mUsers.isEmpty()))
+                final List <User> filteredResult = new ArrayList<>();
+                if(!constraint.toString().isEmpty())
                 {
-                    for(User u : mUsers)
-                    {
-                        String userName = u.username;
-                        if(userName.toLowerCase().contains(constraint.toString()))
+                    final CountDownLatch latch = new CountDownLatch(1);
+
+                    String URL = BASE_URL + GET_USERS_MOBILE
+                            +"/" + mCurrentUser + "/?" + MOBILE_PREFIX + "=" + constraint.toString();
+                    Log.d("URL",URL);
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                            (Request.Method.GET, URL, null, new Response.Listener<JSONObject>()
+                            {
+                                @Override
+                                public void onResponse(JSONObject response)
+                                {
+                                    Log.d("ResponseMessage: " , response.toString());
+                                    try
+                                    {
+                                        JSONArray chats = response.getJSONArray("Users");
+                                        for(int i=0;i<chats.length();i++)
+                                        {
+                                            JSONObject chat = (JSONObject) chats.get(i);
+
+                                            String username = chat.getString("Username");
+                                            String phoneNum = chat.getString("MobileNo");
+                                            filteredResult.add(new User(username,null,null,phoneNum));
+                                        }
+                                    }
+                                    catch (JSONException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                    latch.countDown();
+                                }
+                            }, new Response.ErrorListener()
+                            {
+                                @Override
+                                public void onErrorResponse(VolleyError error)
+                                {
+                                    latch.countDown();
+                                }
+                            }){
+                        @Override
+                        public Priority getPriority()
                         {
-                            filteredResult.add(u);
+                            return Priority.IMMEDIATE;
                         }
+                    };
+                    VolleyController.getInstance(mContext).addToRequestQueueWithRetry(jsonObjectRequest);
+                    try
+                    {
+                        latch.await();//wait until response has been received
                     }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                    filteredResult.addAll(mUsers);
                 }
                 results.values = filteredResult;
                 return results;
@@ -144,13 +219,16 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter <ContactsRecyc
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results)
             {
+                mUsers.clear();
                 mUsers = (List<User>) results.values;
                 notifyDataSetChanged();
             }
         };
     }
 
-
+    /**
+     * @return    a random color
+     */
     int getRandomColor()
     {
         int r = 0;

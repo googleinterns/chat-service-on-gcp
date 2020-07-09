@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,7 +56,6 @@ public class ViewContactsActivity extends AppCompatActivity
 
     private String currentUser;
     RecyclerView recyclerContacts;
-
     ProgressBar progressBar;
 
     @Override
@@ -67,6 +67,7 @@ public class ViewContactsActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.view_contacts_toolbar);
         setSupportActionBar(toolbar);
 
+        getCurrentUser();
         progressBar = (ProgressBar) findViewById(R.id.view_contacts_indeterminateBar);
 
         initializeDisplayContent();
@@ -82,6 +83,9 @@ public class ViewContactsActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * loads all chats with whom the current user has had a conversation earlier.
+     */
     private void loadChatsFromServer()
     {
         Log.d("currentUser sent to server:",currentUser);
@@ -105,12 +109,15 @@ public class ViewContactsActivity extends AppCompatActivity
                                 String username = chat.getString("Username");
                                 String chatID = chat.getString("ChatId");
                                 String lastMessageID = chat.getString("LastSentMessageId");
-
-                                Log.d("here",username);
-                                contacts.add(new User(username,chatID,lastMessageID));
+                                String phoneNum = chat.getString("MobileNo");
+ 
+                                contacts.add(new User(username,chatID,lastMessageID,phoneNum));
                             }
-                            progressBar.setVisibility(View.GONE);
-                            contactsRecyclerAdapter.updateContactsList(contacts);
+                            if(active)
+                            {
+                                progressBar.setVisibility(View.GONE);
+                                contactsRecyclerAdapter.updateContactsList(contacts);
+                            }
                         }
                         catch (JSONException e)
                         {
@@ -136,6 +143,9 @@ public class ViewContactsActivity extends AppCompatActivity
     }
 
 
+    /**
+     * A method to get the currentUser stored in Shared Preferences & log out if no user found.
+     */
     private void getCurrentUser()
     {
         SharedPreferences mPrefs= getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
@@ -146,11 +156,14 @@ public class ViewContactsActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * sets up the recyclerView for displaying contacts
+     */
     private void initializeDisplayContent()
     {
         recyclerContacts = (RecyclerView) findViewById(R.id.contacts_recyclerView);
         contactLayoutManager = new LinearLayoutManager(this);
-        contactsRecyclerAdapter = new ContactsRecyclerAdapter(this,users);
+        contactsRecyclerAdapter = new ContactsRecyclerAdapter(this,users,currentUser);
         recyclerContacts.addItemDecoration(new DividerItemDecoration(recyclerContacts.getContext(), DividerItemDecoration.VERTICAL));
         recyclerContacts.setLayoutManager(contactLayoutManager);
         recyclerContacts.setAdapter(contactsRecyclerAdapter);
@@ -162,8 +175,6 @@ public class ViewContactsActivity extends AppCompatActivity
     {
         super.onResume();
         active=true;
-        getCurrentUser();
-        Log.d("currentUser",currentUser);
         loadChatsFromServer();
     }
 
@@ -171,6 +182,7 @@ public class ViewContactsActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
+        Runtime.getRuntime().gc();// free heap memory by destroying unreachable objects
     }
 
     @Override
@@ -204,6 +216,9 @@ public class ViewContactsActivity extends AppCompatActivity
 
     }
 
+    /**
+     * exits the application
+     */
     private void exit()
     {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -222,14 +237,16 @@ public class ViewContactsActivity extends AppCompatActivity
 
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
+            public boolean onMenuItemActionExpand(MenuItem item)
+            {
                 searchView.setFocusable(true);
                 searchView.requestFocus();
                 return true;
             }
 
             @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
+            public boolean onMenuItemActionCollapse(MenuItem item)
+            {
                 searchView.setQuery("",false);
                 fab.setVisibility(View.VISIBLE);
                 hideSoftKeyboard();
@@ -242,6 +259,7 @@ public class ViewContactsActivity extends AppCompatActivity
             @Override
             public boolean onClose()
             {
+                progressBar.setVisibility(View.GONE);
                 searchView.setQuery("",false);
                 fab.setVisibility(View.VISIBLE);
                 loadChatsFromServer();
@@ -255,13 +273,25 @@ public class ViewContactsActivity extends AppCompatActivity
                     public boolean onQueryTextSubmit(String query)
                     {
                         contactsRecyclerAdapter.getFilter().filter(query.toLowerCase());
+                        new CountDownTimer(2000, 1000)
+                        {
+                            @Override
+                            public void onTick(long millisUntilFinished)
+                            {
+                            }
+                            @Override
+                            public void onFinish()
+                            {
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        }.start();
                         return true;
                     }
 
                     @Override
                     public boolean onQueryTextChange(String newText)
                     {
-                        contactsRecyclerAdapter.getFilter().filter(newText.toLowerCase());
+                        progressBar.setVisibility(View.VISIBLE);
                         return true;
                     }
                 }
@@ -291,6 +321,9 @@ public class ViewContactsActivity extends AppCompatActivity
         startActivity(new Intent(this,LoginActivity.class));
     }
 
+    /**
+     * show a dialog window for confirmation when the user opts to logout.
+     */
     private void showDialogWindow()
     {
         final AlertDialog dialog = new AlertDialog.Builder(this)

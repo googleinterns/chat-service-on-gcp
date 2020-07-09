@@ -97,7 +97,7 @@ public class RegistrationActivity extends AppCompatActivity
     @Override
     protected void onPause()
     {
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);//fadein-fadeout animation
         active=false;
         super.onPause();
     }
@@ -110,6 +110,10 @@ public class RegistrationActivity extends AppCompatActivity
         super.onResume();
     }
 
+    /**
+     * send details filled by the user to the server
+     * @throws JSONException
+     */
     private void addUserServer() throws JSONException
     {
         String userName = usernameEditText.getText().toString();

@@ -18,7 +18,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:paddingTop="10dp"
             android:gravity="start">
             <TextView
@@ -40,7 +41,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/file_name_linear_layout"
-            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:paddingTop="5dp"
             android:gravity="start">
             <TextView
@@ -85,7 +87,7 @@
                 android:id="@+id/download_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#800080"
+                android:backgroundTint="#A9A9A9"
                 android:text=" Download"
                 android:textSize="11sp"
                 android:textColor="@android:color/white"
@@ -95,7 +97,7 @@
                 android:id="@+id/view_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#800080"
+                android:backgroundTint="#A9A9A9"
                 android:text="View"
                 android:textSize="11sp"
                 android:textColor="@android:color/white"
