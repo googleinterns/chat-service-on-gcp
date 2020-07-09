@@ -4,13 +4,12 @@ MultiUser and SignUpUser classes are derived from User class.
 MultiUser and SignUpUser classes override User's simulate method,
 that sends requests and returns a list of tuple (response object, current_total_qps).
 """
+import random
 from datetime import datetime
 
 import requests
 
 import apis
-import random
-import time
 
 
 def get_random_username():
@@ -102,7 +101,6 @@ class MultiUser(User):
                 index = random.randint(0, 1)
                 response = apis.create_message_request(session, self.user_id, self.chat_id_list[index])
             response_list.append((MultiUser.api_names[api_number - 1], response, User.total_qps))
-            time.sleep(User.interval)
         return response_list
 
 
@@ -118,5 +116,4 @@ class SignupUser(User):
         response_list = []
         while datetime.now() < User.end_time:
             response_list.append(("signup", apis.signup_request(session), User.total_qps))
-            time.sleep(User.interval)
         return response_list
