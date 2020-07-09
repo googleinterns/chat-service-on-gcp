@@ -10,7 +10,7 @@ from csv_file_writer import CsvFileWriter
 class BatchClient:
 
     def __init__(self, api_endpoint, request_type, request_body_dataset_path, response_file_name):
-        """Initializes BatchClient with request_body_dataset_path."""
+        """Initializes BatchClient with api_endpoint, request_type, request_body_dataset_path and response_file_name."""
         self.api_endpoint = api_endpoint
         self.request_type = request_type
         self.request_body_dataset_path = request_body_dataset_path

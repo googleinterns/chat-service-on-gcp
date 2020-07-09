@@ -4,7 +4,7 @@ import logging
 class Client:
     
     def __init__(self, api_endpoint, request_type, request_body):
-        """Initializes Client with post_request_body."""
+        """Initializes Client with api_endpoint, request_type and request_body."""
         self.api_endpoint = api_endpoint
         self.request_type = request_type
         self.request_body = request_body
