@@ -12,11 +12,7 @@ import helper.SuccessResponseGenerator;
 import exceptions.UserIdDoesNotExistException;
 import exceptions.UserIdMissingFromRequestURLPathException;
 
-import java.util.Map;
-import java.util.List;
-import java.util.Comparator;
-import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.data.util.Pair;
@@ -94,18 +90,19 @@ public final class ListChats {
      * <li> ChatId </li>
      * <li> Username (of the other user) </li>
      * <li> LastSentMessageId </li>
+     * <li> Mobile Number (of the other user) (Optional) </li>
      * </ol>
      */
-    ImmutableMap<String, Object> getChatInfoOfChatInMap(Chat chat, Pair<String, String> secondUser) {
+    ImmutableMap<String, Object> getChatInfoOfChatInMap(Chat chat, Pair<String, Optional<String>> secondUser) {
         
-        ImmutableMap<String, Object> chatInfoOfChatInMap = ImmutableMap.<String, Object> builder()
-                                                                        .put("ChatId", chat.getChatId())
-                                                                        .put("Username", secondUser.getFirst())
-                                                                        .put("MobileNo", secondUser.getSecond())
-                                                                        .put("LastSentMessageId", chat.getLastSentMessageId())
-                                                                        .build();
-
-        return chatInfoOfChatInMap;
+        ImmutableMap.Builder<String, Object> chatInfoOfChatInMapBuilder = ImmutableMap.<String, Object> builder();
+        chatInfoOfChatInMapBuilder.put("ChatId", chat.getChatId());
+        chatInfoOfChatInMapBuilder.put("Username", secondUser.getFirst());
+        chatInfoOfChatInMapBuilder.put("LastSentMessageId", chat.getLastSentMessageId());
+        if(secondUser.getSecond().isPresent()) {
+            chatInfoOfChatInMapBuilder.put("MobileNo", secondUser.getSecond().get());
+        }
+        return chatInfoOfChatInMapBuilder.build();
     }
 
     /**
@@ -166,11 +163,14 @@ public final class ListChats {
 
         ImmutableList<UsernameMobileNoChatId> usernameMobileNoChatIdForSecondUsers = queryUser.getUsernameMobileNoChatIdForSecondUsers(userId, listOfChatId);
 
-        //Stores username of the other User against ChatId for each Chat of the User.
-        Map<Long, Pair<String, String>> chatIdSecondUsernameMap = new LinkedHashMap<Long, Pair<String, String>>();
+        //Stores username and mobile number of the other User against ChatId for each Chat of the User.
+        Map<Long, Pair<String, Optional<String>>> chatIdSecondUsernameMap = new LinkedHashMap<Long, Pair<String, Optional<String>>>();
 
         for (UsernameMobileNoChatId usernameMobileNoChatId : usernameMobileNoChatIdForSecondUsers) {
-            chatIdSecondUsernameMap.put(usernameMobileNoChatId.getChatId(), Pair.of(usernameMobileNoChatId.getUsername(), usernameMobileNoChatId.getMobileNo()));
+            chatIdSecondUsernameMap.put(
+                    usernameMobileNoChatId.getChatId(),
+                    Pair.of(usernameMobileNoChatId.getUsername(), Optional.ofNullable(usernameMobileNoChatId.getMobileNo()))
+            );
         }
 
         //Stores list of all details of each Chat of the User.
