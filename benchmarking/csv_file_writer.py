@@ -1,7 +1,17 @@
 import csv
 
 class CsvFileWriter:
+    """Represents a file writer for CSVs.
+    
+    Responsible writing the given data in a 
+    CSV with the given file name and column names.
 
+    Attributes:
+        csv_name: A String for name of CSV to be written to.
+        csv_col_names: A list of String column names of the CSV.
+        csv_rows: A list of rows to be written to the CSV.
+    """
+    
     def __init__(self, csv_name, csv_col_names, csv_rows):
         self.csv_name = csv_name
         self.csv_col_names = csv_col_names

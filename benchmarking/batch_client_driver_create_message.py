@@ -9,6 +9,14 @@ DATASET_FILE_NAME = config["BatchClientDriverForCreateMessage"]["DATASET_FILE_NA
 RESPONSE_FILE_NAME = config["BatchClientDriverForCreateMessage"]["CREATE_MESSAGE_RESPONSE_FILE_NAME"]
 
 class BatchClientDriverForCreateMessage:
+    """Driver Class for benchmarking the createMessage API.
+    
+    Responsible for driving the sending of requests to 
+    createMessage and storing the consequent responses.
+
+    Attributes:
+        batch_client: A BatchClient object to perform the above functions.
+    """
 
     def __init__(self):
         self.batch_client = BatchClient(CREATE_MESSAGE_URL, "POST", DATASET_FILE_NAME, RESPONSE_FILE_NAME)

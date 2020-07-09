@@ -10,6 +10,14 @@ DATASET_FILE_NAME = config["BatchClientDriverForGetAttachment"]["DATASET_FILE_NA
 RESPONSE_FILE_NAME = config["BatchClientDriverForGetAttachment"]["GET_ATTACHMENT_RESPONSE_FILE_NAME"]
 
 class BatchClientDriverForGetAttachment:
+    """Driver Class for benchmarking the getAttachment API.
+    
+    Responsible for driving the sending of requests to 
+    getAttachment and storing the consequent responses.
+
+    Attributes:
+        batch_client: A BatchClient object to perform the above functions.
+    """
 
     def __init__(self):
         self.batch_client = BatchClient(GET_ATTACHMENT_URL, "GET", DATASET_FILE_NAME, RESPONSE_FILE_NAME)

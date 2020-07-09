@@ -2,7 +2,20 @@ import requests
 import logging
 
 class Client:
+    """Represents a Client which sends requests.
     
+    Responsible for a request(POST/GET) to the given API.
+
+    Attributes:
+        api_endpoint: A String for the URL at which to send the request.
+        request_type: A String for the HTTP Request Type of the requests to be sent (POST/GET here).
+        request_body: A dict containing at least one of the following keys:
+                        <ol>
+                        <li> data : {textContent: <random_string>} </li>
+                        <li> files : {file: (<file_name>, <file_content>, <file mime type>)}
+                        </ol>
+    """
+
     def __init__(self, api_endpoint, request_type, request_body):
         """Initializes Client with api_endpoint, request_type and request_body."""
         self.api_endpoint = api_endpoint

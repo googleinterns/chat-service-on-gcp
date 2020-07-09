@@ -8,7 +8,16 @@ config.read("config.ini")
 DATASET_FILE_NAME = config["DatasetGenerator"]["DATASET_FILE_NAME"]
 
 class DatasetGeneratorForCreateMessage:
+    """Generator of the dataset of requests to createMessage.
+    
+    Responsible for generating a dataset of message content 
+    for sending requests to the createMessage API.
 
+    Attributes:
+        root_node: An InternalNode object representing the 
+                root of the threading tree for dataset generation.
+    """
+    
     def __init__(self):
         self.root_node = InternalNode(depth_in_tree = 0, parameter_to_value = {})
         

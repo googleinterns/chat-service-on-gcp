@@ -8,6 +8,21 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 class StatisticalAnalyst:
+    """Works as a Percentile Calculator.
+    
+    Responsible for reading 2 columns(metadata and data) from 
+    the given dataset and computing the values of the given 
+    set of percentiles of the data for each entry. 
+
+    Attributes:
+        dataset_file_path: A String for the complete path of the dataset file.
+        results_file_path: A String for the complete path of the file for storing statistical results.
+        metadata_attribute_name: A String for the name of the 'Metadata' attribute.
+        metadata_params: A list containing names of the parameters contained in Metadata of each entry.
+        data_attribute_name: A String for the name of the 'Data' attribute.
+        percentiles: A list of integers for the percentiles to be calculated.
+        percentile_names: A list of String for the column names of the respective percentiles.
+    """
 
     def __init__(self, dataset_file_path, results_file_path, metadata_attribute_name, metadata_params, data_attribute_name, percentiles, percentile_names):
         self.dataset_file_path = dataset_file_path
@@ -53,7 +68,7 @@ class StatisticalAnalyst:
             result_entries.append(result_entry)
 
         result_col_names = self.metadata_params.copy()
-        result_col_names.extend([percentile_name + " Percentile" for percentile_name in self.percentile_names])
+        result_col_names.extend([percentile_name + " Percentile (sec)" for percentile_name in self.percentile_names])
 
         csv_file_writer = CsvFileWriter(self.results_file_path, result_col_names, result_entries)
         csv_file_writer.write_to_csv()

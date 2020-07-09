@@ -8,12 +8,23 @@ import configparser
 from csv_file_writer import CsvFileWriter 
 
 class BatchClient:
+    """Represents a Benchmarking-in-Batch Client.
+    
+    Responsible for sending a set of requests in batches, to 
+    the given API and storing the consequent responses in a CSV.
 
-    def __init__(self, api_endpoint, request_type, request_body_dataset_path, response_file_name):
-        """Initializes BatchClient with api_endpoint, request_type, request_body_dataset_path and response_file_name."""
+    Attributes:
+        api_endpoint: A String for the URL/prefix of URL at which to send the request.
+        request_type: A String for the HTTP Request Type of the requests to be sent (POST/GET here).
+        request_dataset_path: A String for the complete path of the file containing request body/URL suffixes.
+        response_file_name: A String for the complete path of the file in which to store the responses.
+    """
+
+    def __init__(self, api_endpoint, request_type, request_dataset_path, response_file_name):
+        """Initializes BatchClient with api_endpoint, request_type, request_dataset_path and response_file_name."""
         self.api_endpoint = api_endpoint
         self.request_type = request_type
-        self.request_body_dataset_path = request_body_dataset_path
+        self.request_dataset_path = request_dataset_path
         self.response_file_name = response_file_name
 
     def __create_post_clients(self, count, request_body_list):
@@ -43,7 +54,7 @@ class BatchClient:
         return clients
     
     def send_requests_store_responses(self):
-        request_body_df = pd.read_csv(self.request_body_dataset_path)
+        request_body_df = pd.read_csv(self.request_dataset_path)
         response_entry_all_batches = []
         
         for batch_id in range(0, len(request_body_df)):
