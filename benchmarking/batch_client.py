@@ -4,8 +4,8 @@ import ast
 from concurrent.futures import ThreadPoolExecutor
 import requests
 import os
-import csv
 import configparser
+from csv_file_writer import CsvFileWriter 
 
 class BatchClient:
 
@@ -15,12 +15,6 @@ class BatchClient:
         self.request_type = request_type
         self.request_body_dataset_path = request_body_dataset_path
         self.response_file_name = response_file_name
-
-    def __store_responses_in_file(self, response_entry_all_batches):
-        with open(self.response_file_name, 'w') as csv_file:  
-            csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(["Metadata", "Responses", "Latency"])
-            csv_writer.writerows(response_entry_all_batches)
 
     def __create_post_clients(self, count, request_body_list):
         clients = []
@@ -80,5 +74,6 @@ class BatchClient:
                 
             response_entry_all_batches.append([batch_metadata, response_entry_batch, latency_entry_batch])
 
-        self.__store_responses_in_file(response_entry_all_batches)
+        csv_file_writer = CsvFileWriter(self.response_file_name, ["Metadata", "Responses", "Latency"], response_entry_all_batches)
+        csv_file_writer.write_to_csv()
                         
