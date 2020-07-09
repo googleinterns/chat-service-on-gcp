@@ -20,6 +20,7 @@ class BatchClientDriverForGetAttachment:
     """
 
     def __init__(self):
+        """Intializes BatchClientDriverForGetAttachment."""
         self.batch_client = BatchClient(GET_ATTACHMENT_URL, "GET", DATASET_FILE_NAME, RESPONSE_FILE_NAME)
         self.batch_client.send_requests_store_responses()
         

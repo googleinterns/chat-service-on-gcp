@@ -17,8 +17,9 @@ class DatasetGeneratorForGetAttachment:
     corresponds to call to getAttachment for a valid message
     i.e. one that does contain an attachment. 
     """
-    
+
     def __init__(self):
+        """Intializes DatasetGeneratorForGetAttachment."""
         self.__generate_dataset_for_get_attachment()
 
     def __generate_dataset_for_get_attachment(self):

@@ -11,8 +11,9 @@ class CsvFileWriter:
         csv_col_names: A list of String column names of the CSV.
         csv_rows: A list of rows to be written to the CSV.
     """
-    
+
     def __init__(self, csv_name, csv_col_names, csv_rows):
+        """Intializes CsvFileWriter with csv_name, csv_col_names and csv_rows."""
         self.csv_name = csv_name
         self.csv_col_names = csv_col_names
         self.csv_rows = csv_rows

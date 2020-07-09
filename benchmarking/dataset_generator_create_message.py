@@ -19,6 +19,8 @@ class DatasetGeneratorForCreateMessage:
     """
     
     def __init__(self):
+        """Intializes CsvFileWriter with csv_name, csv_col_names, csv_rows."""
+
         self.root_node = InternalNode(depth_in_tree = 0, parameter_to_value = {})
         
         data = self.root_node.create_child_nodes()

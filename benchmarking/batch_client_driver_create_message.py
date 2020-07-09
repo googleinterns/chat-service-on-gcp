@@ -19,6 +19,7 @@ class BatchClientDriverForCreateMessage:
     """
 
     def __init__(self):
+        """Intializes BatchClientDriverForCreateMessage."""
         self.batch_client = BatchClient(CREATE_MESSAGE_URL, "POST", DATASET_FILE_NAME, RESPONSE_FILE_NAME)
         self.batch_client.send_requests_store_responses()
 

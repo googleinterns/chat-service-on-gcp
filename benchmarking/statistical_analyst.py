@@ -25,6 +25,18 @@ class StatisticalAnalyst:
     """
 
     def __init__(self, dataset_file_path, results_file_path, metadata_attribute_name, metadata_params, data_attribute_name, percentiles, percentile_names):
+        """Intializes StatisticalAnalyst with 
+            <ol>
+            <li> dataset_file_path </li>
+            <li> results_file_path </li>
+            <li> metadata_attribute_name </li>
+            <li> metadata_params </li>
+            <li> data_attribute_name </li>
+            <li> percentiles </li>
+            <li> percentile_names </li>
+            </ol>
+        """
+
         self.dataset_file_path = dataset_file_path
         self.results_file_path = results_file_path
         self.metadata_attribute_name = metadata_attribute_name
