@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 
 /**
  * Controller which responds to client requests to create a Chat between two Users.
@@ -44,6 +45,56 @@ public final class CreateChat {
 
     @Autowired
     private UniqueIdGenerator uniqueIdGenerator;
+
+    /**
+     * Encapsulation for the following fields related to a Chat for one of the Users engaged in that Chat. 
+     * <ol>
+     * <li> ChatId </li>
+     * <li> UserID of Second User in Chat </li>
+     * </ol>
+     */
+    public static final class ChatIdWithUserIds {
+
+        @Column(name = "ChatID")
+        private long chatId;
+
+        @Column(name = "UserID1")
+        private long userId1;
+
+        @Column(name = "UserID2")
+        private long userId2;
+
+        public ChatIdWithUserIds() {}
+
+        public ChatIdWithUserIds(long chatId, long userId2) {
+            this.chatId = chatId;
+            this.userId2 = userId2;
+        }
+
+        public void setChatId(long chatId) {
+            this.chatId = chatId;
+        }
+
+        public void setUserId1(long userId1) {
+            this.userId1 = userId1;
+        }
+
+        public void setUserId2(long userId2) {
+            this.userId2 = userId2;
+        }
+
+        public long getChatId() {
+            return chatId;
+        }
+
+        public long getUserId1() {
+            return userId1;
+        }
+
+        public long getUserId2() {
+            return userId2;
+        }
+    }
 
     /**
      * Responds to requests with missing userId URL Path Variable.
@@ -84,22 +135,23 @@ public final class CreateChat {
             throw new UsernameDoesNotExistException(path);
         } 
 
-        Chat newChat = new Chat();
-        UserChat newUserChat1 = UserChat.newUserChatWithUserId(userId);
-        UserChat newUserChat2 = UserChat.newUserChatWithUserId(queryUser.getUserIdFromUsername(username));
+        ChatIdWithUserIds chatIdWithUserIds = queryUserChat.getChatIdWithUserIdsIfExistsBetweenUsers(userId, username);
 
-        ImmutableList<UserChat> resultSet = queryUserChat.getChatIdIfChatExistsBetweenUserIds(newUserChat1.getUserId(), newUserChat2.getUserId());
-        if (!resultSet.isEmpty()) {
-            return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", resultSet.get(0).getChatId());
-        } 
-        
+        long chatId = chatIdWithUserIds.getChatId();
+        if (chatId != 0) {
+            return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", chatId);
+        }
+
+        Chat newChat = new Chat();
         newChat.setChatId(uniqueIdGenerator.generateUniqueId("Chat"));
 
-        newUserChat1.setChatId(newChat.getChatId());
-        newUserChat2.setChatId(newChat.getChatId());
+        chatId = newChat.getChatId();
+
+        UserChat newUserChat1 = new UserChat(userId, chatId);
+        UserChat newUserChat2 = new UserChat(chatIdWithUserIds.getUserId2(), chatId);
 
         insertChat.insertForCreateChatTransaction(newChat, newUserChat1, newUserChat2);
 
-        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", newChat.getChatId());
+        return SuccessResponseGenerator.getSuccessResponseForCreateEntity("Chat", chatId);
     }
 }
