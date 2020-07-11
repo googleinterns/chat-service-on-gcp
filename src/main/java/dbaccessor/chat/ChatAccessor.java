@@ -3,6 +3,7 @@ package dbaccessor.chat;
 import entity.User;
 import entity.Chat;
 import entity.UserChat;
+import controller.ListChats;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,20 +78,59 @@ public final class ChatAccessor {
     }
 
     /**
-     * Returns details of all Chats which the given User id engaged in.
+     * Returns details of all Chats which the given UserId engaged in.
      * Details include:
      * <ol>
      * <li> ChatId </li>
+     * <li> Creation Timestamp of Chat </li>
      * <li> LastSentMessageId </li>
-     * <li> Creation Timestamp </li>
+     * <li> Creation Timestamp of LastSentMessage </li>
+     * <li> Username of Second User in Chat </li>
+     * <li> MobileNo of Second User in Chat </li>
      * </ol>
      */
-    public List<Chat> getChatsForUser(User user) {
+    public List<ListChats.AllInfoForListChats> getAllInfoForListChats(long userId) {
+        String sqlStatment = "SELECT "
+                                + "WithUserID.ChatID AS ChatID, " 
+                                + "WithUserID.ChatCreationTS AS ChatCreationTS, " 
+                                + "WithUserID.LastSentMessageID AS LastSentMessageID, " 
+                                + "WithUserID.LastSentMessageCreationTS AS LastSentMessageCreationTS, " 
+                                + "User.Username AS Username, " 
+                                + "User.MobileNo AS MobileNo " 
+                            + "FROM (" 
+                                + "SELECT " 
+                                    + "WithLastSentMessageCreationTS.ChatID AS ChatID, " 
+                                    + "WithLastSentMessageCreationTS.ChatCreationTS AS ChatCreationTS, " 
+                                    + "WithLastSentMessageCreationTS.LastSentMessageID AS LastSentMessageID, " 
+                                    + "WithLastSentMessageCreationTS.LastSentMessageCreationTS AS LastSentMessageCreationTS, " 
+                                    + "UserChat.UserID AS UserID " 
+                                + "FROM (" 
+                                    + "SELECT " 
+                                        + "ChatsOfUser.ChatID AS ChatID, " 
+                                        + "ChatsOfUser.ChatCreationTS AS ChatCreationTS, " 
+                                        + "ChatsOfUser.LastSentMessageID AS LastSentMessageID, " 
+                                        + "Message.CreationTS AS LastSentMessageCreationTS " 
+                                    + "FROM (" 
+                                        + "SELECT " 
+                                        + "UserChat.ChatID AS ChatID, " 
+                                        + "Chat.CreationTS AS ChatCreationTS, " 
+                                        + "Chat.LastSentMessageID AS LastSentMessageID " 
+                                        + "FROM UserChat " 
+                                        + "INNER JOIN Chat " 
+                                        + "ON UserChat.ChatID = Chat.ChatID " 
+                                        + "WHERE UserChat.UserID = @userId" 
+                                        + ") AS ChatsOfUser " 
+                                    + "LEFT OUTER JOIN Message " 
+                                    + "ON ChatsOfUser.LastSentMessageID = Message.MessageID" 
+                                    + ") AS WithLastSentMessageCreationTS " 
+                                + "INNER JOIN UserChat " 
+                                + "ON WithLastSentMessageCreationTS.ChatID = UserChat.ChatID " 
+                                + "WHERE UserChat.UserID != @userId" 
+                                + ") AS WithUserID " 
+                            + "INNER JOIN User " 
+                            + "ON WithUserID.UserID = User.UserID";
 
-        String sqlStatment = "SELECT * FROM Chat WHERE ChatID in (SELECT ChatID FROM UserChat WHERE UserID=@userId)";
-        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(user.getUserId()).build();
-        List<Chat> resultSet = spannerTemplate.query(Chat.class, statement, null);
- 
-        return resultSet;
+        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).build();
+        return spannerTemplate.query(ListChats.AllInfoForListChats.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true));
     }
 }
