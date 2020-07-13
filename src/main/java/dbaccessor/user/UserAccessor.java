@@ -65,7 +65,7 @@ public OptionalLong getUserIdFromEmail(String emailId) {
      * Otherwise returns EnumSet of matching fields
      */
 public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username, String emailId) {
-        String sqlStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username OR EmailID=@emailId";
+        String sqlStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username UNION DISTINCT SELECT Username, EmailID FROM User WHERE EmailID=@emailId";
         Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("Username")
                                 .to(username)

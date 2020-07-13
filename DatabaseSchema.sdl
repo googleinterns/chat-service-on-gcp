@@ -61,4 +61,9 @@ ON User (
     Password
 )
 
+CREATE INDEX UsersByEmailID
+ON User (
+    EmailID
+)
+
 ALTER TABLE Chat ADD CONSTRAINT FK_Message FOREIGN KEY(LastSentMessageID) REFERENCES Message(MessageID);
