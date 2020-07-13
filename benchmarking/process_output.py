@@ -15,10 +15,11 @@ file_names = config['File Names']
 INPUT_FILE_NAME = file_names['WRITE_OUTPUT']
 OUTPUT_FILE_NAME = file_names['PROCESS_OUTPUT']
 
-CSV_COLUMN_NAMES = ["API Name", "Total QPS", "login QPS", "viewUser QPS", "listChats QPS", "listMessages QPS",
-                    "createChat QPS", "createMessage QPS", "signup QPS", "50th Percentile Latency",
+CSV_COLUMN_NAMES = ["API Name", "Total QPS", "login QPS", "viewUser QPS", "getUsersByMobileNumber QPS", "listChats QPS",
+                    "listMessages QPS", "createChat QPS", "createMessage QPS", "signup QPS", "50th Percentile Latency",
                     "95th Percentile Latency", "99th Percentile Latency"]
-API_NAMES = ["login", "viewUser", "listChats", "listMessages", "createChat", "createMessage", "signup"]
+API_NAMES = ["login", "viewUser", "getUsersByMobileNumber", "listChats", "listMessages", "createChat", "createMessage",
+             "signup"]
 
 
 def compute_latencies(df, api_name):

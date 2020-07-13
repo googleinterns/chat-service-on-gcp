@@ -44,6 +44,14 @@ def view_user_request(session, username):
                        })
 
 
+def get_users_by_mobile_number_request(session, user_id):
+    mobile_no_prefix = random_string.numeric_variable_length(3, 10)
+    return session.get(BASE_URL + 'getUsersByMobileNumber/' + str(user_id),
+                       params={
+                           "mobileNoPrefix": mobile_no_prefix
+                       })
+
+
 def list_chats_request(session, user_id):
     return session.get(BASE_URL + 'users/' + str(user_id) + '/chats')
 
