@@ -45,10 +45,11 @@ class MultiUser(User):
     and sends requests of following type:
         1. login
         2. viewUser
-        3. listChats
-        4. listMessages
-        5. createChat
-        6. createMessage
+        3. getUsersByMobileNumber
+        4. listChats
+        5. listMessages
+        6. createChat
+        7. createMessage
     Class Variables:
         1. distribution: probability distribution of each type of request.
         2. user_details: pandas data-frame containing details
@@ -64,7 +65,8 @@ class MultiUser(User):
     distribution = []
     user_details = None
     chat_details = None
-    api_names = ["login", "viewUser", "listChats", "listMessages", "createChat", "createMessage"]
+    api_names = ["login", "viewUser", "getUsersByMobileNumber", "listChats", "listMessages",
+                 "createChat", "createMessage"]
 
     def __init__(self, user_id, username, password, chat_id_list):
         super().__init__()
@@ -85,17 +87,19 @@ class MultiUser(User):
         session = requests.Session()
         response_list = []
         while datetime.now() < User.end_time:
-            api_number = random.choices(range(1, 7), MultiUser.distribution)[0]
+            api_number = random.choices(range(1, 8), MultiUser.distribution)[0]
             if api_number == 1:
                 response = apis.login_request(session, self.username, self.password)
             elif api_number == 2:
                 response = apis.view_user_request(session, get_random_username())
             elif api_number == 3:
-                response = apis.list_chats_request(session, self.user_id)
+                response = apis.get_users_by_mobile_number_request(session, self.user_id)
             elif api_number == 4:
+                response = apis.list_chats_request(session, self.user_id)
+            elif api_number == 5:
                 index = random.randint(0, 1)
                 response = apis.list_messages_request(session, self.user_id, self.chat_id_list[index])
-            elif api_number == 5:
+            elif api_number == 6:
                 response = apis.create_chat_request(session, self.user_id, get_random_username())
             else:
                 index = random.randint(0, 1)

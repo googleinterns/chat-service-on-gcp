@@ -5,11 +5,12 @@ This module takes following input arguments in this order-
 3. test duration
 4. weight of login requests
 5. weight of viewUser requests
-6. weight of listChats requests
-7. weight of listMessages requests
-8. weight of createChat requests
-9. weight of createMessage requests
-10. weight of signup requests
+6. weight of getUsersByMobileNumber requests
+7. weight of listChats requests
+8. weight of listMessages requests
+9. weight of createChat requests
+10. weight of createMessage requests
+11. weight of signup requests
 According to these values, it instantiates the required number of user instances.
 It collects the list of tuples returned by the simulate method of users and
 sends this to write_output module.
@@ -115,7 +116,8 @@ class ProcessInput:
         """
         Returns a dictionary with API names as keys and weight proportion of APIs as values.
         """
-        api_names = ["login", "viewUser", "listChats", "listMessages", "createChat", "createMessage", "signup"]
+        api_names = ["login", "viewUser", "getUsersByMobileNumber", "listChats", "listMessages", "createChat",
+                     "createMessage", "signup"]
         api_weights_dict = {api_names[i]: self.input_args[i + 3]/self.total_weight for i in range(len(api_names))}
         return api_weights_dict
 
