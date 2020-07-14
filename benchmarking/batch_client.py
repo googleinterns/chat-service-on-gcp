@@ -18,6 +18,7 @@ class BatchClient:
 
     def __create_post_clients(self, count, request_body_list):
         clients = []
+        
         for i in range(count):
             clients.append(Client(
                             self.api_endpoint, 
@@ -31,7 +32,7 @@ class BatchClient:
     def __create_get_clients(self, count, url_path_var_list):
         clients = []
 
-        for i in range(0, count):
+        for i in range(count):
             clients.append(Client(
                             self.api_endpoint + url_path_var_list[i], 
                             self.request_type,
@@ -51,7 +52,7 @@ class BatchClient:
             response_entry_batch = []
             latency_entry_batch = []
 
-            for sub_batch_id in range(0, len(batch_data)):
+            for sub_batch_id in range(len(batch_data)):
                 client_count = batch_metadata["qps"]
                 clients = []
 

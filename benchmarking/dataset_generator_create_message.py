@@ -7,7 +7,7 @@ config.read("config.ini")
 
 DATASET_FILE_NAME = config["DatasetGenerator"]["DATASET_FILE_NAME"]
 
-class DatasetGenerator:
+class DatasetGeneratorForCreateMessage:
 
     def __init__(self):
         self.root_node = InternalNode(depth_in_tree = 0, parameter_to_value = {})
@@ -16,4 +16,4 @@ class DatasetGenerator:
         csv_file_writer = CsvFileWriter(DATASET_FILE_NAME, ["Metadata", "Data"], data)
         csv_file_writer.write_to_csv()
 
-datasetGenerator = DatasetGenerator()
+datasetGenerator = DatasetGeneratorForCreateMessage()
