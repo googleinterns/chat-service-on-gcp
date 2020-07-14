@@ -185,7 +185,7 @@ public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username
      */
     public ImmutableList<ListChats.UsernameMobileNoChatId> getUsernameMobileNoChatIdForSecondUsers(long userId, ImmutableList<Long> listOfChatIdOfUser) {
 
-        String sqlStatment = "SELECT User.Username as Username, User.MobileNo as MobileNo, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN UNNEST (@listOfChatIdOfUser) AND UserChat.UserID != @userId";
+        String sqlStatment = "SELECT User.Username as Username, User.MobileNo as MobileNo, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat@{FORCE_INDEX=UserChatByChatID} ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN UNNEST (@listOfChatIdOfUser) AND UserChat.UserID != @userId";
         Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).bind("listOfChatIdOfUser").toInt64Array(listOfChatIdOfUser).build();
         return ImmutableList.copyOf(spannerTemplate.query(ListChats.UsernameMobileNoChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true)));
     }

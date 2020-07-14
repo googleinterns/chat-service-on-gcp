@@ -87,7 +87,7 @@ public final class ChatAccessor {
      */
     public List<Chat> getChatsForUser(User user) {
 
-        String sqlStatment = "SELECT * FROM Chat WHERE ChatID in (SELECT ChatID FROM UserChat WHERE UserID=@userId)";
+        String sqlStatment = "SELECT * FROM Chat WHERE ChatID in (SELECT ChatID FROM UserChat@{FORCE_INDEX=UserChatByUserID} WHERE UserID=@userId)";
         Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(user.getUserId()).build();
         List<Chat> resultSet = spannerTemplate.query(Chat.class, statement, null);
  
