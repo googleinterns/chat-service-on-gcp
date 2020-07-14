@@ -1,8 +1,8 @@
 from batch_client import BatchClient
 import ast
-import csv
 import pandas as pd
 import configparser
+from csv_file_writer import CsvFileWriter 
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -18,12 +18,6 @@ class BatchClientDriverForGetAttachment:
         self.__generate_dataset_for_get_attachment()
         self.batch_client = BatchClient(GET_ATTACHMENT_URL, "GET", DATASET_FILE_NAME, RESPONSE_FILE_NAME)
         self.batch_client.send_requests_store_responses()
-
-    def __store_generated_dataset_in_file(self, data):
-        with open(DATASET_FILE_NAME, 'w') as csv_file:  
-            csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(["Metadata", "Data"])
-            csv_writer.writerows(data)
 
     def __generate_dataset_for_get_attachment(self):
         create_message_responses_df = pd.read_csv(CREATE_MESSAGE_RESPONSE_FILE_NAME)
@@ -50,7 +44,8 @@ class BatchClientDriverForGetAttachment:
             
             message_id_list_all_batches.append([batch_metadata, message_id_list_batch])
 
-        self.__store_generated_dataset_in_file(message_id_list_all_batches)
+        csv_file_writer = CsvFileWriter(DATASET_FILE_NAME, ["Metadata", "Data"], message_id_list_all_batches)
+        csv_file_writer.write_to_csv()
                 
 
 batch_client_driver = BatchClientDriverForGetAttachment()
