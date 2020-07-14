@@ -71,10 +71,10 @@ public final class UserChatAccessor {
                                     + "FROM User " 
                                     + "WHERE Username = @username" 
                                     + ") AS SecondUserID " 
-                                + "LEFT OUTER JOIN UserChat " 
+                                + "LEFT OUTER JOIN UserChat@{FORCE_INDEX=UserChatByUserID} " 
                                 + "ON SecondUserID.UserID2 = UserChat.UserID" 
                                 + ") AS ChatsOfUserID2 " 
-                            + "LEFT OUTER JOIN UserChat " 
+                            + "LEFT OUTER JOIN UserChat@{FORCE_INDEX=UserChatByChatID} " 
                             + "ON ChatsOfUserID2.ChatID = UserChat.ChatID";
 
         Statement statement = Statement.newBuilder(sqlStatment).bind("username").to(username).bind("userId").to(userId).build();
