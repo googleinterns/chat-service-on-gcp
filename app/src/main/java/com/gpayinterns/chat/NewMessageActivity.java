@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.ClientError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -38,7 +39,9 @@ import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.gpayinterns.chat.ServerConstants.BASE_URL;
@@ -58,8 +61,25 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
     public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private String chatID;
     private String messageText;
-    private static boolean active = false;
+    private static boolean active;
 
+    /**
+     * This Activity helps to start a conversation with a user whose username
+     * will be provided in an editText at the top of the screen.
+     *
+     * The user also gets an option to scroll through the contacts present on the device
+     * and choose a contact to have a conversation with.
+     *
+     * The user has to perform the following actions to start a chat:
+     * 1. Enter/Select a valid username.
+     * 2. Enter a message to send & tap on send button
+     *
+     *
+     * This activity performs it's task in the following manner:
+     * 1. Get the chatID with the username provided using createChat
+     * 2. With the received chatID send the message to the server
+     * 3. Switch to ViewMessage Activity once the message has been sent.
+     */
     @Override
     protected void onResume()
     {
@@ -90,9 +110,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         chatID = null;
         initializeDisplayContent();
         getCurrentUser();
-
     }
-
 
     private void initializeDisplayContent()
     {
@@ -102,7 +120,6 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         recyclerMessages.setLayoutManager(messageLayoutManager);
         recyclerMessages.setAdapter(messageRecyclerAdapter);
     }
-
 
     private void getCurrentUser()
     {
@@ -142,56 +159,53 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
     {
-        if (resultCode == RESULT_OK)
+        if (resultCode == RESULT_OK && requestCode == CONTACT_PICKER_RESULT)
         {
-            if(requestCode == CONTACT_PICKER_RESULT)
+            Cursor cursor = null;
+            String email = "", name = "";
+            try
             {
-                Cursor cursor = null;
-                String email = "", name = "";
-                try
+                assert data != null;
+                Uri result = data.getData();
+                Log.v("NewMessageActivity", "Got a contact result: " + result.toString());
+
+                String id = ((Uri) result).getLastPathSegment();
+
+                cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,  null, ContactsContract.CommonDataKinds.Email.CONTACT_ID+" =? ", new String[] {id}, null);
+
+                assert cursor != null;
+                int nameId = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
+
+                int emailIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA);
+
+                if (cursor.moveToFirst())
                 {
-                    assert data != null;
-                    Uri result = data.getData();
-                    Log.v("NewMessageActivity", "Got a contact result: " + result.toString());
-
-                    String id = ((Uri) result).getLastPathSegment();
-
-                    cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,  null, ContactsContract.CommonDataKinds.Email.CONTACT_ID+" =? ", new String[] {id}, null);
-
-                    assert cursor != null;
-                    int nameId = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
-
-                    int emailIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA);
-
-                    if (cursor.moveToFirst())
-                    {
-                        email = cursor.getString(emailIdx);
-                        name = cursor.getString(nameId);
-                        Log.v("NewMessageActivity", "Got email: " + email);
-                    }
-                    else
-                    {
-                        Log.w("NewMessageActivity", "No results");
-                    }
+                    email = cursor.getString(emailIdx);
+                    name = cursor.getString(nameId);
+                    Log.v("NewMessageActivity", "Got email: " + email);
                 }
-                catch (Exception e)
+                else
                 {
-                    Log.e("NewMessageActivity", "Failed to get email data", e);
+                    Log.w("NewMessageActivity", "No results");
                 }
-                finally
+            }
+            catch (Exception e)
+            {
+                Log.e("NewMessageActivity", "Failed to get email data", e);
+            }
+            finally
+            {
+                if (cursor != null)
                 {
-                    if (cursor != null)
-                    {
-                        cursor.close();
-                    }
-                    EditText emailEntry = (EditText) findViewById(R.id.new_message_username);
-                    Log.d("NewMessageActivity",email);
-                    Log.d("NewMessageActivity",name);
-                    emailEntry.setText(email);
-                    if (email.length() == 0 && name.length() == 0)
-                    {
-                        Toast.makeText(this, "No Email found for selected contact",Toast.LENGTH_LONG).show();
-                    }
+                    cursor.close();
+                }
+                EditText emailEntry = (EditText) findViewById(R.id.new_message_username);
+                Log.d("NewMessageActivity",email);
+                Log.d("NewMessageActivity",name);
+                emailEntry.setText(email);
+                if (email.length() == 0 && name.length() == 0)
+                {
+                    Toast.makeText(this, "No Email found for selected contact",Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -202,35 +216,29 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
     private void getChatID() throws JSONException
     {
         String URL = BASE_URL + USERS + "/"
                 + currentUser + "/" + CHATS;
 
         String username = ((EditText)findViewById(R.id.new_message_username)).getText().toString();
-
         JSONObject jsonBody = new JSONObject();
-        Log.d("username sent to server: ",username);
         jsonBody.put("username",username);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
                 {
-
-
                     @Override
                     public void onResponse(JSONObject response)
                     {
                         Log.d("ResponseMessage: " , response.toString());
-
                         try
                         {
                             String message = response.getString("message");
                             if(message.equals("Success"))
                             {
                                 chatID = response.getString("ChatId");
-                                sendFirstMessageToServer();
+                                sendFirstMessageToServer(messageText);
                             }
                         }
                         catch (JSONException e)
@@ -281,79 +289,77 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
-    private void sendFirstMessageToServer() throws JSONException
+    private void sendFirstMessageToServer(final String messageText)
     {
-        String URL = BASE_URL + USERS + "/" +
-                currentUser + "/" + CHATS +
-                "/" + chatID + "/" + MESSAGES;
+        String URL = BASE_URL + USERS
+                + "/" + currentUser + "/" + CHATS
+                + "/" + chatID + "/" + MESSAGES;
 
         Log.d("message sent to server: ",messageText);
 
-        JSONObject jsonBody = new JSONObject();
-        jsonBody.put("contentType","text");
-        jsonBody.put("textContent",messageText);
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL, jsonBody, new Response.Listener<JSONObject>()
+        VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, URL,
+                new Response.Listener<NetworkResponse>()
                 {
                     @Override
-                    public void onResponse(JSONObject response)
+                    public void onResponse(NetworkResponse response)
                     {
-                        Log.d("ResponseMessage: " , response.toString());
-
+                        String resultResponse = new String(response.data);
+                        Log.d("ServerResponse",resultResponse);
+                        JSONObject result = null;
                         try
                         {
-                            String message = response.getString("message");
+                            result = new JSONObject(resultResponse);
+                            String message = result.getString("message");
                             if(message.equals("Success"))
                             {
-                                String messageID = response.getString("MessageId");
+                                String messageID = result.getString("MessageId");
                                 switchToViewMessages(messageID);
                             }
                         }
                         catch (JSONException e)
                         {
-                            Toast.makeText(getApplicationContext(), "Parse Error", Toast.LENGTH_SHORT).show();
-                            Log.d("JsonError: ",e.toString());
                             e.printStackTrace();
                         }
                     }
-                }, new Response.ErrorListener()
+                },
+                new Response.ErrorListener()
                 {
                     @Override
                     public void onErrorResponse(VolleyError error)
                     {
-                        Log.d("errorMessage",error.toString());
-                        if (error instanceof TimeoutError || error instanceof NoConnectionError)
+                        NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = "Unknown error";
+                        if (networkResponse == null)
                         {
-                            Toast.makeText(getApplicationContext(), "Network timeout", Toast.LENGTH_LONG).show();
-                        }
-                        else if(error instanceof ClientError)
-                        {
-                            String responseBody = null;
-                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                            JSONObject data = null;
-                            try
+                            if (error.getClass().equals(TimeoutError.class))
                             {
-                                data = new JSONObject(responseBody);
+                                errorMessage = "Request timeout";
                             }
-                            catch (JSONException e)
+                            else if (error.getClass().equals(NoConnectionError.class))
                             {
-                                e.printStackTrace();
+                                errorMessage = "Failed to connect server";
                             }
-
-                            assert data != null;
-                            String message = data.optString("Message");
-                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         }
+                        Log.d("Error", errorMessage);
+                        error.printStackTrace();
                     }
                 }) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String> params = new HashMap<>();
+                params.put("textContent", messageText);
+                return params;
+            }
+
             @Override
             public Priority getPriority()
             {
                 return Priority.IMMEDIATE;
             }
         };
-        VolleyController.getInstance(this).addToRequestQueue(jsonObjectRequest);
+
+        VolleyController.getInstance(this).addToRequestQueue(volleyMultipartRequest);
     }
 
     private void switchToViewMessages(String lastMessageID)
@@ -369,10 +375,9 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
             intent.putExtra(ViewMessageActivity.LAST_MESSAGE_ID, lastMessageID);
 
             startActivity(intent);
+            finish();
         }
-        finish();
     }
-
 
     private void hideSoftKeyboard()
     {
@@ -385,6 +390,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    //explicitly request to access contacts if permission not already provided
     public void requestContactPermission()
     {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED)
@@ -437,6 +443,7 @@ public class NewMessageActivity extends AppCompatActivity implements View.OnClic
             }
         }
     }
+    //launches the contacts application to select a contact
     private void getContacts()
     {
         Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);

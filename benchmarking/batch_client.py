@@ -18,7 +18,7 @@ class BatchClient:
 
     def __create_post_clients(self, count, request_body_list):
         clients = []
-
+        
         for i in range(count):
             clients.append(Client(
                             self.api_endpoint, 
@@ -60,7 +60,7 @@ class BatchClient:
                     clients = self.__create_get_clients(client_count, batch_data[sub_batch_id])
                 elif self.request_type == "POST":
                     clients = self.__create_post_clients(client_count, batch_data[sub_batch_id])
-
+                    
                 with ThreadPoolExecutor(max_workers = client_count) as executor:
                     responses = executor.map(Client.call_send_request, clients)
 

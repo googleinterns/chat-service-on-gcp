@@ -10,7 +10,7 @@ public class OpenHelper extends SQLiteOpenHelper
 {
     private static final String DATABASE_NAME = "Chat.db";
     private static final int DATABASE_VERSION = 1;
-    private static OpenHelper instance;
+
 
     public OpenHelper(@Nullable Context context)
     {
@@ -20,20 +20,7 @@ public class OpenHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        db.execSQL(DatabaseContract.userEntry.SQL_CREATE_TABLE);
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_TABLE);
-        db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_TABLE);
-
-        db.execSQL(DatabaseContract.userEntry.SQL_CREATE_INDEX1);
-
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_INDEX1);
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_INDEX2);
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_INDEX3);
-        db.execSQL(DatabaseContract.messageEntry.SQL_CREATE_INDEX4);
-
-        db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_INDEX1);
-        db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_INDEX2);
-        db.execSQL(DatabaseContract.chatEntry.SQL_CREATE_INDEX3);
+        db.execSQL(DatabaseContract.BlobEntry.SQL_CREATE_TABLE);//creates the DB if not already created
     }
 
     @Override

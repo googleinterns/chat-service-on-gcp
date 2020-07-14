@@ -65,7 +65,7 @@ public OptionalLong getUserIdFromEmail(String emailId) {
      * Otherwise returns EnumSet of matching fields
      */
 public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username, String emailId) {
-        String sqlStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username OR EmailID=@emailId";
+        String sqlStatment = "SELECT Username, EmailID FROM User WHERE Username=@Username UNION DISTINCT SELECT Username, EmailID FROM User WHERE EmailID=@emailId";
         Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("Username")
                                 .to(username)
@@ -118,7 +118,7 @@ public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username
      * If no such user exists, returns -1
      */
     public long login(String username, String password) {
-        String sqlStatment = "SELECT UserID from User WHERE Username=@username AND Password=@password";
+        String sqlStatment = "SELECT UserID from User@{FORCE_INDEX=UsersByUsernamePassword} WHERE Username=@username AND Password=@password";
         Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("username")
                                 .to(username)
@@ -137,7 +137,7 @@ public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username
      * If no such user exists, returns null
      */
     public User getUser(String username) {
-        String sqlStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User WHERE Username=@Username";
+        String sqlStatment = "SELECT UserID, Username, EmailID, MobileNo, Picture FROM User@{FORCE_INDEX=UsersByUsernamePassword} WHERE Username=@Username";
         Statement statement = Statement.newBuilder(sqlStatment)
                                 .bind("Username")
                                 .to(username)
@@ -183,10 +183,31 @@ public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username
      * <li> ChatId </li>
      * </ol>
      */
-    public ImmutableList<ListChats.UsernameChatId> getUsernameChatIdForSecondUsers(long userId, ImmutableList<Long> listOfChatIdOfUser) {
+    public ImmutableList<ListChats.UsernameMobileNoChatId> getUsernameMobileNoChatIdForSecondUsers(long userId, ImmutableList<Long> listOfChatIdOfUser) {
 
-        String sqlStatment = "SELECT User.Username as Username, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN UNNEST (@listOfChatIdOfUser) AND UserChat.UserID != @userId";
+        String sqlStatment = "SELECT User.Username as Username, User.MobileNo as MobileNo, UserChat.ChatID as ChatID FROM User INNER JOIN UserChat ON User.UserID = UserChat.UserID WHERE UserChat.ChatID IN UNNEST (@listOfChatIdOfUser) AND UserChat.UserID != @userId";
         Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).bind("listOfChatIdOfUser").toInt64Array(listOfChatIdOfUser).build();
-        return ImmutableList.copyOf(spannerTemplate.query(ListChats.UsernameChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true)));
+        return ImmutableList.copyOf(spannerTemplate.query(ListChats.UsernameMobileNoChatId.class, statement,  new SpannerQueryOptions().setAllowPartialRead(true)));
+    }
+
+    /**
+     * Given the userId of a user A and a string mobileNoPrefix, returns all users such that either of the following is true:
+     *  1. There is a Chat between user A and this user and the mobile number of this user starts with the string mobileNoPrefix.
+     *  2. MobileNo of this user is equal to mobileNoPrefix.
+     */
+    public ImmutableList<User> getUsersByMobileNumber(long userId, String mobileNoPrefix) {
+        String sqlStatement = "SELECT * from User where MobileNo LIKE @mobileNoPrefix AND " +
+                "UserID IN (SELECT UserID FROM UserChat WHERE UserID != @userId AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userId)) " +
+                "UNION DISTINCT SELECT * FROM User@{FORCE_INDEX=UsersByMobileNo} WHERE MobileNo=@mobileNo";
+        Statement statement = Statement
+                .newBuilder(sqlStatement)
+                .bind("userId")
+                .to(userId)
+                .bind("mobileNoPrefix")
+                .to(mobileNoPrefix + "%")
+                .bind("mobileNo")
+                .to(mobileNoPrefix)
+                .build();
+        return ImmutableList.copyOf(spannerTemplate.query(User.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)));
     }
 }
