@@ -28,7 +28,7 @@ class BatchClient:
 
     def __create_clients(self, count, request_body_list):
         clients = []
-        for i in range(0, count):
+        for i in range(count):
             clients.append(Client(
                             self.api_endpoint, 
                             self.request_type, 
@@ -43,14 +43,14 @@ class BatchClient:
         batch_count = len(request_body_df)
         response_entry_all_batches = []
         
-        for batch_id in range(0, batch_count):
+        for batch_id in range(batch_count):
             batch_metadata = ast.literal_eval(request_body_df["Metadata"][batch_id])
             batch_data = ast.literal_eval(request_body_df["Data"][batch_id])
             sub_batch_count = len(batch_data)
             client_count = batch_metadata["qps"]
             response_entry_batch = []
 
-            for sub_batch_id in range(0, sub_batch_count):
+            for sub_batch_id in range(sub_batch_count):
                 clients = self.__create_clients(client_count, batch_data[sub_batch_id])
                 with ThreadPoolExecutor(max_workers = client_count) as executor:
                     responses = executor.map(Client.call_send_request, clients)
