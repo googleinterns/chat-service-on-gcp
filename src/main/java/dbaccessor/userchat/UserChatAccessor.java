@@ -76,7 +76,6 @@ public final class UserChatAccessor {
                                 + ") AS ChatsOfUserID2 " 
                             + "LEFT OUTER JOIN UserChat " 
                             + "ON ChatsOfUserID2.ChatID = UserChat.ChatID";
-                            // + "WHERE UserChat.UserID = @userId";
 
         Statement statement = Statement.newBuilder(sqlStatment).bind("username").to(username).bind("userId").to(userId).build();
         List<CreateChat.ChatIdWithUserIds> resultSet = spannerTemplate.query(
