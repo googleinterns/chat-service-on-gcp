@@ -24,8 +24,7 @@ class BatchClient:
 
     def __create_post_clients(self, count, request_body_list):
         clients = []
-
-        for i in range(0, count):
+        for i in range(count):
             clients.append(Client(
                             self.api_endpoint, 
                             self.request_type, 
@@ -52,7 +51,7 @@ class BatchClient:
         request_body_df = pd.read_csv(self.request_body_dataset_path)
         response_entry_all_batches = []
         
-        for batch_id in range(0, len(request_body_df)):
+        for batch_id in range(len(request_body_df)):
             batch_metadata = ast.literal_eval(request_body_df["Metadata"][batch_id])
             batch_data = ast.literal_eval(request_body_df["Data"][batch_id])
             response_entry_batch = []
@@ -66,7 +65,7 @@ class BatchClient:
                     clients = self.__create_get_clients(client_count, batch_data[sub_batch_id])
                 elif self.request_type == "POST":
                     clients = self.__create_post_clients(client_count, batch_data[sub_batch_id])
-
+                    
                 with ThreadPoolExecutor(max_workers = client_count) as executor:
                     responses = executor.map(Client.call_send_request, clients)
 

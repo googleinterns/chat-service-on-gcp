@@ -93,7 +93,7 @@ class LeafNode:
         mean_file_size = self.__get_mean_file_size()
         std_dev_file_size = self.__get_std_dev_file_size()
 
-        for count in range(0, message_count):
+        for count in range(message_count):
             message_content = {}
             message_content["data"] = {}
             message_content["files"] = {}
@@ -113,7 +113,7 @@ class LeafNode:
         mean_file_size = self.__get_mean_file_size()
         std_dev_file_size = self.__get_std_dev_file_size()
 
-        for count in range(0, message_count):
+        for count in range(message_count):
             message_content = {}
             message_content["files"] = {}
             file_name, file_content = self.__sample_normal_file_size_generate_random_file_content(mean_file_size, std_dev_file_size)
@@ -128,7 +128,7 @@ class LeafNode:
         mean_length_of_text = self.__get_mean_length_of_text()
         std_dev_length_of_text = self.__get_std_dev_length_of_text()
 
-        for count in range(0, message_count):
+        for count in range(message_count):
             message_content = {}
             message_content["data"] = {}
             message_content["data"]["textContent"] = self.__sample_normal_length_of_text_generate_random_text(
@@ -187,7 +187,7 @@ class LeafNode:
         
         message_content_all_batches = []
 
-        for batch_number in range(0, DURATION_SECONDS):
+        for batch_number in range(DURATION_SECONDS):
             message_content_for_batch = []
             message_content_for_batch.extend(self.__generate_message_content_without_file(message_count["without_file"]))
             message_content_for_batch.extend(self.__generate_message_content_with_file_without_text(message_count["with_file"]["without_text"]))
