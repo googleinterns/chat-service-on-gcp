@@ -196,9 +196,25 @@ public EnumSet<User.UniqueFields> checkIfUsernameOrEmailIdExists(String username
      *  2. MobileNo of this user is equal to mobileNoPrefix.
      */
     public ImmutableList<User> getUsersByMobileNumber(long userId, String mobileNoPrefix) {
-        String sqlStatement = "SELECT * from User where MobileNo LIKE @mobileNoPrefix AND " +
-                "UserID IN (SELECT UserID FROM UserChat WHERE UserID != @userId AND ChatID IN (SELECT ChatID FROM UserChat WHERE UserID=@userId)) " +
-                "UNION DISTINCT SELECT * FROM User@{FORCE_INDEX=UsersByMobileNo} WHERE MobileNo=@mobileNo";
+        String sqlStatement =
+                "SELECT UserID, Username, EmailID, MobileNo, Picture " +
+                "FROM User " +
+                "WHERE MobileNo LIKE @mobileNoPrefix " +
+                "AND UserID " +
+                "IN (" +
+                    "SELECT UserID " +
+                    "FROM UserChat@{FORCE_INDEX=UserChatByChatID} " +
+                    "WHERE ChatID " +
+                        "IN (" +
+                            "SELECT ChatID FROM UserChat@{FORCE_INDEX=UserChatByUserID} WHERE UserID=@userId" +
+                        ") " +
+                    "EXCEPT DISTINCT " +
+                    "SELECT @userId" +
+                ") " +
+                "UNION DISTINCT " +
+                "SELECT UserID, Username, EmailID, MobileNo, Picture " +
+                "FROM User@{FORCE_INDEX=UsersByMobileNo} " +
+                "WHERE MobileNo=@mobileNo";
         Statement statement = Statement
                 .newBuilder(sqlStatement)
                 .bind("userId")
