@@ -1,3 +1,11 @@
+"""Contains the DatasetGeneratorForGetAttachment class.
+
+Creates a DatasetGeneratorForGetAttachment object. 
+Reads the Response file of CreateMessage and 
+generates the dataset containing URL suffixes 
+for making calls to the getAttachment API.
+"""
+
 import configparser
 import ast 
 import pandas as pd 
@@ -10,8 +18,16 @@ CREATE_MESSAGE_RESPONSE_FILE_NAME = config["BatchClientDriverForCreateMessage"][
 DATASET_FILE_NAME = config["BatchClientDriverForGetAttachment"]["DATASET_FILE_NAME"]
 
 class DatasetGeneratorForGetAttachment:
+    """Generator of the dataset of URL Suffixes to getAttachment.
+    
+    Responsible for generating a dataset of URL Suffixes 
+    for GET requests to the getAttachment API. Each suffix
+    corresponds to call to getAttachment for a valid message
+    i.e. one that does contain an attachment. 
+    """
 
     def __init__(self):
+        """Intializes DatasetGeneratorForGetAttachment."""
         self.__generate_dataset_for_get_attachment()
 
     def __generate_dataset_for_get_attachment(self):

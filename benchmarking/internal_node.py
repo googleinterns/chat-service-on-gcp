@@ -1,3 +1,5 @@
+"""Contains the InternalNode class."""
+
 from leaf_node import LeafNode
 import configparser
 import ast
@@ -76,7 +78,7 @@ class InternalNode:
         """Retrieves information of the parameter next in the hierarchy w.r.t. the current node.
 
         The parameter next in the hierarchy is the parameter at index = depth_in_tree 
-        in the PARAMETER_HIERARCHY. 
+        in the list HIERARCHY in config.ini. 
 
         Returns:
             A dictionary mapping info of the next parameter next in hierarchy
