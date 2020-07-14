@@ -41,7 +41,7 @@ class StatisticalAnalyst:
         dataset_df = pd.read_csv(self.dataset_file_path)
         result_entries = []
 
-        for entry_id in range(0, len(dataset_df)):
+        for entry_id in range(len(dataset_df)):
             metadata = ast.literal_eval(dataset_df[self.metadata_attribute_name][entry_id])
             data = ast.literal_eval(dataset_df[self.data_attribute_name][entry_id])
 

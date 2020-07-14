@@ -18,7 +18,7 @@ class DatasetGeneratorForGetAttachment:
         create_message_responses_df = pd.read_csv(CREATE_MESSAGE_RESPONSE_FILE_NAME)
         message_id_list_all_batches = []
         
-        for batch_id in range(0, len(create_message_responses_df)):
+        for batch_id in range(len(create_message_responses_df)):
             batch_metadata = ast.literal_eval(create_message_responses_df["Metadata"][batch_id])
             batch_create_message_responses = ast.literal_eval(create_message_responses_df["Responses"][batch_id])
             
@@ -27,10 +27,10 @@ class DatasetGeneratorForGetAttachment:
 
             message_id_list_batch = []
 
-            for sub_batch_id in range(0, len(batch_create_message_responses)):
+            for sub_batch_id in range(len(batch_create_message_responses)):
                 message_id_list_sub_batch = []
 
-                for response_id in range(0, len(batch_create_message_responses[sub_batch_id])):
+                for response_id in range(len(batch_create_message_responses[sub_batch_id])):
                     message_id_list_sub_batch.append(
                         str(batch_create_message_responses[sub_batch_id][response_id]["MessageId"])
                         + "/attachments")

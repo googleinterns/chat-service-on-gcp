@@ -19,7 +19,7 @@ class BatchClient:
     def __create_post_clients(self, count, request_body_list):
         clients = []
 
-        for i in range(0, count):
+        for i in range(count):
             clients.append(Client(
                             self.api_endpoint, 
                             self.request_type, 
@@ -32,7 +32,7 @@ class BatchClient:
     def __create_get_clients(self, count, url_path_var_list):
         clients = []
 
-        for i in range(0, count):
+        for i in range(count):
             clients.append(Client(
                             self.api_endpoint + url_path_var_list[i], 
                             self.request_type,
@@ -46,13 +46,13 @@ class BatchClient:
         request_body_df = pd.read_csv(self.request_body_dataset_path)
         response_entry_all_batches = []
         
-        for batch_id in range(0, len(request_body_df)):
+        for batch_id in range(len(request_body_df)):
             batch_metadata = ast.literal_eval(request_body_df["Metadata"][batch_id])
             batch_data = ast.literal_eval(request_body_df["Data"][batch_id])
             response_entry_batch = []
             latency_entry_batch = []
 
-            for sub_batch_id in range(0, len(batch_data)):
+            for sub_batch_id in range(len(batch_data)):
                 client_count = batch_metadata["qps"]
                 clients = []
 
