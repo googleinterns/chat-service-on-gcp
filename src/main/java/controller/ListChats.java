@@ -11,7 +11,6 @@ import dbaccessor.message.MessageAccessor;
 import helper.SuccessResponseGenerator;
 import exceptions.UserIdDoesNotExistException;
 import exceptions.UserIdMissingFromRequestURLPathException;
-
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import com.google.cloud.Timestamp;
 import com.google.common.collect.ImmutableMap;
+import org.springframework.cloud.gcp.data.spanner.core.mapping.NotMapped;
 
 /**
  * Controller which responds to client requests to get the list of chats which the user is engaged in.
@@ -42,44 +42,112 @@ public final class ListChats {
     @Autowired 
     private ChatAccessor queryChat;
 
-    @Autowired
-    private MessageAccessor queryMessage;
-
-    @Autowired
-    private UniqueIdGenerator uniqueIdGenerator;
-
     /**
-     * Encapsulation for ChatId, Username and MobileNo of one of the Users engaged in that Chat.
+     * Encapsulation for the following fields related to a Chat for one of the Users engaged in that Chat. 
+     * <ol>
+     * <li> ChatId </li>
+     * <li> Creation Timestamp of Chat </li>
+     * <li> LastSentMessageId </li>
+     * <li> Creation Timestamp of LastSentMessage </li>
+     * <li> Username of Second User in Chat </li>
+     * <li> MobileNo of Second User in Chat </li>
+     * </ol>
      */
-    public static final class UsernameMobileNoChatId {
-
-        @Column(name = "Username")
-        private String username;
+    public static final class AllInfoForListChats {
 
         @Column(name = "ChatID")
         private long chatId;
 
+        @Column(name = "ChatCreationTS")
+        private Timestamp chatCreationTs;
+
+        @Column(name = "LastSentMessageID")
+        private long lastSentMessageId;
+
+        @Column(name = "LastSentMessageCreationTS")
+        private Timestamp lastSentMessageCreationTs;
+
+        @Column(name = "Username")
+        private String username;
+        
         @Column(name = "MobileNo")
         private String mobileNo;
 
-        public UsernameMobileNoChatId() {}
+        @NotMapped
+        private Timestamp lastSentTime;
 
-        public UsernameMobileNoChatId(String username, String mobileNo, long chatId) {
-            this.mobileNo = mobileNo;
-            this.username = username;
+        public AllInfoForListChats() {}
+
+        public AllInfoForListChats(
+            long chatId, 
+            Timestamp chatCreationTs, 
+            long lastSentMessageId, 
+            Timestamp lastSentMessageCreationTs, 
+            String username, 
+            String mobileNo
+            ) {
+                this.chatId = chatId;
+                this.chatCreationTs = chatCreationTs;
+                this.lastSentMessageId = lastSentMessageId;
+                this.lastSentMessageCreationTs = lastSentMessageCreationTs;
+                this.username = username;
+                this.mobileNo = mobileNo;
+            }
+
+        public void setChatId(long chatId) {
             this.chatId = chatId;
         }
 
-        public String getMobileNo() {
-            return this.mobileNo;
+        public void setChatCreationTs(Timestamp chatCreationTs) {
+            this.chatCreationTs = chatCreationTs;
+        }
+
+        public void setLastSentMessageId(long lastSentMessageId) {
+            this.lastSentMessageId = lastSentMessageId;
+        }
+
+        public void setLastSentMessageCreationTs(Timestamp lastSentMessageCreationTs) {
+            this.lastSentMessageCreationTs = lastSentMessageCreationTs;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+      
+        public void setMobileNo(String mobileNo) {
+            this.mobileNo = mobileNo;
+        }
+
+        public void setLastSentTime(Timestamp lastSentTime) {
+            this.lastSentTime = lastSentTime;
+        }
+
+        public long getChatId() {
+            return chatId;
+        }
+
+        public Timestamp getChatCreationTs() {
+            return chatCreationTs;
+        }
+
+        public long getLastSentMessageId() {
+            return lastSentMessageId;
+        }
+
+        public Timestamp getLastSentMessageCreationTs() {
+            return lastSentMessageCreationTs;
         }
 
         public String getUsername() {
             return username;
         }
 
-        public long getChatId() {
-            return chatId;
+        public String getMobileNo() {
+            return mobileNo;
+        }
+
+        public Timestamp getLastSentTime() {
+            return lastSentTime;
         }
     }
 
@@ -89,20 +157,27 @@ public final class ListChats {
      * <ol>
      * <li> ChatId </li>
      * <li> Username (of the other user) </li>
+     * <li> MobileNo (if any, of the other user) </li>
      * <li> LastSentMessageId </li>
      * <li> Mobile Number (of the other user) (Optional) </li>
      * </ol>
      */
-    ImmutableMap<String, Object> getChatInfoOfChatInMap(Chat chat, Pair<String, Optional<String>> secondUser) {
-        
-        ImmutableMap.Builder<String, Object> chatInfoOfChatInMapBuilder = ImmutableMap.<String, Object> builder();
-        chatInfoOfChatInMapBuilder.put("ChatId", chat.getChatId());
-        chatInfoOfChatInMapBuilder.put("Username", secondUser.getFirst());
-        chatInfoOfChatInMapBuilder.put("LastSentMessageId", chat.getLastSentMessageId());
-        if(secondUser.getSecond().isPresent()) {
-            chatInfoOfChatInMapBuilder.put("MobileNo", secondUser.getSecond().get());
+    ImmutableMap<String, Object> getChatInfoOfChatInMap(AllInfoForListChats infoObject) {
+        ImmutableMap.Builder<String, Object> chatInfoOfChatInMapBuilder = ImmutableMap.builder();
+
+        chatInfoOfChatInMapBuilder.put("ChatId", infoObject.getChatId());
+        chatInfoOfChatInMapBuilder.put("Username", infoObject.getUsername());
+
+        String mobileNo = infoObject.getMobileNo();
+        if (mobileNo != null) {
+            chatInfoOfChatInMapBuilder.put("MobileNo", mobileNo);
         }
-        return chatInfoOfChatInMapBuilder.build();
+                                                                        
+        chatInfoOfChatInMapBuilder.put("LastSentMessageId", infoObject.getLastSentMessageId());
+
+        ImmutableMap<String, Object> chatInfoOfChatInMap = chatInfoOfChatInMapBuilder.build();
+
+        return chatInfoOfChatInMap;
     }
 
     /**
@@ -132,52 +207,23 @@ public final class ListChats {
             throw new UserIdDoesNotExistException(path);
         }
 
-        User user = User.newBuilder().userId(userId).build();
-        List<Chat> chatsOfUser = queryChat.getChatsForUser(user);
-        ImmutableList.Builder<Long> listOfChatIdBuilder = ImmutableList.builder();
+        List<AllInfoForListChats> allInfoForListChats = queryChat.getAllInfoForListChats(userId);
 
-        for (Chat chat : chatsOfUser) {
-            listOfChatIdBuilder.add(chat.getChatId());
-        }
-
-        ImmutableList<Long> listOfChatId = listOfChatIdBuilder.build();
-        ImmutableList<Message> listOfChatIdCreationTsOfLastSentMessageId = queryMessage.getCreationTsOfLastSentMessageIdForChatsOfUser(userId, listOfChatId);
-
-        //Stores time of the last Message sent in each ChatId of the User against ChatId.
-        Map<Long, Timestamp> chatIdCreationTsOflastSentMessageIdMap = new LinkedHashMap<Long, Timestamp>();
-
-        for (Message chatIdCreationTsOfLastSentMessageId : listOfChatIdCreationTsOfLastSentMessageId) {
-            chatIdCreationTsOflastSentMessageIdMap.put(chatIdCreationTsOfLastSentMessageId.getChatId(), chatIdCreationTsOfLastSentMessageId.getCreationTs());
-        }
-        
-        //Sets time of the last Message sent for each Chat of the User.
-        for (Chat chat : chatsOfUser) {
-            if (chat.getLastSentMessageId() == 0) { 
-                chat.setLastSentTime(chat.getCreationTs());
+        for (AllInfoForListChats infoObject : allInfoForListChats) {
+            if (infoObject.getLastSentMessageCreationTs() != null) {
+                infoObject.setLastSentTime(infoObject.getLastSentMessageCreationTs());
             } else {
-                chat.setLastSentTime(chatIdCreationTsOflastSentMessageIdMap.get(chat.getChatId()));
+                infoObject.setLastSentTime(infoObject.getChatCreationTs());
             }
         }
-        
-        Collections.sort(chatsOfUser, Comparator.comparing(Chat::getLastSentTime).reversed());
-
-        ImmutableList<UsernameMobileNoChatId> usernameMobileNoChatIdForSecondUsers = queryUser.getUsernameMobileNoChatIdForSecondUsers(userId, listOfChatId);
-
-        //Stores username and mobile number of the other User against ChatId for each Chat of the User.
-        Map<Long, Pair<String, Optional<String>>> chatIdSecondUsernameMap = new LinkedHashMap<Long, Pair<String, Optional<String>>>();
-
-        for (UsernameMobileNoChatId usernameMobileNoChatId : usernameMobileNoChatIdForSecondUsers) {
-            chatIdSecondUsernameMap.put(
-                    usernameMobileNoChatId.getChatId(),
-                    Pair.of(usernameMobileNoChatId.getUsername(), Optional.ofNullable(usernameMobileNoChatId.getMobileNo()))
-            );
-        }
-
+      
+        Collections.sort(allInfoForListChats, Comparator.comparing(ListChats.AllInfoForListChats::getLastSentTime).reversed());
+      
         //Stores list of all details of each Chat of the User.
         ImmutableList.Builder<ImmutableMap<String, Object>> chatInfoOfChatsOfUserBuilder = ImmutableList.builder();
 
-        for (Chat chat : chatsOfUser) {
-            chatInfoOfChatsOfUserBuilder.add(getChatInfoOfChatInMap(chat, chatIdSecondUsernameMap.get(chat.getChatId())));
+        for (AllInfoForListChats infoObject : allInfoForListChats) {
+            chatInfoOfChatsOfUserBuilder.add(getChatInfoOfChatInMap(infoObject));
         }
 
         ImmutableList<ImmutableMap<String, Object>> chatInfoOfChatsOfUser = chatInfoOfChatsOfUserBuilder.build();

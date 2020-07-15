@@ -228,22 +228,6 @@ public final class MessageAccessor {
     }
 
     /**
-     * Returns details of Messages which were sent last in the Chats which the given User is engaged in.
-     * Details include:
-     * <ol>
-     * <li> ChatId </li>
-     * <li> Creation Timestamp (of the Message) </li>
-     * </ol>
-     */
-    public ImmutableList<Message> getCreationTsOfLastSentMessageIdForChatsOfUser(long userId, ImmutableList<Long> listOfChatIdOfUser) {
-        String sqlStatment = "SELECT ChatID, CreationTS FROM Message WHERE MessageID IN (SELECT LastSentMessageID FROM Chat WHERE ChatID IN (SELECT ChatID FROM UserChat WHERE UserID = @userId) AND LastSentMessageID IS NOT NULL)";
-        Statement statement = Statement.newBuilder(sqlStatment).bind("userId").to(userId).build();
-        ImmutableList<Message> resultSet = ImmutableList.copyOf(spannerTemplate.query(Message.class, statement, new SpannerQueryOptions().setAllowPartialRead(true)));
-
-        return resultSet;
-    }
-
-    /**
      * Returns details of Attachment corresponding to the Message with the given MessageId.
      * Details include:
      * <ol>
