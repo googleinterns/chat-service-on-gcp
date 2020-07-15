@@ -1,6 +1,7 @@
 package dbaccessor.userchat;
 
 import entity.UserChat;
+import controller.CreateChat;
 
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,49 @@ public final class UserChatAccessor {
         List<UserChat> resultSet = spannerTemplate.query(UserChat.class, statement, null);
     
         return !resultSet.isEmpty();
+    }
+
+    /**
+     * Finds the UserId corresponding to the given username.
+     * If a Chat exists between the two Users, returns its ChatId and the UserId found above.
+     * Otherwise, returns a zero ChatId along with the UserId found above. 
+     */
+    public CreateChat.ChatIdWithUserIds getChatIdWithUserIdsIfExistsBetweenUsers(long userId, String username) {
+        String sqlStatment = "SELECT " 
+                                + "ChatsOfUserID2.ChatID AS ChatID, " 
+                                + "UserChat.UserID AS UserID1, "
+                                + "ChatsOfUserID2.UserID2 AS UserID2, "
+                            + "FROM (" 
+                                + "SELECT " 
+                                    + "SecondUserID.UserID2 AS UserID2, " 
+                                    + "UserChat.ChatID AS ChatID " 
+                                + "FROM (" 
+                                    + "SELECT UserID AS UserID2 " 
+                                    + "FROM User " 
+                                    + "WHERE Username = @username" 
+                                    + ") AS SecondUserID " 
+                                + "LEFT OUTER JOIN UserChat@{FORCE_INDEX=UserChatByUserID} " 
+                                + "ON SecondUserID.UserID2 = UserChat.UserID" 
+                                + ") AS ChatsOfUserID2 " 
+                            + "LEFT OUTER JOIN UserChat@{FORCE_INDEX=UserChatByChatID} " 
+                            + "ON ChatsOfUserID2.ChatID = UserChat.ChatID";
+
+        Statement statement = Statement.newBuilder(sqlStatment).bind("username").to(username).bind("userId").to(userId).build();
+        List<CreateChat.ChatIdWithUserIds> resultSet = spannerTemplate.query(
+                                                        CreateChat.ChatIdWithUserIds.class, 
+                                                        statement, 
+                                                        new SpannerQueryOptions().setAllowPartialRead(true)
+                                                        );
+
+        for (CreateChat.ChatIdWithUserIds result : resultSet) {
+            if (result.getUserId1() == userId) {
+                return result;
+            }
+        }
+
+        resultSet.get(0).setChatId(0);
+        resultSet.get(0).setUserId1(0);
+
+        return resultSet.get(0);
     }
 }
