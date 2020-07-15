@@ -47,10 +47,44 @@ public final class SuccessResponseGenerator {
         ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
                                                             .put("UserId", user.getUserId())
                                                             .put("Username", user.getUsername())
-                                                            .put("CreationTs", user.getCreationTs())
                                                             .build();
 
         return ImmutableMap.of("payload", responseBody);
+    }
+
+    /**
+     * Renders the User details in a Map to return a successful HTTP response for all client requests to the viewUser API.
+     * User Details include:
+     * <ul>
+     *     <li>UserID</li>
+     *     <li>Username</li>
+     *     <li>EmailID</li>
+     *     <li>MobileNo</li>
+     *     <li>Picture</li> (Optional)
+     * </ul>
+     */
+    public static ImmutableMap<String, Object> getSuccessResponseForViewUser(User user) {
+        ImmutableMap.Builder<String, Object> responseBuilder = ImmutableMap.builder();
+        responseBuilder.put("UserID", user.getUserId());
+        responseBuilder.put("Username", user.getUsername());
+        responseBuilder.put("EmailID", user.getEmailId());
+        responseBuilder.put("MobileNo", user.getMobileNumber());
+        String picture = user.getPicture();
+        if(picture != null && picture.length() > 0) {
+            responseBuilder.put("Picture", picture);
+        }
+        return responseBuilder.build();
+    }
+
+    /**
+     * Renders all Users in a Map to return a successful HTTP response for all client requests to the getUsersByMobileNumbers API.
+     */
+    public static ImmutableMap<String, ImmutableList<ImmutableMap<String, Object>>> getSuccessResponseForGetUsersByMobileNumber(ImmutableList<User> users) {
+        ImmutableList.Builder<ImmutableMap<String, Object>> responseBuilder = ImmutableList.builder();
+        for(User user: users) {
+            responseBuilder.add(getSuccessResponseForViewUser(user));
+        }
+        return ImmutableMap.of("Users", responseBuilder.build());
     }
 
     /**
@@ -60,7 +94,6 @@ public final class SuccessResponseGenerator {
         ImmutableMap<String, Object> responseBody = ImmutableMap.<String, Object> builder()
                                                             .put("ChatId", chat.getChatId())
                                                             .put("LastSentMessageId", chat.getLastSentMessageId())
-                                                            .put("CreationTs", chat.getCreationTs())
                                                             .build();
         return ImmutableMap.of("payload", responseBody);
     }
@@ -81,7 +114,12 @@ public final class SuccessResponseGenerator {
         messageForResponseBody.put("SentByCurrentUser", message.getSenderId() == userId);
         messageForResponseBody.put("SentTs", message.getSentTs());
         messageForResponseBody.put("ReceivedTs", message.getReceivedTs());
-        messageForResponseBody.put("TextContent", message.getTextContent());
+
+        String textContent = message.getTextContent();
+
+        if (textContent != null) {
+            messageForResponseBody.put("TextContent", textContent);
+        }
 
         return messageForResponseBody;
     }

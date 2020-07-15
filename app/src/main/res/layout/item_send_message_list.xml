@@ -13,7 +13,8 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="5dp">
 
     <TextView
         android:id="@+id/send_message_text"
@@ -27,6 +28,28 @@
         app:layout_constraintStart_toStartOf="parent"
         android:textSize="17sp"
         />
+        <ProgressBar
+            android:id="@+id/message_progressbar"
+            android:layout_marginStart="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/time_send_message_text"
+            android:visibility="gone"
+            style="@android:style/Widget.Material.ProgressBar"
+            android:indeterminateOnly="true"/>
+        <ImageView
+            android:layout_marginStart="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/time_send_message_text"
+            android:src="@drawable/baseline_done_white_18dp"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/time_send_message_text"

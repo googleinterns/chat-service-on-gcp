@@ -4,10 +4,12 @@ MultiUser and SignUpUser classes are derived from User class.
 MultiUser and SignUpUser classes override User's simulate method,
 that sends requests and returns a list of tuple (response object, current_total_qps).
 """
-from datetime import datetime
-import apis
 import random
-import time
+from datetime import datetime
+
+import requests
+
+import apis
 
 
 def get_random_username():
@@ -43,15 +45,17 @@ class MultiUser(User):
     and sends requests of following type:
         1. login
         2. viewUser
-        3. listChats
-        4. listMessages
-        5. createChat
-        6. createMessage
+        3. getUsersByMobileNumber
+        4. listChats
+        5. listMessages
+        6. createChat
+        7. createMessage
     Class Variables:
         1. distribution: probability distribution of each type of request.
         2. user_details: pandas data-frame containing details
                         like UserID, Username, Password etc of all the users.
         3. chat_details: pandas data-frame containing UserIDs and ChatID for all users.
+        4. api_names: list of all API names that the simulate method sends requests for.
     Attributes:
         1. user_id: UserID of the user.
         2. username: Username of the user.
@@ -61,6 +65,8 @@ class MultiUser(User):
     distribution = []
     user_details = None
     chat_details = None
+    api_names = ["login", "viewUser", "getUsersByMobileNumber", "listChats", "listMessages",
+                 "createChat", "createMessage"]
 
     def __init__(self, user_id, username, password, chat_id_list):
         super().__init__()
@@ -76,27 +82,29 @@ class MultiUser(User):
         Stores the response and current total qps.
         Waits for interval number of seconds.
         Repeats the above steps until end_time.
-        Returns a list of tuple (response object, current_total_qps).
+        Returns a list of tuple (api_name, response object, current_total_qps).
         """
+        session = requests.Session()
         response_list = []
         while datetime.now() < User.end_time:
-            api_number = random.choices(range(1, 7), MultiUser.distribution)[0]
+            api_number = random.choices(range(1, 8), MultiUser.distribution)[0]
             if api_number == 1:
-                response = apis.login_request(self.username, self.password)
+                response = apis.login_request(session, self.username, self.password)
             elif api_number == 2:
-                response = apis.view_user_request(get_random_username())
+                response = apis.view_user_request(session, get_random_username())
             elif api_number == 3:
-                response = apis.list_chats_request(self.user_id)
+                response = apis.get_users_by_mobile_number_request(session, self.user_id)
             elif api_number == 4:
-                index = random.randint(0, 1)
-                response = apis.list_messages_request(self.user_id, self.chat_id_list[index])
+                response = apis.list_chats_request(session, self.user_id)
             elif api_number == 5:
-                response = apis.create_chat_request(self.user_id, get_random_username())
+                index = random.randint(0, 1)
+                response = apis.list_messages_request(session, self.user_id, self.chat_id_list[index])
+            elif api_number == 6:
+                response = apis.create_chat_request(session, self.user_id, get_random_username())
             else:
                 index = random.randint(0, 1)
-                response = apis.create_message_request(self.user_id, self.chat_id_list[index])
-            response_list.append((response, User.total_qps))
-            time.sleep(User.interval)
+                response = apis.create_message_request(session, self.user_id, self.chat_id_list[index])
+            response_list.append((MultiUser.api_names[api_number - 1], response, User.total_qps))
         return response_list
 
 
@@ -106,10 +114,10 @@ class SignupUser(User):
         """
         Sends signup request and waits for interval number of seconds.
         Repeats until end_time.
-        Returns a list of tuple (response object, current_total_qps).
+        Returns a list of tuple (api_name, response object, current_total_qps).
         """
+        session = requests.Session()
         response_list = []
         while datetime.now() < User.end_time:
-            response_list.append((apis.signup_request(), User.total_qps))
-            time.sleep(User.interval)
+            response_list.append(("signup", apis.signup_request(session), User.total_qps))
         return response_list

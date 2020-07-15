@@ -15,10 +15,11 @@ file_names = config['File Names']
 INPUT_FILE_NAME = file_names['WRITE_OUTPUT']
 OUTPUT_FILE_NAME = file_names['PROCESS_OUTPUT']
 
-CSV_COLUMN_NAMES = ["API Name", "Total QPS", "login QPS", "viewUser QPS", "listChats QPS", "listMessages QPS",
-                    "createChat QPS", "createMessage QPS", "signup QPS", "50th Percentile Latency",
+CSV_COLUMN_NAMES = ["API Name", "Total QPS", "login QPS", "viewUser QPS", "getUsersByMobileNumber QPS", "listChats QPS",
+                    "listMessages QPS", "createChat QPS", "createMessage QPS", "signup QPS", "50th Percentile Latency",
                     "95th Percentile Latency", "99th Percentile Latency"]
-API_NAMES = ["login", "viewUser", "listChats", "listMessages", "createChat", "createMessage", "signup"]
+API_NAMES = ["login", "viewUser", "getUsersByMobileNumber", "listChats", "listMessages", "createChat", "createMessage",
+             "signup"]
 
 
 def compute_latencies(df, api_name):
@@ -30,10 +31,11 @@ def compute_latencies(df, api_name):
         latency95 = 0
         latency99 = 0
     else:
-        df.sort_values(by=['ResponseTime'])
-        latency50 = df['ResponseTime'][max(round(total_count * 0.5) - 1, 0)]
-        latency95 = df['ResponseTime'][round(total_count * 0.95) - 1]
-        latency99 = df['ResponseTime'][round(total_count * 0.99) - 1]
+        sorted_df = df.sort_values(by=['ResponseTime'])
+        sorted_df.reset_index(drop=True, inplace=True)
+        latency50 = sorted_df['ResponseTime'][max(round(total_count * 0.5) - 1, 0)]
+        latency95 = sorted_df['ResponseTime'][round(total_count * 0.95) - 1]
+        latency99 = sorted_df['ResponseTime'][round(total_count * 0.99) - 1]
     latency_values['50th Percentile Latency'] = latency50
     latency_values['95th Percentile Latency'] = latency95
     latency_values['99th Percentile Latency'] = latency99
@@ -50,6 +52,7 @@ writer.writeheader()
 
 for total_qps in unique_total_qps_values:
     data_for_total_qps = input_data[input_data['Total QPS'] == total_qps]
+    data_for_total_qps.reset_index(drop=True, inplace=True)
     qps_values = dict()
     qps_values['Total QPS'] = total_qps
     for api in API_NAMES:

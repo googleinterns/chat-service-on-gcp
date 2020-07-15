@@ -16,3 +16,7 @@ def alpha_numeric_variable_length(min_length, max_length):
 
 def numeric_fixed_length(length):
     return ''.join(random.choices(string.digits, k=length))
+
+
+def numeric_variable_length(min_length, max_length):
+    return numeric_fixed_length(random.randint(min_length, max_length))

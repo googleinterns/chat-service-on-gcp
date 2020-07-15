@@ -11,19 +11,16 @@ import dbaccessor.message.MessageAccessor;
 import helper.SuccessResponseGenerator;
 import exceptions.UserIdDoesNotExistException;
 import exceptions.UserIdMissingFromRequestURLPathException;
+import java.util.*;
+import javax.servlet.http.HttpServletRequest;
 
-import java.util.Map;
-import java.util.List;
-import java.util.Comparator;
-import java.util.Collections;
-import javax.servlet.http.HttpServletRequest;  
+import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Column;
 import com.google.cloud.Timestamp;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.NotMapped;
 
@@ -116,7 +113,7 @@ public final class ListChats {
         public void setUsername(String username) {
             this.username = username;
         }
-
+      
         public void setMobileNo(String mobileNo) {
             this.mobileNo = mobileNo;
         }
@@ -162,6 +159,7 @@ public final class ListChats {
      * <li> Username (of the other user) </li>
      * <li> MobileNo (if any, of the other user) </li>
      * <li> LastSentMessageId </li>
+     * <li> Mobile Number (of the other user) (Optional) </li>
      * </ol>
      */
     ImmutableMap<String, Object> getChatInfoOfChatInMap(AllInfoForListChats infoObject) {
@@ -218,9 +216,9 @@ public final class ListChats {
                 infoObject.setLastSentTime(infoObject.getChatCreationTs());
             }
         }
-
+      
         Collections.sort(allInfoForListChats, Comparator.comparing(ListChats.AllInfoForListChats::getLastSentTime).reversed());
-
+      
         //Stores list of all details of each Chat of the User.
         ImmutableList.Builder<ImmutableMap<String, Object>> chatInfoOfChatsOfUserBuilder = ImmutableList.builder();
 

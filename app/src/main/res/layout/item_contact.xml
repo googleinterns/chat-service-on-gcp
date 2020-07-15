@@ -53,7 +53,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/view_contact_message"
+                android:id="@+id/view_contact_phone_num"
                 style="@style/autoscroll"
                 android:layout_width="200sp"
                 android:layout_height="wrap_content"

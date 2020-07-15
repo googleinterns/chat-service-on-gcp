@@ -19,18 +19,10 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,16 +32,24 @@ import static com.gpayinterns.chat.ServerConstants.LOGIN;
 import static com.gpayinterns.chat.ServerConstants.USER_PASSWORD;
 import static com.gpayinterns.chat.ServerConstants.USER_USERNAME;
 
-
+/**
+ * LoginActivity gets launched when the user starts the application.
+ * Major functions performed by it are:
+ * 1. Check if the last user was already signed in, if yes then move to ViewContacts.
+ * 2. Let the user signIn by verifying the credentials provided.
+ */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
 {
     private EditText usernameEditText;
     private EditText passwordEditText;
     private String currentUser;
-    private GoogleSignInClient mGoogleSignInClient;
-    private static final int RC_GOOGLE_SIGN_IN = 9001;
-    private static final String TAG = "SignInActivity";
-    private static final String EMAIL = "email";
+
+    /**
+     * active variable is used to check whether the LoginActivity is active or not.
+     * It's necessary as the Asynchronous login requests might try to
+     * update the view when the activity is no longer active, causing the application to crash
+     */
+    private boolean active;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -62,56 +62,39 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         catch (NullPointerException ignored)
         {
+            /*
+            A NullPointerException will occur
+            when there won't be any SupportActionBar present hence no need to hide it
+            */
         }
 
         setContentView(R.layout.activity_login);
-
-
+        getCurrentUser();
         //Views
         usernameEditText = findViewById(R.id.input_email_id);
         passwordEditText = findViewById(R.id.input_password);
         //Buttons
         findViewById(R.id.login_button).setOnClickListener(this);
-        findViewById(R.id.google_sign_in_button).setOnClickListener(this);
         findViewById(R.id.new_user_register).setOnClickListener(this);
         findViewById(R.id.forgot_password).setOnClickListener(this);
-
-        googleLogin();
     }
-
-    private void googleLogin()
-    {
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        SignInButton signInButton = findViewById(R.id.google_sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setColorScheme(SignInButton.COLOR_LIGHT);
-    }
-
 
     private void getCurrentUser()
     {
         SharedPreferences mPrefs = getSharedPreferences("CHAT_LOGGED_IN_USER", 0);
         currentUser = mPrefs.getString("currentUser","");
+        assert currentUser != null;
         if (!currentUser.equals(""))
         {
+            //autoLogin
             startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));
         }
     }
 
     @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-    }
-
-    @Override
     protected void onResume()
     {
-        getCurrentUser();
+        active = true;
         super.onResume();
     }
 
@@ -161,16 +144,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     e.printStackTrace();
                 }
                 break;
-            case R.id.google_sign_in_button:
-                signInWithGoogle();
-                break;
         }
-    }
-
-    private void signInWithGoogle()
-    {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
     }
 
     private void shakeLoginButton()
@@ -195,7 +169,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPreferences.Editor mEditor = mPrefs.edit();
         mEditor.putString("currentUser", currentUser).apply();
     }
-    
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        active = false;
+    }
+
     private void authenticateFromServer() throws JSONException
     {
         String userName = usernameEditText.getText().toString();
@@ -217,12 +198,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         try
                         {
                             String message = response.getString("message");
-                            if(message.equals("Success"))
+                            if(message.equals("Success") && active)
                             {
                                 currentUser = response.getString("UserId");
                                 setCurrentUser();
                                 Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(LoginActivity.this,ViewContactsActivity.class));
+                                startActivity(new Intent(LoginActivity.this, ViewContactsActivity.class));
                             }
                         }
                         catch (JSONException e)
@@ -244,21 +225,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         }
                         else if(error instanceof ClientError)
                         {
-                            String responseBody = null;
-                            responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                            JSONObject data = null;
-                            try
-                            {
-                                data = new JSONObject(responseBody);
-                            }
-                            catch (JSONException e)
-                            {
-                                e.printStackTrace();
-                            }
-
-                            assert data != null;
-                            String message = data.optString("message");
-
                             shakeLoginButton();
                             Toast.makeText(getBaseContext(), "Invalid Credentials", Toast.LENGTH_SHORT).show();
                             usernameEditText.setText("");
@@ -283,6 +249,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     {
         if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis())
         {
+            //exit the application
             Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -293,46 +260,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         {
             Toast.makeText(getBaseContext(), "Tap back once again to exit the application", Toast.LENGTH_SHORT).show();
         }
-
         mBackPressed = System.currentTimeMillis();
-
-    }
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null)
-        {
-
-            //TODO login after sending tokenID to the backend server.
-            String Email = account.getDisplayName();
-            Log.d("userEmail: ",Email);
-        }
-    }
-
-    @Override
-    public void onActivityResult ( int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_GOOGLE_SIGN_IN)
-        {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-
-    private void handleSignInResult (Task < GoogleSignInAccount > completedTask)
-    {
-        try
-        {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            Log.d("LoginActivity", "Signed In with Google");
-        }
-        catch (ApiException e)
-        {
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-        }
     }
 }
