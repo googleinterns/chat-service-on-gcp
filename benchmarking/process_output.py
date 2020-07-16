@@ -22,7 +22,56 @@ API_NAMES = ["login", "viewUser", "getUsersByMobileNumber", "listChats", "listMe
              "signup"]
 
 
+class ProcessOutput:
+    """
+    A class for processing the response times output file to compute following latencies:
+        1. 50th percentile latency
+        2. 95th percentile latency
+        3. 99th percentile latency
+    It computes the above latencies for all APIs for different qps and stores the final output to a CSV file.
+
+    Attributes:
+        unique_total_qps_values: list of total qps values at which the latencies should be computed.
+    """
+    def __init__(self, all_qps):
+        self.unique_total_qps_values = all_qps
+
+    def process_output(self):
+        input_data = pd.read_csv(INPUT_FILE_NAME)
+        api_wise_input_data = [(input_data[input_data['API Name'] == api_name], api_name) for api_name in API_NAMES]
+
+        csv_file = open(OUTPUT_FILE_NAME, 'w')
+        writer = csv.DictWriter(csv_file, fieldnames=CSV_COLUMN_NAMES)
+        writer.writeheader()
+
+        for total_qps in self.unique_total_qps_values:
+            data_for_total_qps = input_data[input_data['Total QPS'] == total_qps]
+            data_for_total_qps.reset_index(drop=True, inplace=True)
+            qps_values = dict()
+            qps_values['Total QPS'] = total_qps
+            for api in API_NAMES:
+                column_name = api + " QPS"
+                qps_values[column_name] = data_for_total_qps[column_name][0]
+            for data, api_name in api_wise_input_data:
+                api_wise_data_for_total_qps = data[data['Total QPS'] == total_qps]
+                writer.writerow({**qps_values, **compute_latencies(api_wise_data_for_total_qps, api_name)})
+
+        csv_file.close()
+
+
 def compute_latencies(df, api_name):
+    """
+    Computes 50th, 95th and 99th percentile latencies for a given API
+    using the given response times for a fixed total qps value.
+
+    :param df: response times for an API for a fixed total qps value
+    :param api_name: API name for which the response times are given
+    :return: a dictionary with following keys:
+                1. API Name
+                2. 50th Percentile Latency
+                3. 95th Percentile Latency
+                4. 99th Percentile Latency
+    """
     latency_values = dict()
     latency_values['API Name'] = api_name
     total_count = len(df.index)
@@ -40,26 +89,3 @@ def compute_latencies(df, api_name):
     latency_values['95th Percentile Latency'] = latency95
     latency_values['99th Percentile Latency'] = latency99
     return latency_values
-
-
-input_data = pd.read_csv(INPUT_FILE_NAME)
-api_wise_input_data = [(input_data[input_data['API Name'] == api_name], api_name) for api_name in API_NAMES]
-unique_total_qps_values = input_data['Total QPS'].unique().tolist()
-
-csv_file = open(OUTPUT_FILE_NAME, 'w')
-writer = csv.DictWriter(csv_file, fieldnames=CSV_COLUMN_NAMES)
-writer.writeheader()
-
-for total_qps in unique_total_qps_values:
-    data_for_total_qps = input_data[input_data['Total QPS'] == total_qps]
-    data_for_total_qps.reset_index(drop=True, inplace=True)
-    qps_values = dict()
-    qps_values['Total QPS'] = total_qps
-    for api in API_NAMES:
-        column_name = api + " QPS"
-        qps_values[column_name] = data_for_total_qps[column_name][0]
-    for data, api_name in api_wise_input_data:
-        api_wise_data_for_total_qps = data[data['Total QPS'] == total_qps]
-        writer.writerow({**qps_values, **compute_latencies(api_wise_data_for_total_qps, api_name)})
-
-csv_file.close()
