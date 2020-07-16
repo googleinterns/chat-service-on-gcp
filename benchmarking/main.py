@@ -84,7 +84,7 @@ def warm_up():
     load_test_warm_up = LoadTest(
         int(load_test_constants['WARM_UP_MIN_QPS']),
         int(load_test_constants['WARM_UP_MAX_QPS']),
-        int(load_test_constants['WARM_UP_DURATION']),
+        int(load_test_constants['WARM_UP_DURATION_MINUTES']),
         process_input.get_all_api_weights())
     load_test_warm_up.run()
 
